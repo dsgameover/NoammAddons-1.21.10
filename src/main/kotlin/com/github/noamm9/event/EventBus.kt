@@ -2,6 +2,8 @@
 
 package com.github.noamm9.event
 
+import com.github.noamm9.NoammAddons
+import com.github.noamm9.utils.ChatUtils
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArraySet
 
@@ -10,7 +12,14 @@ object EventBus {
 
     @JvmStatic
     fun post(event: Event): Boolean {
-        listeners[event.javaClass]?.forEach { it.listener.invoke(EventContext(event)) }
+        listeners[event.javaClass]?.forEach {
+            runCatching {
+                it.listener.invoke(EventContext(event))
+            }.onFailure { exception ->
+                NoammAddons.logger.error("EventBus", exception)
+                ChatUtils.modMessage("§c§lError in event: ${event.javaClass.name}. Error: ${exception.message}")
+            }
+        }
         return if (event.cancelable) event.isCanceled else false
     }
 

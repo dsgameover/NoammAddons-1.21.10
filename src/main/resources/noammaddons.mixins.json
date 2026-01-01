@@ -3,7 +3,10 @@
   "package": "com.github.noamm9.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ExampleMixin"
+    "ExampleMixin",
+    "MixinConnection",
+    "MixinEntityGlow",
+    "MixinPacketProcessorListener"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -12,6 +15,5 @@
     "requireAnnotations": true
   },
   "client": [
-    "MixinLevelRenderer"
   ]
 }
