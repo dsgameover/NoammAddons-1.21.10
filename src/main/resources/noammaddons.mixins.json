@@ -5,7 +5,7 @@
   "mixins": [
     "ExampleMixin",
     "MixinConnection",
-    "MixinEntityGlow",
+    "MixinEntity",
     "MixinPacketProcessorListener"
   ],
   "injectors": {
@@ -15,5 +15,8 @@
     "requireAnnotations": true
   },
   "client": [
+    "AccessorPlayerTabOverlay",
+    "MixinEntityRenderDispatcher",
+    "MixinGui"
   ]
 }

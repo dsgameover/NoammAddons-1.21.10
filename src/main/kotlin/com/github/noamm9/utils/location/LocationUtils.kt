@@ -1,14 +1,20 @@
-package com.github.noamm9.utils
+package com.github.noamm9.utils.location
 
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.NoammAddons.mc
-import com.github.noamm9.event.EventBus.register
+import com.github.noamm9.event.EventBus
+import com.github.noamm9.event.EventDispatcher
+import com.github.noamm9.event.impl.DungeonEvent
 import com.github.noamm9.event.impl.MainThreadPacketRecivedEvent
 import com.github.noamm9.event.impl.ServerEvent
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
+import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.removeFormatting
+import com.github.noamm9.utils.MathUtils
 import com.github.noamm9.utils.Utils.remove
 import com.github.noamm9.utils.Utils.startsWithOneOf
+import com.github.noamm9.utils.dungeons.DungeonListener
 import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
@@ -17,7 +23,7 @@ import kotlin.jvm.optionals.getOrNull
 
 object LocationUtils {
     @JvmStatic
-    val onHypixel get() =  mc.player?.connection?.serverBrand()?.lowercase()?.contains("hypixel") == true
+    val onHypixel get() = mc.player?.connection?.serverBrand()?.lowercase()?.contains("hypixel") == true
 
     @JvmField
     var inSkyblock = false
@@ -46,69 +52,44 @@ object LocationUtils {
     @JvmField
     var F7Phase: Int? = null
 
-    enum class WorldType(val tabName: String) {
-        DungeonHub("Dungeon Hub"),
-        Catacombs("Catacombs"),
-        Home("Private Island"),
-        Hub("Hub"),
-        Park("The Park"),
-        SpiderDen("Spider"),
-        End("The End"),
-        CrimonIsle("Crimson Isle"),
-        GoldMine("Gold Mine"),
-        DeepCaverns("Deep Caverns"),
-        DwarvenMines("Dwarven Mines"),
-        CrystalHollows("Crystal Hollows"),
-        TheBarn("The Farming Islands"),
-        BackwaterBayou("Backwater Bayou"),
-        Garden("Garden");
-    }
-
-
-
-    fun init() {
-        register<MainThreadPacketRecivedEvent.Post> {
+    init {
+        EventBus.register<MainThreadPacketRecivedEvent.Post> {
             // if (DevOptions.devMode) return setDevModeValues()
-            if (! onHypixel) return@register
+            if (!onHypixel) return@register
 
             if (event.packet is ClientboundPlayerInfoUpdatePacket) {
                 val actions = event.packet.actions()
-                if (actions.contains(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME) || actions.contains(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER)){
-                    val area = event.packet.entries().find { it.displayName()?.string?.removeFormatting()?.startsWithOneOf("Area: ", "Dungeon: ") == true }?.displayName?.string?.removeFormatting() ?: return@register
+                if (actions.contains(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME) || actions.contains(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER)) {
+                    val area = event.packet.entries().find { it.displayName()?.string?.startsWithOneOf("Area: ", "Dungeon: ") == true }?.displayName?.string ?: return@register
                     world = WorldType.entries.firstOrNull { area.remove("Area: ", "Dungeon: ") == it.tabName }
-                    ChatUtils.modMessage(area)
                 }
-            }
-            else if (event.packet is ClientboundSetPlayerTeamPacket) {
+            } else if (event.packet is ClientboundSetPlayerTeamPacket) {
                 val prams = event.packet.parameters.getOrNull() ?: return@register
-                val text = (prams.playerPrefix.string + prams.playerSuffix.string).removeFormatting()
+                val text = prams.playerPrefix.string + prams.playerSuffix.string
 
-                if (! inDungeon && text.contains("The Catacombs (") && ! text.contains("Queue")) {
+                if (!inDungeon && text.contains("The Catacombs (") && !text.contains("Queue")) {
                     inDungeon = true
                     dungeonFloor = text.substringAfter("(").substringBefore(")")
                     dungeonFloorNumber = dungeonFloor?.lastOrNull()?.digitToIntOrNull() ?: 0
                 }
-            }
-            else if (event.packet is ClientboundSetObjectivePacket) {
-                if (! inSkyblock) inSkyblock = onHypixel && event.packet.objectiveName == "SBScoreboard"
+            } else if (event.packet is ClientboundSetObjectivePacket) {
+                if (!inSkyblock) inSkyblock = onHypixel && event.packet.objectiveName == "SBScoreboard"
             }
         }
 
-        register<TickEvent.Server> {
-            inBoss = isInBossRoom()
-            /*
-        if (inBoss) {
-            if (DungeonUtils.bossEntryTime == null) {
-                EventDispatcher.postAndCatch(DungeonEvent.BossEnterEvent())
-                DungeonUtils.bossEntryTime = RunSplits.currentTime
-        }
-            }*/
+        EventBus.register<TickEvent.Server> {
+            inBoss = isInBossRoom().also {
+                if (it && DungeonListener.bossEntryTime == null) {
+                    DungeonListener.bossEntryTime = DungeonListener.currentTime
+                    EventBus.post(DungeonEvent.BossEnterEvent())
+                }
+            }
             F7Phase = getPhase()
             P3Section = findP3Section()
         }
 
-        register<WorldChangeEvent> { reset() }
-        register<ServerEvent.Disconnect> { reset() }
+        EventBus.register<WorldChangeEvent> { reset() }
+        EventBus.register<ServerEvent.Disconnect> { reset() }
     }
 
     private fun reset() {
@@ -134,7 +115,7 @@ object LocationUtils {
 
     private fun getPhase(): Int? {
         if (dungeonFloorNumber != 7 || ! inBoss) return null
-        val playerPosition = mc.player?.y ?: return null
+        val playerPosition = NoammAddons.mc.player?.y ?: return null
 
         return when {
             playerPosition > 210 -> 1
@@ -148,13 +129,13 @@ object LocationUtils {
     private val P3Sections = arrayOf(
         Pair(BlockPos(90, 158, 123), BlockPos(111, 105, 32)),  //  1
         Pair(BlockPos(16, 158, 122), BlockPos(111, 105, 143)), //  2
-        Pair(BlockPos(19, 158, 48), BlockPos(- 3, 106, 142)),  //  3
-        Pair(BlockPos(91, 158, 50), BlockPos(- 3, 106, 30))    //  4
+        Pair(BlockPos(19, 158, 48), BlockPos(-3, 106, 142)),  //  3
+        Pair(BlockPos(91, 158, 50), BlockPos(-3, 106, 30))    //  4
     )
 
     private fun findP3Section(): Int? {
         if (F7Phase != 3) return null
-        val playerPos = mc.player?.position() ?: return null
+        val playerPos = NoammAddons.mc.player?.position() ?: return null
 
         P3Sections.forEachIndexed { i, (a, b) ->
             if (MathUtils.isCoordinateInsideBox(playerPos, a, b)) {
@@ -166,17 +147,17 @@ object LocationUtils {
     }
 
     private val bossRoomCorners = mapOf(
-        7 to Pair(BlockPos(- 8, 0, - 8), BlockPos(134, 254, 147)),
-        6 to Pair(BlockPos(- 40, 51, - 8), BlockPos(22, 110, 134)),
-        5 to Pair(BlockPos(- 40, 112, - 8), BlockPos(50, 53, 118)),
-        4 to Pair(BlockPos(- 40, 112, - 40), BlockPos(50, 53, 47)),
-        3 to Pair(BlockPos(- 40, 118, - 40), BlockPos(42, 64, 31)),
-        2 to Pair(BlockPos(- 40, 99, - 40), BlockPos(24, 54, 59)),
-        1 to Pair(BlockPos(- 14, 55, 49), BlockPos(- 72, 146, - 40))
+        7 to Pair(BlockPos(-8, 0, -8), BlockPos(134, 254, 147)),
+        6 to Pair(BlockPos(-40, 51, -8), BlockPos(22, 110, 134)),
+        5 to Pair(BlockPos(-40, 112, -8), BlockPos(50, 53, 118)),
+        4 to Pair(BlockPos(-40, 112, -40), BlockPos(50, 53, 47)),
+        3 to Pair(BlockPos(-40, 118, -40), BlockPos(42, 64, 31)),
+        2 to Pair(BlockPos(-40, 99, -40), BlockPos(24, 54, 59)),
+        1 to Pair(BlockPos(-14, 55, 49), BlockPos(-72, 146, -40))
     )
 
     private fun isInBossRoom(): Boolean {
-        val playerPos = mc.player?.position() ?: return false
+        val playerPos = NoammAddons.mc.player?.position() ?: return false
         val floor = dungeonFloorNumber ?: return false
         val corners = bossRoomCorners[floor] ?: return false
         return MathUtils.isCoordinateInsideBox(playerPos, corners.first, corners.second)

@@ -1,19 +1,29 @@
 package com.github.noamm9.ui.clickgui
 
 import com.github.noamm9.features.FeatureManager
+import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.utils.Animation
+import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.render.Render2D
-import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 
 class Panel(val category: CategoryType, var x: Int, var y: Int) {
     private val features = FeatureManager.getFeaturesByCategory(category)
 
-    private val width = 100
-    private val headerHeight = 18
+    private val openAnim = Animation(150)
+    var collapsed = false
+
+    private val width = 110
+    private val headerHeight = 22
+    private val buttonHeight = 16
     private var dragging = false
     private var dragX = 0
     private var dragY = 0
+
+    private val headerBg = Color(20, 20, 20, 230)
+    private val bodyBg = Color(15, 15, 15, 180)
+    private val hoverColor = Color(255, 255, 255, 30)
 
     fun render(context: GuiGraphics, mouseX: Int, mouseY: Int) {
         if (dragging) {
@@ -21,45 +31,89 @@ class Panel(val category: CategoryType, var x: Int, var y: Int) {
             y = mouseY - dragY
         }
 
-        Render2D.drawRect(context, x, y, width, headerHeight, Color(40, 40, 45, 255))
-        Render2D.drawString(context, category.name, x + width / 2 - category.name.width() / 2, y + 5)
-
-        var currentY = y + headerHeight
-
-        features.forEach { feature ->
-            val isHovered = mouseX >= x && mouseX <= x + width && mouseY >= currentY && mouseY <= currentY + 14
-
-            val bgColor = when {
-                feature.enabled -> if (isHovered) Color(0, 150, 255) else Color(0, 120, 255)
-                isHovered -> Color(60, 60, 65)
-                else -> Color(40, 40, 45, 255)
-            }
-
-            Render2D.drawRect(context, x, currentY, width, 14, bgColor)
-            Render2D.drawString(context, feature.name, x + width / 2 - feature.name.width() / 2, currentY + 3)
-
-            currentY += 14
+        val filteredFeatures = features.filter {
+            it.name.contains(ClickGuiScreen.searchQuery, ignoreCase = true)
         }
 
-        Render2D.drawRect(context, x, currentY, width, 2, Color(40, 40, 45))
+        if (filteredFeatures.isEmpty() && ClickGuiScreen.searchQuery.isNotEmpty()) return
+
+        openAnim.update(if (collapsed) 0f else 1f)
+
+        Render2D.drawRect(context, x, y, width, headerHeight, headerBg)
+        Render2D.drawRect(context, x, y, width, 2, Style.accentColor)
+
+        val icon = if (collapsed) "+" else "-"
+        Render2D.drawString(context, icon, x + width - 12, y + 7, Color.GRAY)
+
+        Render2D.drawCenteredString(context, "§l${category.name}", x + width / 2, y + 7)
+
+        if (openAnim.value > 0.01f) {
+            var currentY = y + headerHeight
+
+            val scissorHeight = (filteredFeatures.size * buttonHeight * openAnim.value).toInt()
+            context.enableScissor(x, y + headerHeight, x + width, y + headerHeight + scissorHeight)
+
+            filteredFeatures.forEach { feature ->
+                val isHovered = mouseX >= x && mouseX <= x + width && mouseY >= currentY && mouseY <= currentY + buttonHeight
+
+                Render2D.drawRect(context, x, currentY, width, buttonHeight, bodyBg)
+
+                if (feature.enabled) {
+                    Render2D.drawRect(context, x, currentY, width, buttonHeight, Style.accentColor.withAlpha(100))
+                    Render2D.drawRect(context, x, currentY, 2, buttonHeight, Style.accentColor)
+                }
+
+                if (isHovered) {
+                    Render2D.drawRect(context, x, currentY, width, buttonHeight, hoverColor)
+                }
+
+                Render2D.drawCenteredString(context, feature.name, x + width / 2, currentY + 4)
+
+                if (isHovered && ClickGuiScreen.selectedFeature == null) {
+                    TooltipManager.hover(feature.description, mouseX, mouseY)
+                }
+
+                currentY += buttonHeight
+            }
+            context.disableScissor()
+        }
+    }
+
+    fun isMouseOverHeader(mx: Double, my: Double): Boolean {
+        return mx >= x && mx <= x + width && my >= y && my <= y + headerHeight
     }
 
     fun mouseClicked(mouseX: Double, mouseY: Double, button: Int) {
-        if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + headerHeight) {
+        if (ClickGuiScreen.selectedFeature != null) return
+
+        if (isMouseOverHeader(mouseX, mouseY)) {
             if (button == 0) {
                 dragging = true
                 dragX = (mouseX - x).toInt()
                 dragY = (mouseY - y).toInt()
             }
+            else if (button == 1) {
+                collapsed = ! collapsed
+                Style.playClickSound(if (collapsed) 0.8f else 1.1f)
+            }
+            return
         }
 
+        if (collapsed) return
+
         var currentY = y + headerHeight
-        FeatureManager.getFeaturesByCategory(category).forEach { feature ->
-            if (mouseX >= x && mouseX <= x + width && mouseY >= currentY && mouseY <= currentY + 14) {
-                if (button == 0) feature.toggle() // Left click to toggle
-                // if (button == 1) feature.expanded = !feature.expanded // Right click for settings
+        val filteredFeatures = features.filter { it.name.contains(ClickGuiScreen.searchQuery, ignoreCase = true) }
+
+        filteredFeatures.forEach { feature ->
+            if (mouseX >= x && mouseX <= x + width && mouseY >= currentY && mouseY <= currentY + buttonHeight) {
+                if (button == 0) {
+                    feature.toggle()
+                }
+                else if (button == 1) {
+                    ClickGuiScreen.selectFeature(feature)
+                }
             }
-            currentY += 14
+            currentY += buttonHeight
         }
     }
 

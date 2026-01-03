@@ -1,46 +1,237 @@
 package com.github.noamm9.ui.clickgui
 
 import com.github.noamm9.config.Config
+import com.github.noamm9.features.Feature
+import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.utils.Animation
+import com.github.noamm9.ui.utils.Resolution
+import com.github.noamm9.utils.ColorUtils.withAlpha
+import com.github.noamm9.utils.render.Render2D
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.input.CharacterEvent
+import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
+import java.awt.Color
 
 
 object ClickGuiScreen: Screen(Component.literal("ClickGUI")) {
     private val panels = mutableListOf<Panel>()
+    var searchQuery = ""
+    private var isSearchFocused = true
+
+    var selectedFeature: Feature? = null
+
+    private var scrollTarget = 0f
+    private val scrollAnim = Animation(200L)
 
     init {
         CategoryType.entries.forEachIndexed { index, category ->
-            panels.add(Panel(category, 20 + (index * 110), 20))
+            panels.add(Panel(category, 20 + (index * 120), 20))
         }
     }
 
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
-        panels.forEach { it.render(context, mouseX, mouseY) }
-        super.render(context, mouseX, mouseY, delta)
+        Resolution.refresh()
+        Resolution.apply(context)
+
+        val mX = Resolution.getMouseX(mouseX)
+        val mY = Resolution.getMouseY(mouseY)
+
+        TooltipManager.reset()
+
+        context.fillGradient(0, 0, Resolution.width.toInt(), Resolution.height.toInt(), Color(0, 0, 0, 100).rgb, Color(0, 0, 0, 150).rgb)
+
+        panels.forEach { it.render(context, mX, mY) }
+        drawSearchBar(context)
+
+        selectedFeature?.let { feature ->
+            drawSettingsMenu(context, feature, mX, mY)
+        }
+
+        TooltipManager.draw(context, Resolution.width, Resolution.height)
+        Resolution.restore(context)
+    }
+
+    private fun drawSettingsMenu(context: GuiGraphics, feature: Feature, mx: Int, my: Int) {
+        val x = (Resolution.width / 2) - 100
+        val y = (Resolution.height / 2) - 125
+        val menuWidth = 200
+        val menuHeight = 250
+
+        Render2D.drawRect(context, x, y, menuWidth.toFloat(), menuHeight.toFloat(), Color(20, 20, 20, 240))
+        Render2D.drawRect(context, x, y, menuWidth.toFloat(), 2f, Style.accentColor)
+        Render2D.drawCenteredString(context, "§l${feature.name}", Resolution.width / 2, y + 10)
+        Render2D.drawRect(context, x + 10, y + 28, 180f, 1f, Color(255, 255, 255, 30))
+
+        val visibleSettings = feature.configSettings.filter { it.isVisible }
+
+        val totalContentHeight = visibleSettings.sumOf { it.height + 5 }.toFloat()
+        val viewportHeight = 195f
+        val maxScroll = if (totalContentHeight > viewportHeight) totalContentHeight - viewportHeight else 0f
+
+        context.enableScissor(x.toInt(), (y + 30).toInt(), (x + menuWidth).toInt(), (y + 30 + 195).toInt())
+
+        scrollAnim.update(scrollTarget)
+        var sY = y + 40 + scrollAnim.value
+
+        visibleSettings.forEach { setting ->
+            setting.x = (Resolution.width / 2).toInt() - 90
+            setting.y = sY.toInt()
+            setting.width = 180
+
+            setting.draw(context, mx, my)
+            
+            val isHovered = mx >= setting.x && mx <= setting.x + setting.width &&
+                my >= setting.y && my <= setting.y + setting.height &&
+                my > y + 30 && my < y + 225
+
+            if (isHovered) TooltipManager.hover(setting.description, mx, my)
+
+            sY += setting.height + 5
+        }
+        context.disableScissor()
+
+        if (maxScroll > 0) {
+            val barWidth = 2f
+            val barX = x + menuWidth - barWidth - 2f
+            val barY = y + 32f
+            val barHeight = viewportHeight - 4f
+
+            Render2D.drawRect(context, barX, barY, barWidth, barHeight, Color(255, 255, 255, 15))
+
+            val thumbHeight = (viewportHeight / totalContentHeight) * barHeight
+            val thumbY = barY + (- scrollAnim.value / totalContentHeight) * barHeight
+
+            Render2D.drawRect(context, barX, thumbY, barWidth, thumbHeight, Style.accentColor.withAlpha(160))
+        }
+
+        if (scrollTarget > 0) scrollTarget = 0f
+        if (scrollTarget < - maxScroll) scrollTarget = - maxScroll
+
+        Render2D.drawCenteredString(context, "§7Click outside to close", Resolution.width / 2, y + 235)
+    }
+
+    private fun drawSearchBar(context: GuiGraphics) {
+        val x = (Resolution.width / 2) - 75
+        val y = Resolution.height - 40
+        Render2D.drawRect(context, x, y, 150f, 22f, Color(15, 15, 15, 200))
+        val borderColor = if (isSearchFocused) Style.accentColor else Color(255, 255, 255, 30)
+        Render2D.drawRect(context, x, y + 20, 150f, 2f, borderColor)
+
+        if (searchQuery.isEmpty()) Render2D.drawCenteredString(context, "§8Search...", Resolution.width / 2, y + 7, Color.GRAY, shadow = false)
+        else Render2D.drawCenteredString(context, "§f$searchQuery", Resolution.width / 2, y + 7, Color.WHITE)
     }
 
     override fun mouseClicked(mouseButtonEvent: MouseButtonEvent, bl: Boolean): Boolean {
-        val mouseX = mouseButtonEvent.x
-        val mouseY = mouseButtonEvent.y
+        val mx = Resolution.getMouseX(mouseButtonEvent.x)
+        val my = Resolution.getMouseY(mouseButtonEvent.y)
         val button = mouseButtonEvent.button()
-        panels.forEach { it.mouseClicked(mouseX, mouseY, button) }
+
+        selectedFeature?.let { feature ->
+            val menuX = (Resolution.width / 2) - 100
+            val menuY = (Resolution.height / 2) - 125
+            if (mx < menuX || mx > menuX + 200 || my < menuY || my > menuY + 250) {
+                selectFeature(null)
+                return true
+            }
+            if (my > menuY + 30 && my < menuY + 225) {
+                feature.configSettings.forEach {
+                    if (! it.isVisible) return@forEach
+                    if (it.mouseClicked(mx.toDouble(), my.toDouble(), button)) return true
+                }
+            }
+            return true
+        }
+
+        panels.asReversed().find { panel -> panel.isMouseOverHeader(mx.toDouble(), my.toDouble()) }?.let { clickedPanel ->
+            panels.remove(clickedPanel)
+            panels.add(clickedPanel)
+
+            clickedPanel.mouseClicked(mx.toDouble(), my.toDouble(), button)
+            isSearchFocused = false
+
+            return true
+        }
+
+        val barX = (Resolution.width / 2) - 75
+        val barY = Resolution.height - 40
+        isSearchFocused = mx >= barX && mx <= barX + 150 && my >= barY && my <= barY + 22
+
+        panels.forEach { it.mouseClicked(mx.toDouble(), my.toDouble(), button) }
         return super.mouseClicked(mouseButtonEvent, bl)
     }
 
     override fun mouseReleased(mouseButtonEvent: MouseButtonEvent): Boolean {
-        panels.forEach { it.mouseReleased(mouseButtonEvent.x, mouseButtonEvent.y, mouseButtonEvent.button()) }
+        val mx = Resolution.getMouseX(mouseButtonEvent.x)
+        val my = Resolution.getMouseY(mouseButtonEvent.y)
+        selectedFeature?.configSettings?.forEach { it.mouseReleased(mouseButtonEvent.button()) }
+        panels.forEach { it.mouseReleased(mx.toDouble(), my.toDouble(), mouseButtonEvent.button()) }
         return super.mouseReleased(mouseButtonEvent)
     }
 
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontal: Double, vertical: Double): Boolean {
+        if (selectedFeature != null) {
+            scrollTarget += (vertical * 30).toFloat()
+            return true
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontal, vertical)
+    }
+
+    override fun charTyped(characterEvent: CharacterEvent): Boolean {
+        selectedFeature?.configSettings?.forEach { it.charTyped(characterEvent.codepoint.toChar()) }?.also { return true }
+
+        if (isSearchFocused) {
+            searchQuery += characterEvent.codepoint.toChar()
+            return true
+        }
+        return super.charTyped(characterEvent)
+    }
+
+    override fun keyPressed(keyEvent: KeyEvent): Boolean {
+        if (selectedFeature != null) {
+            selectedFeature?.configSettings?.forEach {
+                if (it.keyPressed(keyEvent.key)) {
+                    return true
+                }
+            }
+
+            if (keyEvent.key == InputConstants.KEY_ESCAPE) {
+                if (selectedFeature != null) {
+                    selectedFeature = null
+                    return true
+                }
+            }
+        }
+
+        if (isSearchFocused) {
+            if (keyEvent.key == InputConstants.KEY_BACKSPACE && searchQuery.isNotEmpty()) {
+                searchQuery = searchQuery.dropLast(1)
+                return true
+            }
+            if (keyEvent.key == InputConstants.KEY_ESCAPE) {
+                if (searchQuery.isNotEmpty()) {
+                    searchQuery = ""
+                    return true
+                }
+            }
+        }
+        return super.keyPressed(keyEvent)
+    }
+
+    fun selectFeature(feature: Feature?) {
+        selectedFeature = feature
+        scrollTarget = 0f
+        scrollAnim.set(0f)
+    }
+
     override fun onClose() {
+        selectFeature(null)
         Config.save()
         super.onClose()
     }
-    override fun isPauseScreen(): Boolean = false
-}
 
-enum class CategoryType {
-    COMBAT, DEV, PLAYER, VISUAL, MISC
+    override fun isPauseScreen(): Boolean = false
 }
