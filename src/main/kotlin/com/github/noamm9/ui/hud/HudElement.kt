@@ -72,8 +72,8 @@ abstract class HudElement {
         }
     }
 
-    var x = 0f
-    var y = 0f
+    open var x = 0f
+    open var y = 0f
 
     var scale = 1f
 

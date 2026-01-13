@@ -15,4 +15,11 @@ object ItemUtils {
     val ItemStack.itemUUID: String get() = customData.getString("uuid").orElse("")
     val ItemStack.lore: List<String> get() = getOrDefault(DataComponents.LORE, ItemLore.EMPTY).styledLines().map { it.formattedText }
 
+
+    fun getSkullTexture(stack: ItemStack): String? {
+        if (stack.isEmpty) return null
+        val profile = stack.get(DataComponents.PROFILE) ?: return null
+        val properties = profile.partialProfile().properties
+        return properties["textures"].firstOrNull()?.value
+    }
 }

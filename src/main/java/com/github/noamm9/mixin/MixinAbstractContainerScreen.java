@@ -39,47 +39,61 @@ public abstract class MixinAbstractContainerScreen extends Screen {
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void onInit(CallbackInfo ci) {
-        if (EventBus.post(new ContainerEvent.Open((Screen) (Object) this))) {
+        if (EventBus.post(new ContainerEvent.Open(this))) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void onRenderPre(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        if (EventBus.post(new ContainerEvent.Render.Pre(this, context, mouseX, mouseY))) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "render", at = @At("TAIL"), cancellable = true)
+    private void onRenderPost(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        if (EventBus.post(new ContainerEvent.Render.Post(this, context, mouseX, mouseY))) {
             ci.cancel();
         }
     }
 
     @Inject(method = "onClose", at = @At("HEAD"), cancellable = true)
     protected void onClose(CallbackInfo ci) {
-        if (EventBus.post(new ContainerEvent.Close((Screen) (Object) this))) {
+        if (EventBus.post(new ContainerEvent.Close(this))) {
             ci.cancel();
         }
     }
 
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlotPre(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
-        if (EventBus.post(new ContainerEvent.Render.Slot.Pre((Screen) (Object) this, guiGraphics, slot))) {
+        if (EventBus.post(new ContainerEvent.Render.Slot.Pre(this, guiGraphics, slot))) {
             ci.cancel();
         }
     }
 
     @Inject(method = "renderSlot", at = @At("TAIL"))
     private void onDrawSlotPost(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
-        EventBus.post(new ContainerEvent.Render.Slot.Post((Screen) (Object) this, guiGraphics, slot));
+        EventBus.post(new ContainerEvent.Render.Slot.Post(this, guiGraphics, slot));
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     public void onMouseClicked(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        if (EventBus.post(new ContainerEvent.MouseClick((Screen) (Object) this, click.x(), click.y(), click.button(), click.modifiers()))) {
-            cir.cancel();
+        if (EventBus.post(new ContainerEvent.MouseClick(this, click.x(), click.y(), click.button(), click.modifiers()))) {
+            cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     public void onKeyPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
-        if (EventBus.post(new ContainerEvent.Keyboard((Screen) (Object) this, input.key(), (char) input.input(), input.scancode(), input.modifiers()))) {
-            cir.cancel();
+        if (EventBus.post(new ContainerEvent.Keyboard(this, input.key(), (char) input.input(), input.scancode(), input.modifiers()))) {
+            cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "mouseScrolled", at = @At("TAIL"))
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount, CallbackInfoReturnable<Boolean> cir) {
-        EventBus.post(new ContainerEvent.MouseScroll((Screen) (Object) this, mouseX, mouseY, horizontalAmount, verticalAmount));
+        EventBus.post(new ContainerEvent.MouseScroll(this, mouseX, mouseY, horizontalAmount, verticalAmount));
     }
 
     @Inject(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/ResourceLocation;)V", opcode = Opcodes.GETFIELD), cancellable = true)
@@ -88,7 +102,7 @@ public abstract class MixinAbstractContainerScreen extends Screen {
             ScrollableTooltip.setSlot(this.hoveredSlot.index);
 
             ContainerEvent.Render.Tooltip event = new ContainerEvent.Render.Tooltip(
-                (Screen) (Object) this, context, stack, mouseX, mouseY, new ArrayList<>(getTooltipFromContainerItem(stack))
+                this, context, stack, mouseX, mouseY, new ArrayList<>(getTooltipFromContainerItem(stack))
             );
 
             ci.cancel();

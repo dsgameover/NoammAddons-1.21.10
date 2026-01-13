@@ -149,4 +149,71 @@ object Render2D {
         ctx.fillGradient(0, 0, iw, ih, color1.rgb, color2.rgb)
         ctx.pose().translate(- fx, - fy)
     }
+
+    fun drawCircle(ctx: GuiGraphics, cx: Int, cy: Int, radius: Int, color: Color = Color.WHITE) {
+        var x = 0
+        var y = radius
+        var d = 3 - 2 * radius
+
+        while (x <= y) {
+            ctx.hLine(cx - x, cx + x, cy + y, color.rgb)
+            ctx.hLine(cx - x, cx + x, cy - y, color.rgb)
+            ctx.hLine(cx - y, cx + y, cy + x, color.rgb)
+            ctx.hLine(cx - y, cx + y, cy - x, color.rgb)
+
+            if (d < 0) d += 4 * x + 6
+            else {
+                d += 4 * (x - y) + 10
+                y --
+            }
+            x ++
+        }
+    }
+
+    fun drawRoundedRect(ctx: GuiGraphics, x: Number, y: Number, width: Number, height: Number, radius: Number, color: Color) {
+        val xInt = x.toInt() * 4
+        val yInt = y.toInt() * 4
+        val wInt = width.toInt() * 4
+        val hInt = height.toInt() * 4
+        val rInt = radius.toInt() * 4
+
+        ctx.pose().pushMatrix()
+        ctx.pose().scale(1 / 4f)
+
+        ctx.fill(xInt + rInt, yInt, xInt + wInt - rInt, yInt + hInt, color.rgb)
+        ctx.fill(xInt, yInt + rInt, xInt + rInt, yInt + hInt - rInt, color.rgb)
+        ctx.fill(xInt + wInt - rInt, yInt + rInt, xInt + wInt, yInt + hInt - rInt, color.rgb)
+
+        var dx = 0
+        var dy = rInt
+        var p = 3 - 2 * rInt
+
+        val xLeft = xInt + rInt
+        val xRight = xInt + wInt - rInt - 1
+        val yTop = yInt + rInt
+        val yBottom = yInt + hInt - rInt - 1
+
+        while (dx <= dy) {
+            ctx.hLine(xLeft - dx, xLeft, yTop - dy, color.rgb)
+            ctx.hLine(xLeft - dy, xLeft, yTop - dx, color.rgb)
+
+            ctx.hLine(xRight, xRight + dx, yTop - dy, color.rgb)
+            ctx.hLine(xRight, xRight + dy, yTop - dx, color.rgb)
+
+            ctx.hLine(xLeft - dx, xLeft, yBottom + dy, color.rgb)
+            ctx.hLine(xLeft - dy, xLeft, yBottom + dx, color.rgb)
+
+            ctx.hLine(xRight, xRight + dx, yBottom + dy, color.rgb)
+            ctx.hLine(xRight, xRight + dy, yBottom + dx, color.rgb)
+
+            if (p < 0) p += 4 * dx + 6
+            else {
+                p += 4 * (dx - dy) + 10
+                dy --
+            }
+            dx ++
+        }
+
+        ctx.pose().popMatrix()
+    }
 }

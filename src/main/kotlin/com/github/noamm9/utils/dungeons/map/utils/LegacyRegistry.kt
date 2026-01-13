@@ -1,12 +1,13 @@
 package com.github.noamm9.utils.dungeons.map.utils
 
-import com.github.noamm9.utils.world.WorldUtils
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.FluidTags
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.SlabBlock
 import net.minecraft.world.level.block.state.BlockState
 
 object LegacyRegistry {
-    val BLOCKS = mapOf(
+    private val BLOCKS = mapOf(
         "minecraft:air" to 0,
         "minecraft:stone" to 1,
         "minecraft:polished_andesite" to 1,
@@ -156,9 +157,9 @@ object LegacyRegistry {
         "minecraft:spruce_fence" to 188,
     )
 
-    fun getLegacyId(blockState: BlockState, debug: Boolean = false): Int? {
+    fun getLegacyId(blockState: BlockState): Int? {
         val block = blockState.block
-        var registryName = WorldUtils.registryName(block)
+        var registryName = registryName(block)
         val fluidState = blockState.fluidState
         if (! fluidState.isEmpty) {
             if (fluidState.`is`(FluidTags.WATER)) return if (fluidState.isSource) 9 else 8
@@ -169,5 +170,10 @@ object LegacyRegistry {
         val result = BLOCKS[registryName]
 
         return result
+    }
+
+    private fun registryName(block: Block): String {
+        val registry = BuiltInRegistries.BLOCK.getKey(block)
+        return "${registry.namespace}:${registry.path}"
     }
 }

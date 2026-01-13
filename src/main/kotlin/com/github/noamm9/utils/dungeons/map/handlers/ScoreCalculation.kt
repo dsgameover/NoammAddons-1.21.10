@@ -103,30 +103,24 @@ object ScoreCalculation {
 
     fun onPacket(packet: Packet<*>) {
         if (packet is ClientboundPlayerInfoUpdatePacket) {
-            if (packet.actions().containsOneOf(UPDATE_DISPLAY_NAME, ADD_PLAYER)) return
+            if (! packet.actions().containsOneOf(UPDATE_DISPLAY_NAME, ADD_PLAYER)) return
             packet.entries().forEach { entry ->
                 val line = entry.displayName?.formattedText ?: return@forEach
 
                 when {
-                    line.contains("Crypts:") -> {
-                        cryptsPattern.find(line)?.let {
-                            cryptsCount = it.groups["crypts"]?.value?.toIntOrNull() ?: cryptsCount
-                        }
+                    line.contains("Crypts:") -> cryptsPattern.find(line)?.let {
+                        cryptsCount = it.groups["crypts"]?.value?.toIntOrNull() ?: cryptsCount
                     }
 
-                    line.contains("Completed Rooms:") -> {
-                        completedRoomsRegex.find(line)?.let {
-                            completedRooms = it.groups["count"]?.value?.toIntOrNull() ?: completedRooms
-                        }
+                    line.contains("Completed Rooms:") -> completedRoomsRegex.find(line)?.let {
+                        completedRooms = it.groups["count"]?.value?.toIntOrNull() ?: completedRooms
                     }
 
-                    line.contains("Secrets Found:") -> {
-                        if (line.contains('%')) secretsFoundPercentagePattern.find(line)?.let {
-                            secretPercentage = it.groups["percentage"]?.value?.toDoubleOrNull() ?: secretPercentage
-                        }
-                        else secretsFoundPattern.find(line)?.let {
-                            foundSecrets = it.groups["secrets"]?.value?.toIntOrNull() ?: foundSecrets
-                        }
+                    line.contains("Secrets Found:") -> if (line.contains('%')) secretsFoundPercentagePattern.find(line)?.let {
+                        secretPercentage = it.groups["percentage"]?.value?.toDoubleOrNull() ?: secretPercentage
+                    }
+                    else secretsFoundPattern.find(line)?.let {
+                        foundSecrets = it.groups["secrets"]?.value?.toIntOrNull() ?: foundSecrets
                     }
                 }
 

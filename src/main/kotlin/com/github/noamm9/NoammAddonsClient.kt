@@ -50,6 +50,7 @@ object NoammAddonsClient: ClientModInitializer {
             }
         }
 
+        // temp until i make somehting better chz this is cancer
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(
                 ClientCommandManager.literal("na")
@@ -110,7 +111,6 @@ object NoammAddonsClient: ClientModInitializer {
                     ThreadUtils.scheduledTask(25) {
                         ChatUtils.modMessage("hi")
                     }
-
                     1
                 }
             )

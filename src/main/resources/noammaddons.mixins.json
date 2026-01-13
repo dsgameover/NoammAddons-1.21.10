@@ -40,7 +40,6 @@
     "MixinMouseHandler",
     "MixinMultiPlayerGameMode",
     "MixinOptions",
-    "MixinScreen",
     "MixinScreenEffectRenderer",
     "NameTagFeatureRendererMixin",
     "PlayerRendererMixin"

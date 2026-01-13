@@ -97,6 +97,8 @@ object Scoreboard: Feature("draws a custom scoreboard instead of the vanilla one
     }
 
     override fun init() {
+        hud.x = 100f
+        hud.y = 100f
         hudElements.add(hud)
     }
 

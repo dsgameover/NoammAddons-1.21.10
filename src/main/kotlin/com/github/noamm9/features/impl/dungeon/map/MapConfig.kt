@@ -21,7 +21,7 @@ object MapConfig {
     val textScale = SliderSetting("Map Text Scale", 1f, 0.4f, 1.5f, 0.1).section("Size")
     val checkmarkSize = SliderSetting("Map Checkmark Scale", 1f, 0.3f, 1.5f, 0.1f)
     val playerHeadScale = SliderSetting("Player Heads Scale", 1f, 0.3f, 1.5f, 0.1f)
-    val playerNameScale = SliderSetting("Player Name Scale", 0f, 0.3f, 1.5f, 0.1f)
+    val playerNameScale = SliderSetting("Player Name Scale", 0.5f, 0.3f, 1.5f, 0.1f)
 
     val mapBackground = ColorSetting("Map Background Color", Color(255, 255, 255, 50), true)
     val mapBorderColor = ColorSetting("Map Border Color", Color(255, 255, 255), true)
