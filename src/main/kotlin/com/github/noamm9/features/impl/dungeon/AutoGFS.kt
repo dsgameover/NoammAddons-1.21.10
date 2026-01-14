@@ -50,21 +50,18 @@ object AutoGFS: Feature("Automatically refills dungeon items from your sacks usi
             }
         }
 
-        fun checkAndRefill(current: Int, max: Int, gfsName: String, toggle: Boolean) {
-            if (! toggle) return
-            val needed = max - current
-            if (needed >= 4) {
-                fillFromSack(gfsName, needed)
-            }
-        }
-
         checkAndRefill(pearlCount, 16, "ender_pearl", refillPearl.value)
         checkAndRefill(jerryCount, 64, "inflatable_jerry", refillJerry.value)
         checkAndRefill(tntCount, 64, "superboom_tnt", refillTNT.value)
         checkAndRefill(leapCount, 16, "spirit_leap", refillLeaps.value)
     }
 
-    private fun fillFromSack(name: String, amount: Int) {
-        ChatUtils.sendCommand("gfs $name $amount")
+    private fun checkAndRefill(current: Int, max: Int, gfsName: String, toggle: Boolean) {
+        if (! toggle) return
+        if (current == 0) return
+        val needed = max - current
+        if (needed >= 4) {
+            ChatUtils.sendCommand("gfs $gfsName $needed")
+        }
     }
 }

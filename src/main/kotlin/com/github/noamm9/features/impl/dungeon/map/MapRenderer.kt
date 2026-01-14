@@ -3,6 +3,8 @@ package com.github.noamm9.features.impl.dungeon.map
 import com.github.noamm9.NoammAddons.MOD_ID
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.ui.hud.HudElement
+import com.github.noamm9.utils.ColorUtils.colorCodeByPresent
+import com.github.noamm9.utils.ColorUtils.colorizeScore
 import com.github.noamm9.utils.ItemUtils.skyblockId
 import com.github.noamm9.utils.MathUtils
 import com.github.noamm9.utils.dungeons.Classes
@@ -46,28 +48,6 @@ object MapRenderer: HudElement() {
         renderExtraInfo(ctx)
 
         return 128f to if (MapConfig.mapExtraInfo.value) 140f else 128f
-    }
-
-    fun colorizeScore(score: Int): String {
-        return when {
-            score < 270 -> "§c${score}"
-            score < 300 -> "§e${score}"
-            else -> "§a${score}"
-        }
-    }
-
-    private fun colorCodeByPresent(value: Number, maxValue: Number, reversed: Boolean = false): String {
-        val max = maxValue.toFloat().coerceAtLeast(1f)
-        val current = value.toFloat().coerceIn(0f, max)
-
-        val percentage = (current / max) * 100f
-
-        return when {
-            percentage > 75 -> if (reversed) "§c" else "§a"
-            percentage > 50 -> if (reversed) "§6" else "§e"
-            percentage > 25 -> if (reversed) "§e" else "§6"
-            else -> if (reversed) "§a" else "§c"
-        }
     }
 
     private fun renderBackground(ctx: GuiGraphics) {

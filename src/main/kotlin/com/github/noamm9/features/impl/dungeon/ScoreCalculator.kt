@@ -2,13 +2,13 @@ package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.event.impl.DungeonEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.features.impl.dungeon.map.MapRenderer
 import com.github.noamm9.ui.clickgui.componnents.*
 import com.github.noamm9.ui.clickgui.componnents.impl.TextInputSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.ui.hud.getValue
 import com.github.noamm9.ui.hud.provideDelegate
 import com.github.noamm9.utils.ChatUtils
+import com.github.noamm9.utils.ColorUtils
 import com.github.noamm9.utils.dungeons.map.handlers.ScoreCalculation
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
@@ -47,7 +47,7 @@ object ScoreCalculator: Feature("Shows the score of the dungeon run") {
 
     val scoreHud by hudElement("ScoreCalculator", enabled = { LocationUtils.inDungeon }, toggled = { hudElement.value }) { ctx, demoMode ->
         val text = if (demoMode) "&eScore: &a300"
-        else "&eScore: " + MapRenderer.colorizeScore(ScoreCalculation.score)
+        else "&eScore: " + ColorUtils.colorizeScore(ScoreCalculation.score)
 
         Render2D.drawString(ctx, text, 0, 0)
         return@hudElement text.width().toFloat() to 9f

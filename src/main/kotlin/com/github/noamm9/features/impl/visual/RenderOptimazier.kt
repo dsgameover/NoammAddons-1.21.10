@@ -19,7 +19,6 @@ import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.monster.Blaze
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -51,6 +50,7 @@ object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
         register<MainThreadPacketRecivedEvent.Pre> {
             if (! LocationUtils.inSkyblock) return@register
             if (event.packet is ClientboundSetEntityDataPacket) {
+                if (event.packet.id == mc.player?.id) return@register
                 if (hide0HealthNames.value || hideDeadMobs.value) for (entry in event.packet.packedItems) {
                     val value = entry.value()
 
@@ -106,7 +106,6 @@ object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
 
             val isStarred = name.contains("✯")
             if (hideStar.value && isStarred || hideNonStar.value && ! isStarred) {
-                if (event.entity !is Blaze) event.entity.remove(Entity.RemovalReason.DISCARDED)
                 event.isCanceled = true
             }
         }

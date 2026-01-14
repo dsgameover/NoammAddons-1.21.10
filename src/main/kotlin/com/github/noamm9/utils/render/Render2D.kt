@@ -90,13 +90,11 @@ object Render2D {
         drawString(ctx, str, centerX, y, color, scale, shadow)
     }
 
-    fun renderItem(context: GuiGraphics, item: ItemStack, x: Float, y: Float, scale: Float) {
+    fun renderItem(context: GuiGraphics, item: ItemStack, x: Number, y: Number, scale: Number = 1) {
         context.pose().pushMatrix()
-        context.pose().translate(x, y)
-        context.pose().scale(scale, scale)
-
+        context.pose().translate(x.toFloat(), y.toFloat())
+        context.pose().scale(scale.toFloat())
         context.renderItem(item, 0, 0)
-
         context.pose().popMatrix()
     }
 

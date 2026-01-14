@@ -5,7 +5,6 @@ import com.github.noamm9.utils.render.RenderHelper.renderX
 import com.github.noamm9.utils.render.RenderHelper.renderY
 import com.github.noamm9.utils.render.RenderHelper.renderZ
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
@@ -17,7 +16,6 @@ import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import org.joml.Matrix4f
 import java.awt.Color
-import kotlin.math.sqrt
 
 object Render3D {
     fun renderBlock(
@@ -32,7 +30,7 @@ object Render3D {
         val mstack = ctx.matrixStack ?: return
         val consumers = ctx.consumers ?: return
         val camPos = ctx.camera.position
-        val shape = state.getShape(mc.level!!, pos, CollisionContext.of(ctx.camera.entity))
+        val shape = state.getShape(mc.level !!, pos, CollisionContext.of(ctx.camera.entity))
 
         if (shape.isEmpty) return renderBox(ctx, pos.x + 0.5, pos.y, pos.z + 0.5, 1.0, 1.0, color, outline, fill, phase)
 
@@ -82,16 +80,21 @@ object Render3D {
         fill: Boolean = true,
         phase: Boolean = false
     ) {
-        if (!outline && !fill) return
+        if (! outline && ! fill) return
         val consumers = ctx.consumers ?: return
         val matrices = ctx.matrixStack ?: return
         val cam = ctx.camera.position.reverse()
 
-        val xd = x.toDouble(); val yd = y.toDouble(); val zd = z.toDouble()
+        val xd = x.toDouble();
+        val yd = y.toDouble();
+        val zd = z.toDouble()
         val hw = width.toDouble() / 2.0
         val hd = height.toDouble()
 
-        val r = color.red / 255f; val g = color.green / 255f; val b = color.blue / 255f; val a = color.alpha / 255f
+        val r = color.red / 255f;
+        val g = color.green / 255f;
+        val b = color.blue / 255f;
+        val a = color.alpha / 255f
 
         matrices.pushPose()
         matrices.translate(cam.x, cam.y, cam.z)
@@ -106,10 +109,6 @@ object Render3D {
             ShapeRenderer.renderLineBox(matrices.last(), consumers.getBuffer(layer), xd - hw, yd, zd - hw, xd + hw, yd + hd, zd + hw, r, g, b, 1f)
         }
         matrices.popPose()
-    }
-
-    fun renderBox(ctx: RenderContext, entity: Entity, color: Color = Color.CYAN, outline: Boolean = true, fill: Boolean = true, phase: Boolean = false) {
-        renderBox(ctx, entity.renderX, entity.renderY, entity.renderZ, entity.bbWidth, entity.bbHeight, color, outline, fill, phase)
     }
 
     fun renderString(
@@ -127,13 +126,13 @@ object Render3D {
         val dy = (y.toDouble() - camera.position.y).toFloat()
         val dz = (z.toDouble() - camera.position.z).toFloat()
 
-        matrices.translate(dx, dy, dz).rotate(camera.rotation()).scale(toScale, -toScale, toScale)
+        matrices.translate(dx, dy, dz).rotate(camera.rotation()).scale(toScale, - toScale, toScale)
 
         val consumer = mc.renderBuffers().bufferSource()
         val textLayer = if (phase) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL
         val lines = text.split("\n")
         val maxWidth = lines.maxOf { textRenderer.width(it) }
-        val offset = -maxWidth / 2f
+        val offset = - maxWidth / 2f
 
         if (bgBox) {
             val widestLine = lines.maxByOrNull { textRenderer.width(it) } ?: ""
@@ -143,7 +142,7 @@ object Render3D {
         }
 
         for ((i, line) in lines.withIndex()) {
-            textRenderer.drawInBatch(line, -textRenderer.width(line) / 2f, i * 9f, 0xFFFFFFFF.toInt(), true, matrices, consumer, textLayer, 0, LightTexture.FULL_BLOCK)
+            textRenderer.drawInBatch(line, - textRenderer.width(line) / 2f, i * 9f, 0xFFFFFFFF.toInt(), true, matrices, consumer, textLayer, 0, LightTexture.FULL_BLOCK)
         }
         consumer.endBatch()
     }
@@ -156,12 +155,15 @@ object Render3D {
         val matrices = ctx.matrixStack ?: return
         val cameraPos = mc.gameRenderer.mainCamera.position
         matrices.pushPose()
-        matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
+        matrices.translate(- cameraPos.x, - cameraPos.y, - cameraPos.z)
 
         val buffer = (ctx.consumers as MultiBufferSource.BufferSource).getBuffer(RenderType.lines())
         RenderSystem.lineWidth(thickness.toFloat())
 
-        val r = color.red / 255f; val g = color.green / 255f; val b = color.blue / 255f; val a = color.alpha / 255f
+        val r = color.red / 255f;
+        val g = color.green / 255f;
+        val b = color.blue / 255f;
+        val a = color.alpha / 255f
         val direction = finish.subtract(start).normalize().toVector3f()
         val entry = matrices.last()
 
@@ -176,14 +178,14 @@ object Render3D {
         renderLine(ctx, Vec3.atCenterOf(start), Vec3.atCenterOf(end), thickness, color)
     }
 
-    fun renderTracer(ctx: RenderContext,point: Vec3, color: Color, thickness: Number) {
+    fun renderTracer(ctx: RenderContext, point: Vec3, color: Color, thickness: Number) {
         val camera = ctx.camera
         val matrixStack = ctx.matrixStack ?: return
         val consumers = ctx.consumers
         val cameraPos = camera.position
 
         matrixStack.pushPose()
-        matrixStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
+        matrixStack.translate(- cameraPos.x, - cameraPos.y, - cameraPos.z)
 
         val buffer = (consumers as MultiBufferSource.BufferSource).getBuffer(NoammRenderLayers.getLinesThroughWalls(2.5))
         val cameraPoint = cameraPos.add(Vec3.directionFromRotation(camera.xRot, camera.yRot))

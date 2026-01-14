@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinEntityRenderDispatcher {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private <T extends Entity> void onShouldRender(T entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
-        if (entity == null) return;
         if (EventBus.post(new EntityCheckRenderEvent(entity))) {
             cir.setReturnValue(false);
         }

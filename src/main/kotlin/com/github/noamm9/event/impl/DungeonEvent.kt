@@ -20,7 +20,7 @@ abstract class DungeonEvent: Event(false) {
     }
 
     class SecretEvent(val type: SecretType, val pos: BlockPos): DungeonEvent() {
-        enum class SecretType { CHEST, SKULL, ITEM, BAT, LAVER }
+        enum class SecretType { CHEST, SKULL, ITEM, BAT, LEVER }
     }
 
 

@@ -8,4 +8,26 @@ object ColorUtils {
     fun Color.lerp(color: Color, value: Float): Color {
         return MathUtils.lerpColor(this, color, value)
     }
+
+    fun colorizeScore(score: Int): String {
+        return when {
+            score < 270 -> "§c${score}"
+            score < 300 -> "§e${score}"
+            else -> "§a${score}"
+        }
+    }
+
+    fun colorCodeByPresent(value: Number, maxValue: Number, reversed: Boolean = false): String {
+        val max = maxValue.toFloat().coerceAtLeast(1f)
+        val current = value.toFloat().coerceIn(0f, max)
+
+        val percentage = (current / max) * 100f
+
+        return when {
+            percentage > 75 -> if (reversed) "§c" else "§a"
+            percentage > 50 -> if (reversed) "§6" else "§e"
+            percentage > 25 -> if (reversed) "§e" else "§6"
+            else -> if (reversed) "§a" else "§c"
+        }
+    }
 }
