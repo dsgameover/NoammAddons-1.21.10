@@ -26,6 +26,7 @@
     "IPlayerTabOverlay",
     "KeyboardMixin",
     "MixinAbstractContainerScreen",
+    "MixinAbstractRecipeBookScreen",
     "MixinAbstractSoundInstance",
     "MixinBlindnessFogEnvironment",
     "MixinCamera",

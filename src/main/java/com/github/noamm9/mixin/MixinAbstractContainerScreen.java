@@ -119,5 +119,3 @@ public abstract class MixinAbstractContainerScreen extends Screen {
         }
     }
 }
-
-

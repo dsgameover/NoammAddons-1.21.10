@@ -10,6 +10,8 @@ import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.utils.ChatUtils.modMessage
 import com.github.noamm9.utils.GuiUtils
 import com.github.noamm9.utils.render.Render2D
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.inventory.ClickType
 import org.lwjgl.glfw.GLFW
@@ -87,39 +89,41 @@ object SlotBinding: Feature("Allows you to bind slots to hotbar slots for quick 
             mc.gameMode !!.handleInventoryMouseClick(mc.player !!.containerMenu.containerId, inventorySlot, hotbarIndex, ClickType.SWAP, mc.player)
         }
 
-        register<ContainerEvent.Render.Pre> {
-            val screen = event.screen as? InventoryScreen ?: return@register
-            val hoveredSlot = (screen as IAbstractContainerScreen).hoveredSlot?.index
+        register<ContainerEvent.Close> {
+            previousSlot = null
+        }
+    }
 
-            if (showBoundSlots.value) {
-                binds.forEach { (inv, hb) ->
-                    if (neuStyle.value && (hoveredSlot != inv.toInt() && hoveredSlot != hb.toInt())) return@forEach
+    @JvmStatic
+    fun drawSlotBinding(context: GuiGraphics, mouseX: Int, mouseY: Int, screen: AbstractContainerScreen<*>) {
+        if (! enabled) return
+        if (screen !is InventoryScreen) return
+        val hoveredSlot = (screen as IAbstractContainerScreen).hoveredSlot?.index
 
-                    val p1 = GuiUtils.getSlotPos(screen, inv.toInt()) ?: return@forEach
-                    val p2 = GuiUtils.getSlotPos(screen, hb.toInt()) ?: return@forEach
+        if (showBoundSlots.value) {
+            binds.forEach { (inv, hb) ->
+                if (neuStyle.value && (hoveredSlot != inv.toInt() && hoveredSlot != hb.toInt())) return@forEach
 
-                    if (drawLines.value) Render2D.drawLine(
-                        event.context,
-                        p1.first + 8, p1.second + 8,
-                        p2.first + 8, p2.second + 8,
-                        lineColor.value
-                    )
+                val p1 = GuiUtils.getSlotPos(screen, inv.toInt()) ?: return@forEach
+                val p2 = GuiUtils.getSlotPos(screen, hb.toInt()) ?: return@forEach
 
-                    if (drawBorders.value) {
-                        Render2D.drawBorder(event.context, p1.first.toInt(), p1.second.toInt(), 16, 16, borderColor.value)
-                        Render2D.drawBorder(event.context, p2.first.toInt(), p2.second.toInt(), 16, 16, borderColor.value)
-                    }
+                if (drawLines.value) Render2D.drawLine(
+                    context,
+                    p1.first + 8, p1.second + 8,
+                    p2.first + 8, p2.second + 8,
+                    lineColor.value
+                )
+
+                if (drawBorders.value) {
+                    Render2D.drawBorder(context, p1.first.toInt(), p1.second.toInt(), 16, 16, borderColor.value)
+                    Render2D.drawBorder(context, p2.first.toInt(), p2.second.toInt(), 16, 16, borderColor.value)
                 }
-            }
-
-            previousSlot?.let {
-                val p = GuiUtils.getSlotPos(screen, it) ?: return@let
-                Render2D.drawLine(event.context, p.first + 8, p.second + 8, event.mouseX.toFloat(), event.mouseY.toFloat(), lineColor.value, 1f)
             }
         }
 
-        register<ContainerEvent.Close> {
-            previousSlot = null
+        previousSlot?.let {
+            val p = GuiUtils.getSlotPos(screen, it) ?: return@let
+            Render2D.drawLine(context, p.first + 8, p.second + 8, mouseX, mouseY, lineColor.value, 1f)
         }
     }
 }
