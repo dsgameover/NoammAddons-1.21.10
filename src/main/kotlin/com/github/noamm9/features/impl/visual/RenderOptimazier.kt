@@ -19,11 +19,12 @@ import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
-    val dungeonMobRegex = Regex("^(?:§.)*(.+).+§c❤$")
+    private val dungeonMobRegex = Regex("^(?:§.)*(.+).+§c❤$")
 
     private val hideStar by ToggleSetting("Hide Star Mobs's Nametag")
     private val hideNonStar by ToggleSetting("Hide Non Star Mob's Nametag")
@@ -45,27 +46,18 @@ object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
         Regex("^.+ (?:§.)+0§c❤$")
     )
 
-
+    @Suppress("UNCHECKED_CAST")
     override fun init() {
         register<MainThreadPacketRecivedEvent.Pre> {
             if (! LocationUtils.inSkyblock) return@register
             if (event.packet is ClientboundSetEntityDataPacket) {
                 if (event.packet.id == mc.player?.id) return@register
-                if (hide0HealthNames.value || hideDeadMobs.value) for (entry in event.packet.packedItems) {
-                    val value = entry.value()
-
-                    if (value is Optional<*>) (value.getOrNull() as? Component)?.formattedText?.let { name ->
-                        if (hide0HealthNames.value && healthMatches.any { it.matches(name) }) {
-                            mc.level?.getEntity(event.packet.id)?.remove(Entity.RemovalReason.DISCARDED)
-                            event.isCanceled = true
-                            continue
-                        }
-                    }
-
-                    (value as? Float)?.takeIf { it <= 0f && hideDeadMobs.value }?.let {
-                        mc.level?.getEntity(event.packet.id)?.remove(Entity.RemovalReason.DISCARDED)
-                        continue
-                    }
+                if (! hide0HealthNames.value) return@register
+                for (entry in event.packet.packedItems) {
+                    val value = (entry.value() as? Optional<Component>)?.getOrNull() ?: return@register
+                    if (healthMatches.none { it.matches(value.formattedText) }) return@register
+                    mc.level?.getEntity(event.packet.id)?.remove(Entity.RemovalReason.DISCARDED)
+                    event.isCanceled = true
                 }
             }
             else if (event.packet is ClientboundAddEntityPacket) {
@@ -75,7 +67,6 @@ object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
             }
             else if (event.packet is ClientboundLevelParticlesPacket) {
                 val p = event.packet.particle.type
-
                 if (LocationUtils.F7Phase == 5 && hideP5p.value) {
                     val allowed = p.equalsOneOf(ParticleTypes.ENCHANT, ParticleTypes.FLAME, ParticleTypes.FIREWORK)
                     if (! allowed) event.isCanceled = true
@@ -99,6 +90,11 @@ object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
         }
 
         register<EntityCheckRenderEvent> {
+            if (hideDeadMobs.value && ! event.entity.isAlive || ((event.entity as? LivingEntity)?.health ?: 1f) <= 0) {
+                event.isCanceled = true
+                return@register
+            }
+
             if (! LocationUtils.inDungeon) return@register
             if (LocationUtils.inBoss) return@register
             val name = event.entity.displayName?.formattedText ?: return@register

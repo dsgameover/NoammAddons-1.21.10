@@ -24,7 +24,7 @@ object Scoreboard: Feature("draws a custom scoreboard instead of the vanilla one
     private val dateRegex = Regex("§7(\\d{2}/\\d{2}/\\d{2}) §8.+")
 
     private val hud = object: HudElement() {
-        override val toggle = true
+        override val toggle get() = Scoreboard.enabled
 
         override fun draw(ctx: GuiGraphics, example: Boolean): Pair<Float, Float> {
             val scoreboard = mc.level?.scoreboard ?: return 0f to 0f

@@ -5,6 +5,7 @@ import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.EventDispatcher
 import com.github.noamm9.event.impl.ChatMessageEvent
 import com.github.noamm9.features.FeatureManager
+import com.github.noamm9.features.impl.visual.Scoreboard
 import com.github.noamm9.ui.clickgui.ClickGuiScreen
 import com.github.noamm9.ui.hud.HudEditorScreen
 import com.github.noamm9.utils.*
@@ -111,6 +112,8 @@ object NoammAddonsClient: ClientModInitializer {
                     ThreadUtils.scheduledTask(25) {
                         ChatUtils.modMessage("hi")
                     }
+
+                    Scoreboard.init()
                     1
                 }
             )
