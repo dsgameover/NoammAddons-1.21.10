@@ -1,7 +1,6 @@
 package com.github.noamm9.features
 
 import com.github.noamm9.NoammAddons
-import com.github.noamm9.NoammAddonsClient
 import com.github.noamm9.config.Savable
 import com.github.noamm9.event.Event
 import com.github.noamm9.event.EventBus.EventContext
@@ -37,7 +36,7 @@ open class Feature(
 
     protected inline val mc get() = NoammAddons.mc
     protected inline val scope get() = NoammAddons.scope
-    protected inline val cacheData get() = NoammAddonsClient.cacheData
+    protected inline val cacheData get() = NoammAddons.cacheData
 
     fun initialize() {
         if (enabled || alwaysActive) onEnable() else onDisable()

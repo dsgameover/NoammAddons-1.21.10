@@ -89,7 +89,7 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
 
             if (players.filterNotNull().isEmpty()) {
                 Render2D.drawCenteredString(event.context, "§4§lNo players found", Resolution.width / 2, Resolution.height / 2)
-                return@register Resolution.restore(event.context)
+                return@register
             }
 
             Resolution.refresh()
@@ -193,7 +193,6 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
                 else -> return@register
             }
 
-            ChatUtils.modMessage("Quadrant $quadrant")
             event.isCanceled = true
             triggerLeap(quadrant)
         }

@@ -1,6 +1,6 @@
 package com.github.noamm9.features.impl.dev
 
-import com.github.noamm9.NoammAddonsClient
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.ClickGuiScreen
 import com.github.noamm9.ui.clickgui.componnents.getValue
@@ -20,7 +20,7 @@ object ClickGui: Feature("A feature used to change the ClickGui configiration.",
         .withDescription("The Accent Color used by the whole ClickGui.")
 
     val editGuiButton by ButtonSetting("Open HUD Editor") {
-        NoammAddonsClient.screen = HudEditorScreen
+        NoammAddons.screen = HudEditorScreen
         ClickGuiScreen.onClose()
     }.withDescription("Opens the HUD Editor Screen where u can change you HUD elements size and position")
 

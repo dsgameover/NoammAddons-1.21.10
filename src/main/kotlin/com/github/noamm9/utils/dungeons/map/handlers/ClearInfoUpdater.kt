@@ -1,7 +1,6 @@
 package com.github.noamm9.utils.dungeons.map.handlers
 
 import com.github.noamm9.NoammAddons
-import com.github.noamm9.NoammAddonsClient
 import com.github.noamm9.features.impl.dungeon.map.DungeonMap
 import com.github.noamm9.features.impl.dungeon.map.MapConfig
 import com.github.noamm9.utils.ChatUtils
@@ -23,7 +22,7 @@ import net.minecraft.network.chat.MutableComponent
 
 object ClearInfoUpdater {
     private val componentSeparator = createComponent(" &f|&r ")
-    private val cdebug get() = NoammAddonsClient.debugFlags.contains("clearinfo")
+    private val cdebug get() = NoammAddons.debugFlags.contains("clearinfo")
 
     fun checkSplits(room: RoomData, oldState: RoomState, newState: RoomState, players: List<DungeonPlayer>) {
         if (! DungeonMap.enabled) return

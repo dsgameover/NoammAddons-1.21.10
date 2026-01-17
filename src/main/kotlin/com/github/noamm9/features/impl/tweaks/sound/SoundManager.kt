@@ -1,6 +1,6 @@
 package com.github.noamm9.features.impl.tweaks.sound
 
-import com.github.noamm9.NoammAddonsClient
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.config.PogObject
 import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.componnents.getValue
@@ -11,7 +11,7 @@ object SoundManager: Feature("Adjust volumes for every sound in the game") {
     val volumes = PogObject("noammaddons_sounds", mutableMapOf<String, Float>())
 
     val btn by ButtonSetting("Open SoundManager GUI") {
-        NoammAddonsClient.screen = SoundGui
+        NoammAddons.screen = SoundGui
     }
 
     @JvmStatic

@@ -1,6 +1,6 @@
 package com.github.noamm9.features.impl.tweaks.sound
 
-import com.github.noamm9.NoammAddonsClient
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.ui.clickgui.ClickGuiScreen
 import com.github.noamm9.ui.clickgui.componnents.Style
 import com.github.noamm9.ui.utils.Animation
@@ -259,7 +259,7 @@ object SoundGui: Screen(Component.literal("SoundManager")) {
     override fun onClose() {
         SoundManager.volumes.save()
         ThreadUtils.scheduledTask {
-            NoammAddonsClient.screen = ClickGuiScreen
+            NoammAddons.screen = ClickGuiScreen
         }
     }
 

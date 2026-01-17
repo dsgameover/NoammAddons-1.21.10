@@ -1,6 +1,6 @@
 package com.github.noamm9.utils
 
-import com.github.noamm9.NoammAddonsClient
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.utils.dungeons.Blessing
 import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.dungeons.Puzzle
@@ -19,7 +19,7 @@ object DebugHUD {
 
 
     private fun renderDungeonDebug(graphics: GuiGraphics) {
-        if (! NoammAddonsClient.debugFlags.contains("dungeon")) return
+        if (! NoammAddons.debugFlags.contains("dungeon")) return
 
         var y = 20
         val x = 10
@@ -91,7 +91,7 @@ object DebugHUD {
     }
 
     private fun renderLocationDebug(graphics: GuiGraphics) {
-        if (! NoammAddonsClient.debugFlags.contains("location")) return
+        if (! NoammAddons.debugFlags.contains("location")) return
 
         var y = 20
         val x = 180

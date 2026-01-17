@@ -1,8 +1,8 @@
 package com.github.noamm9.utils.dungeons
 
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.NoammAddons.scope
-import com.github.noamm9.NoammAddonsClient
 import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.EventBus.register
 import com.github.noamm9.event.EventPriority
@@ -199,7 +199,7 @@ object DungeonListener {
     }
 
     private fun updateDungeonTeammates(tabName: String, infoSkin: ResourceLocation) {
-        if (NoammAddonsClient.debugFlags.contains("dev")) {
+        if (NoammAddons.debugFlags.contains("dev")) {
             listOf(
                 DungeonPlayer("Noamm", Classes.Mage, 50, isDead = false),
                 DungeonPlayer("Noamm9", Classes.Archer, 50, isDead = false),
@@ -240,7 +240,7 @@ object DungeonListener {
                 )
             )
         }
-        
+
         thePlayer = dungeonTeammates.find { it.name == mc.user.name }
         dungeonTeammatesNoSelf = dungeonTeammates.filter { it != thePlayer }
         leapTeammates = dungeonTeammatesNoSelf.sortedBy { it.clazz }
