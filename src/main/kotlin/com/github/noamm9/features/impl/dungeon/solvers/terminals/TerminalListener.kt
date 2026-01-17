@@ -2,6 +2,7 @@ package com.github.noamm9.features.impl.dungeon.solvers.terminals
 
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.event.EventBus.register
+import com.github.noamm9.event.impl.MainThreadPacketRecivedEvent
 import com.github.noamm9.event.impl.PacketEvent
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.mixin.IServerboundInteractPacket
@@ -11,7 +12,6 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.*
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.ItemStack
-import java.util.concurrent.ConcurrentHashMap
 
 
 object TerminalListener {
@@ -23,9 +23,9 @@ object TerminalListener {
 
     private var interactCooldown = 0
 
-    val currentItems = ConcurrentHashMap<Int, ItemStack>()
+    val currentItems = mutableMapOf<Int, ItemStack>()
 
-    val packetRecivedListener = register<PacketEvent.Received> { onPacketReceived(event.packet) }.unregister()
+    val packetRecivedListener = register<MainThreadPacketRecivedEvent.Pre> { onPacketReceived(event.packet) }.unregister()
     val packetSentListener = register<PacketEvent.Sent> { onPacketSent(event.packet, event) }.unregister()
     val tickListener = register<TickEvent.Server> { onTick() }.unregister()
 
@@ -49,10 +49,22 @@ object TerminalListener {
             is ClientboundContainerSetSlotPacket -> {
                 if (! inTerm || packet.containerId != lastWindowId) return
                 if (packet.slot > currentType !!.slotCount) return
+                if (packet.slot < 0) return
                 currentItems[packet.slot] = packet.item
 
                 if (currentItems.size == currentType?.slotCount || currentType == TerminalType.MELODY) {
                     TerminalSolver.onItemsUpdated(packet.slot, packet.item)
+                }
+            }
+
+            is ClientboundContainerSetContentPacket -> {
+                if (! inTerm || packet.containerId != lastWindowId) return
+                currentItems.clear()
+
+                packet.items.forEachIndexed { index, itemStack ->
+                    if (index < (currentType?.slotCount ?: 0)) {
+                        currentItems[index] = itemStack
+                    }
                 }
             }
 
@@ -93,7 +105,6 @@ object TerminalListener {
         currentTitle = ""
         currentItems.clear()
         lastWindowId = - 1
-        interactCooldown = 0
         TerminalSolver.onTerminalClose()
     }
 }

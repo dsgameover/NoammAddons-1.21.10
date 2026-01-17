@@ -1,27 +1,27 @@
 package com.github.noamm9.features.impl.dungeon.solvers.terminals
 
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.event.impl.ScreenEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.features.impl.dungeon.solvers.terminals.TerminalType.Companion.lastRubixTarget
 import com.github.noamm9.ui.clickgui.componnents.*
 import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.DropdownSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
 import com.github.noamm9.ui.utils.Resolution
+import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.ItemUtils.hasGlint
 import com.github.noamm9.utils.ThreadUtils
 import com.github.noamm9.utils.Utils.equalsOneOf
+import com.github.noamm9.utils.Utils.uppercaseFirst
 import com.github.noamm9.utils.render.Render2D
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import java.awt.Color
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.abs
 import kotlin.math.floor
 
@@ -61,37 +61,33 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
 
     private data class TerminalClick(val slotId: Int, val btn: Int)
 
-    private var solution = CopyOnWriteArrayList<TerminalClick>()
-    private val queue = CopyOnWriteArrayList<TerminalClick>()
+    private var solution = mutableListOf<TerminalClick>()
+    private val queue = mutableListOf<TerminalClick>()
     private var isClicked = false
-
 
     override fun init() {
         register<ScreenEvent.PreRender> {
             if (! TerminalListener.inTerm) return@register
             val termType = TerminalListener.currentType ?: return@register
-            val screen = event.screen as? AbstractContainerScreen<*> ?: return@register
             event.isCanceled = true
 
             Resolution.refresh()
             Resolution.apply(event.context)
 
             val scale = 3f * scale.value
-
             val screenWidth = Resolution.width / scale
             val screenHeight = Resolution.height / scale
             val windowSize = termType.slotCount
 
             val width = 9 * 18
             val height = windowSize / 9 * 18
-
             val offsetX = screenWidth / 2 - width / 2
             val offsetY = screenHeight / 2 - height / 2
 
             event.context.pose().pushMatrix()
             event.context.pose().scale(scale, scale)
 
-            Render2D.drawCenteredString(event.context, termType.name, offsetX + width / 2f, offsetY - 15f, scale = 1.2f)
+            Render2D.drawCenteredString(event.context, termType.name.lowercase().uppercaseFirst(), offsetX + width / 2f, offsetY - 15f, scale = 1.2f)
             Render2D.drawRect(event.context, offsetX, offsetY, width, height, backgroundColor.value)
             Render2D.drawBorder(event.context, offsetX, offsetY, width, height, borderColor.value)
             val color = solutionColor.value
@@ -106,7 +102,7 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
                     Render2D.drawRect(event.context, currentOffsetX, currentOffsetY, 16f, 16f, color.withAlpha(40))
                     Render2D.drawCenteredString(
                         event.context,
-                        screen.menu.getSlot(slot)?.item?.count.toString(),
+                        (TerminalListener.currentItems[slot]?.count ?: mc.player?.containerMenu?.getSlot(slot)?.item?.count).toString(),
                         currentOffsetX + 8f, currentOffsetY + 5f
                     )
                 }
@@ -117,11 +113,7 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
                 else if (TerminalListener.currentType == TerminalType.RUBIX) {
                     Render2D.drawBorder(event.context, currentOffsetX, currentOffsetY, 16f, 16f, color)
                     Render2D.drawRect(event.context, currentOffsetX, currentOffsetY, 16f, 16f, color.withAlpha(40))
-                    Render2D.drawCenteredString(
-                        event.context,
-                        "$btn",
-                        currentOffsetX + 8f, currentOffsetY + 5f
-                    )
+                    Render2D.drawCenteredString(event.context, "$btn", currentOffsetX + 8f, currentOffsetY + 5f)
                 }
             }
 
@@ -179,7 +171,6 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
 
             val width = 9 * 18
             val height = windowSize / 9 * 18
-
             val offsetX = screenWidth / 2 - width / 2
             val offsetY = screenHeight / 2 - height / 2
 
@@ -191,33 +182,33 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
             val slot = slotX + slotY * 9
             if (slot >= windowSize) return@register
 
-            if (TerminalListener.currentType == TerminalType.NUMBERS) {
-                val click = solution.firstOrNull()?.takeIf { it.slotId == slot } ?: return@register
-
-                predict(click)
-                if (isClicked) queue.add(click)
-                else click(click)
-            }
-            else if (TerminalListener.currentType.equalsOneOf(TerminalType.REDGREEN, TerminalType.STARTWITH, TerminalType.COLORS)) {
-                val click = solution.find { it.slotId == slot } ?: return@register
-
-                predict(click)
-                if (isClicked) queue.add(click)
-                else click(click)
-            }
+            val click = if (TerminalListener.currentType == TerminalType.NUMBERS)
+                solution.firstOrNull()?.takeIf { it.slotId == slot }
+            else if (TerminalListener.currentType.equalsOneOf(TerminalType.REDGREEN, TerminalType.STARTWITH, TerminalType.COLORS))
+                solution.find { it.slotId == slot }
             else if (TerminalListener.currentType == TerminalType.RUBIX) {
-                val btn = solution.find { it.slotId == slot }?.btn ?: return@register
-                val clickType = if (btn > 0) 0 else 1
-                val click = TerminalClick(slot, clickType)
+                val btn = solution.find { it.slotId == slot }?.btn
+                if (btn != null) {
+                    val clickType = if (btn > 0) 0 else 1
+                    TerminalClick(slot, clickType)
+                }
+                else null
 
-                predict(click)
-                if (isClicked) queue.add(click)
-                else click(click)
             }
             else if (TerminalListener.currentType == TerminalType.MELODY) {
-                if (! slot.equalsOneOf(16, 25, 34, 43)) return@register
-                mc.gameMode?.handleInventoryMouseClick(TerminalListener.lastWindowId, slot, 0, ClickType.PICKUP, mc.player)
+                if (slot.equalsOneOf(16, 25, 34, 43)) {
+                    mc.gameMode?.handleInventoryMouseClick(TerminalListener.lastWindowId, slot, 0, ClickType.PICKUP, mc.player)
+                }
+                return@register
             }
+            else null
+
+
+            if (click == null) return@register
+            predict(click)
+
+            if (mode.value == 0) click(click)
+            else if (isClicked) queue.add(click) else click(click)
         }
     }
 
@@ -237,10 +228,22 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
     private fun click(click: TerminalClick) {
         val player = mc.player ?: return
         isClicked = true
-        mc.gameMode?.handleInventoryMouseClick(TerminalListener.lastWindowId, click.slotId, click.btn, ClickType.PICKUP, player)
-        val sid = TerminalListener.lastWindowId
+
+        mc.gameMode?.handleInventoryMouseClick(
+            TerminalListener.lastWindowId,
+            click.slotId,
+            if (click.btn == 0) 2 else click.btn,
+            if (click.btn == 0) ClickType.CLONE else ClickType.PICKUP,
+            player
+        )
+
+        val initialWindowId = TerminalListener.lastWindowId
         ThreadUtils.setTimeout(resyncTimeout.value) {
-            if (! TerminalListener.inTerm || sid != TerminalListener.lastWindowId) return@setTimeout
+            if (! TerminalListener.inTerm || initialWindowId != TerminalListener.lastWindowId) return@setTimeout
+            if (NoammAddons.debugFlags.contains("terminal")) {
+                ChatUtils.modMessage("Resync Timeout Triggered")
+            }
+
             queue.clear()
             solve()
             isClicked = false
@@ -253,6 +256,7 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
         val currentItems = TerminalListener.currentItems
         solution.clear()
 
+        // (Solver Logic remains identical to original)
         when (type) {
             TerminalType.NUMBERS -> {
                 currentItems.filter { it.value.item == Items.RED_STAINED_GLASS_PANE }
@@ -269,7 +273,6 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
             TerminalType.STARTWITH -> {
                 val match = TerminalType.startwithRegex.matchEntire(TerminalListener.currentTitle)
                 val letter = match?.groupValues?.get(1)?.lowercase() ?: return
-
                 currentItems.forEach { (slot, item) ->
                     val name = item.hoverName.string.removeFormatting().lowercase()
                     if (name.startsWith(letter) && ! item.hasGlint()) {
@@ -282,11 +285,9 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
                 val match = TerminalType.colorsRegex.matchEntire(TerminalListener.currentTitle)
                 val targetColor = match?.groupValues?.get(1) ?: return
                 val dyeColor = DyeColor.entries.find { it.name.replace("_", " ").equals(targetColor.replace("SILVER", "LIGHT GRAY"), true) } ?: return
-
                 currentItems.forEach { (slot, item) ->
                     if (item.hasGlint()) return@forEach
                     if (item.item == Items.BLACK_STAINED_GLASS_PANE) return@forEach
-
                     val isNameMatch = item.item.name.string.startsWith(dyeColor.name.replace("_", " "), true)
                     val isDyeMatch = when (dyeColor) {
                         DyeColor.BLACK -> item.item == Items.INK_SAC
@@ -295,9 +296,7 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
                         DyeColor.WHITE -> item.item == Items.BONE_MEAL
                         else -> false
                     }
-
                     if (! isNameMatch && ! isDyeMatch) return@forEach
-
                     solution.add(TerminalClick(slot, 0))
                 }
             }
@@ -306,36 +305,27 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
                 val allowedSlots = listOf(12, 13, 14, 21, 22, 23, 30, 31, 32)
                 val panes = currentItems.filter { it.key in allowedSlots }
                 val order = TerminalType.rubixOrder
-
                 val costs = IntArray(5) { 0 }
                 for (i in 0 until 5) {
                     panes.forEach { (_, stack) ->
                         val itemIdx = order.indexOf(stack.item)
                         if (itemIdx == - 1) return@forEach
-
                         val dist = abs(i - itemIdx)
                         val clicksNeeded = if (dist > 2) 5 - dist else dist
                         costs[i] += clicksNeeded
                     }
                 }
-
                 val bestIndex = costs.indices.minByOrNull { costs[it] } ?: 0
-
-                if (lastRubixTarget == null || costs[lastRubixTarget !!] == 0) {
-                    lastRubixTarget = bestIndex
+                if (TerminalType.lastRubixTarget == null || costs[TerminalType.lastRubixTarget !!] == 0) {
+                    TerminalType.lastRubixTarget = bestIndex
                 }
-
-                val origin = lastRubixTarget !!
-
+                val origin = TerminalType.lastRubixTarget !!
                 panes.forEach { (slotId, itemstack) ->
                     val currentIdx = order.indexOf(itemstack.item)
                     if (currentIdx == - 1 || currentIdx == origin) return@forEach
-
                     var diff = origin - currentIdx
-
                     if (diff > 2) diff -= 5
                     if (diff < - 2) diff += 5
-
                     solution.add(TerminalClick(slotId, diff))
                 }
             }
@@ -353,49 +343,36 @@ object TerminalSolver: Feature("Terminal Solver with Prediction and Queue") {
         }
     }
 
-
-    fun onItemsUpdated(slot: Int, item: ItemStack) {
+    fun onItemsUpdated(slot: Int = 0, item: ItemStack = ItemStack.EMPTY) {
         solve(slot, item)
+        if (mode.value == 0) return
 
-        if (TerminalListener.currentType.equalsOneOf(TerminalType.REDGREEN, TerminalType.STARTWITH, TerminalType.COLORS)) {
-            if (queue.isNotEmpty() && queue.all { click -> solution.any { it.slotId == click.slotId } }) {
+        if (queue.isNotEmpty()) {
+            val nextClick = queue[0]
+
+            val isValid = when (TerminalListener.currentType) {
+                TerminalType.NUMBERS -> {
+                    val firstSol = solution.firstOrNull()
+                    firstSol != null && firstSol.slotId == nextClick.slotId
+                }
+
+                TerminalType.RUBIX -> {
+                    val sol = solution.find { it.slotId == nextClick.slotId }
+                    sol != null && ((sol.btn > 0 && nextClick.btn == 0) || (sol.btn < 0 && nextClick.btn == 1))
+                }
+
+                else -> solution.any { it.slotId == nextClick.slotId }
+            }
+
+            if (isValid) {
                 queue.forEach { predict(it) }
-                click(queue[0])
-                queue.removeAt(0)
-            }
-            else queue.clear()
-        }
-        else if (TerminalListener.currentType == TerminalType.NUMBERS) {
-            if (queue.isNotEmpty() && queue.all { entry ->
-                    solution.indexOf(entry) == queue.indexOfFirst { it.slotId == entry.slotId }
-                }) {
-                queue.forEach { click -> predict(click) }
-                click(queue[0])
-                queue.removeAt(0)
-            }
-            else queue.clear()
-        }
-        else if (TerminalListener.currentType == TerminalType.RUBIX) {
-            if (queue.isNotEmpty() && queue.all { queuedClick ->
-                    val target = solution.find { it.slotId == queuedClick.slotId }
-                    val requiredBtn = target?.btn ?: 0
-                    (requiredBtn > 0 && queuedClick.btn == 0) || (requiredBtn < 0 && queuedClick.btn == 1)
-                }) {
-                queue.forEach { predict(it) }
-                click(queue[0])
+                click(nextClick)
                 queue.removeAt(0)
             }
             else queue.clear()
         }
     }
 
-    fun onTerminalOpen() {
-        isClicked = false
-    }
-
-    fun onTerminalClose() {
-        queue.clear()
-        solution.clear()
-        TerminalType.reset()
-    }
+    fun onTerminalOpen() = ::isClicked.set(false)
+    fun onTerminalClose() = queue.clear()
 }
