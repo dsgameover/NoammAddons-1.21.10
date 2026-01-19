@@ -37,7 +37,7 @@ object SoundGui: Screen(Component.literal("SoundManager")) {
 
     override fun render(ctx: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         Resolution.refresh()
-        Resolution.apply(ctx)
+        Resolution.push(ctx)
         val mX = Resolution.getMouseX(mouseX)
         val mY = Resolution.getMouseY(mouseY)
 
@@ -104,7 +104,7 @@ object SoundGui: Screen(Component.literal("SoundManager")) {
         val searchX = x + sidebarWidth + (viewW / 2) - 100
         drawSearch(ctx, searchX, y + h - 30, 200f, 20f, mX.toDouble(), mY.toDouble())
 
-        Resolution.restore(ctx)
+        Resolution.pop(ctx)
     }
 
     private fun drawSoundRow(ctx: GuiGraphics, id: String, x: Float, y: Float, w: Float, h: Float, mx: Double, my: Double) {

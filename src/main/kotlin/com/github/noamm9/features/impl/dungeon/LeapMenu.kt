@@ -93,7 +93,7 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
             }
 
             Resolution.refresh()
-            Resolution.apply(event.context)
+            Resolution.push(event.context)
             val userScale = (scale.value.toFloat() / 100f) * 2.0f
             val screenWidth = Resolution.width / userScale
             val screenHeight = Resolution.height / userScale
@@ -174,7 +174,7 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
             }
 
             pose.popMatrix()
-            Resolution.restore(event.context)
+            Resolution.pop(event.context)
         }
 
         register<ContainerEvent.MouseClick> {
@@ -224,6 +224,8 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
     }
 
     private fun updateLeapMenu() {
+        players.fill(null)
+
         mc.player?.containerMenu?.let { menu ->
             for (i in (menu.slots.indices - 36)) {
                 val stack = menu.slots[i].item

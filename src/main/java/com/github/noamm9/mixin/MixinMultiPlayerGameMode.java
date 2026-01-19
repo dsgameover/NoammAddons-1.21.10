@@ -19,6 +19,7 @@ public class MixinMultiPlayerGameMode {
 
     @Inject(method = "handleInventoryMouseClick", at = @At("HEAD"), cancellable = true)
     private void onHandleSlotClick(int i, int j, int k, ClickType clickType, Player player, CallbackInfo ci) {
+        if (minecraft.screen == null) return;
         var event = new ContainerEvent.SlotClick(minecraft.screen, j, k, clickType);
         if (EventBus.post(event)) {
             ci.cancel();

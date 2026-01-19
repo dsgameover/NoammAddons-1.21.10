@@ -51,9 +51,9 @@ object FeatureManager {
         register<RenderOverlayEvent> {
             if (mc.screen == HudEditorScreen) return@register
             Resolution.refresh()
-            Resolution.apply(event.context)
+            Resolution.push(event.context)
             hudElements.forEach { if (it.shouldDraw) it.renderElement(event.context, false) }
-            Resolution.restore(event.context)
+            Resolution.pop(event.context)
         }
     }
 

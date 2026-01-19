@@ -13,7 +13,7 @@ import java.awt.Color
 object HudEditorScreen: Screen(Component.literal("HudEditor")) {
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         Resolution.refresh()
-        Resolution.apply(context)
+        Resolution.push(context)
 
         val mX = Resolution.getMouseX(mouseX)
         val mY = Resolution.getMouseY(mouseY)
@@ -25,7 +25,7 @@ object HudEditorScreen: Screen(Component.literal("HudEditor")) {
         Render2D.drawCenteredString(context, "Dragging HUD Elements...", midX, 10f, Color.WHITE, 1.2f)
         Render2D.drawCenteredString(context, "ESC to Save and Exit", midX, Resolution.height - 20f, Color.GRAY, shadow = false)
 
-        Resolution.restore(context)
+        Resolution.pop(context)
     }
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontal: Double, vertical: Double): Boolean {

@@ -81,7 +81,7 @@ class DropdownSetting(name: String, value: Int, val options: List<String>): Sett
 
     override fun read(element: JsonElement?) {
         element?.asInt?.let { newValue ->
-            value = newValue
+            value = newValue.coerceIn(0, options.lastIndex)
         }
     }
 }

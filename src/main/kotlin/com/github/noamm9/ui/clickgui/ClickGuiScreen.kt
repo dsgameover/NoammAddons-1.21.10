@@ -40,7 +40,7 @@ object ClickGuiScreen: Screen(Component.literal("ClickGUI")) {
 
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         Resolution.refresh()
-        Resolution.apply(context)
+        Resolution.push(context)
         val mX = Resolution.getMouseX(mouseX.toDouble())
         val mY = Resolution.getMouseY(mouseY.toDouble())
 
@@ -56,7 +56,7 @@ object ClickGuiScreen: Screen(Component.literal("ClickGUI")) {
         }
 
         TooltipManager.draw(context, Resolution.width, Resolution.height)
-        Resolution.restore(context)
+        Resolution.pop(context)
     }
 
     private fun drawSettingsMenu(context: GuiGraphics, feature: Feature, mx: Int, my: Int) {

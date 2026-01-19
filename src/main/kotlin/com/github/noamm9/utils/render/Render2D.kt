@@ -193,14 +193,14 @@ object Render2D {
     }
 
     fun drawRoundedRect(ctx: GuiGraphics, x: Number, y: Number, width: Number, height: Number, radius: Number, color: Color) {
-        val xInt = x.toInt() * 4
-        val yInt = y.toInt() * 4
-        val wInt = width.toInt() * 4
-        val hInt = height.toInt() * 4
-        val rInt = radius.toInt() * 4
+        val xInt = x.toInt() * 12
+        val yInt = y.toInt() * 12
+        val wInt = width.toInt() * 12
+        val hInt = height.toInt() * 12
+        val rInt = radius.toInt() * 12
 
         ctx.pose().pushMatrix()
-        ctx.pose().scale(1 / 4f)
+        ctx.pose().scale(1 / 12f)
 
         ctx.fill(xInt + rInt, yInt, xInt + wInt - rInt, yInt + hInt, color.rgb)
         ctx.fill(xInt, yInt + rInt, xInt + rInt, yInt + hInt - rInt, color.rgb)

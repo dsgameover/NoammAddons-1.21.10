@@ -2,45 +2,44 @@ package com.github.noamm9.ui.utils
 
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.utils.NumbersUtils.div
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 
 object Resolution {
-    private const val REFERENCE_WIDTH = 960f
+    private const val REFERENCE_HEIGHT = 540f
 
-    var customScale = 1f
+    var scale = 1f
         private set
+
     var width = 960f
         private set
+
     var height = 540f
         private set
 
-    /**
-     * Updates the scale math. Call this at the very beginning of 'render'
-     */
     fun refresh() {
-        customScale = mc.window.guiScaledWidth.toFloat() / REFERENCE_WIDTH
-        width = REFERENCE_WIDTH
-        height = mc.window.guiScaledHeight.toFloat() / customScale
+        val window = Minecraft.getInstance().window
+        val guiWidth = window.guiScaledWidth.toFloat()
+        val guiHeight = window.guiScaledHeight.toFloat()
+
+        scale = guiHeight / REFERENCE_HEIGHT
+
+        height = REFERENCE_HEIGHT
+        width = guiWidth / scale
     }
 
-    /**
-     * Scales the renderer. Use this before drawing your UI.
-     */
-    fun apply(ctx: GuiGraphics) {
+    fun push(ctx: GuiGraphics) {
         ctx.pose().pushMatrix()
-        ctx.pose().scale(customScale, customScale)
+        ctx.pose().scale(scale, scale)
     }
 
-    /**
-     * Reverts the scale. Use this at the end of 'render'
-     */
-    fun restore(ctx: GuiGraphics) {
+    fun pop(ctx: GuiGraphics) {
         ctx.pose().popMatrix()
     }
 
-    /**
-     * Converts Minecraft's scaled mouse to our logical coordinates.
-     */
-    fun getMouseX(vanillaX: Number): Int = (vanillaX / customScale).toInt()
-    fun getMouseY(vanillaY: Number): Int = (vanillaY / customScale).toInt()
+    fun getMouseX(vanillaX: Number) = (vanillaX / scale).toInt()
+    fun getMouseY(vanillaY: Number) = (vanillaY / scale).toInt()
+
+    fun getMouseX() = (mc.mouseHandler.xpos() / mc.window.screenWidth.toDouble() * width).toInt()
+    fun getMouseY() = (mc.mouseHandler.ypos() / mc.window.screenHeight.toDouble() * height).toInt()
 }

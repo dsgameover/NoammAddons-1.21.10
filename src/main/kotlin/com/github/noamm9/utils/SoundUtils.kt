@@ -17,7 +17,11 @@ object SoundUtils {
     private val SOUNDS_DIR = Paths.get("config", NoammAddons.MOD_NAME, "sounds")
 
     fun playEvent(event: Holder.Reference<SoundEvent>, volume: Float = 1.0f, pitch: Float = 1f) {
-        val weightedSoundSet = mc.soundManager.getSoundEvent(event.value().location) ?: return
+        playEvent(event.value(), volume, pitch)
+    }
+
+    fun playEvent(event: SoundEvent, volume: Float = 1.0f, pitch: Float = 1f) {
+        val weightedSoundSet = mc.soundManager.getSoundEvent(event.location) ?: return
         val sound = weightedSoundSet.getSound(SoundInstance.createUnseededRandom())
         val soundLocation = sound.location
         val actualPath = "sounds/${soundLocation.path}.ogg"
