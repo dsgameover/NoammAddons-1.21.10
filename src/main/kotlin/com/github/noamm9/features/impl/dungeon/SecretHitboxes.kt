@@ -5,42 +5,34 @@ import com.github.noamm9.ui.clickgui.componnents.getValue
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.componnents.provideDelegate
 import com.github.noamm9.ui.clickgui.componnents.withDescription
-import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.ButtonBlock
 import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock
-import net.minecraft.world.level.block.LeverBlock
-import net.minecraft.world.level.block.SkullBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.AttachFace
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
-import java.util.*
 
 object SecretHitboxes: Feature("Changes the hitboxes of secret blocks to be larger.") {
-    val lever by ToggleSetting("Lever").withDescription("Full block lever hitbox.")
+
+    @JvmStatic
+    val lever by ToggleSetting("Lever").withDescription("Full block Lever hitbox.")
+
+    @JvmStatic
     val button by ToggleSetting("Button").withDescription("Full block button hitbox.")
+
+    @JvmStatic
     val skull by ToggleSetting("Skulls").withDescription("Full block Skull hitbox.")
 
-    fun getShape(state: BlockState): Optional<VoxelShape> {
-        if (! LocationUtils.inDungeon) return Optional.ofNullable(null)
+    @JvmStatic
+    val mushroom by ToggleSetting("Mushroom").withDescription("Full block Mushroom hitbox.")
 
-        return Optional.ofNullable(
-            when (state.block) {
-                is SkullBlock if skull.value -> Shapes.block()
-                is LeverBlock if lever.value -> Shapes.block()
-                is ButtonBlock if button.value -> getHackButtonShape(
-                    state.getValue(FaceAttachedHorizontalDirectionalBlock.FACE),
-                    state.getValue(FaceAttachedHorizontalDirectionalBlock.FACING),
-                    state.getValue(ButtonBlock.POWERED)
-                )
+    @JvmStatic
+    fun getButtonShape(state: BlockState): VoxelShape {
+        val face = state.getValue(FaceAttachedHorizontalDirectionalBlock.FACE)
+        val direction = state.getValue(FaceAttachedHorizontalDirectionalBlock.FACING)
+        val powered = state.getValue(ButtonBlock.POWERED)
 
-                else -> null
-            }
-        )
-    }
-
-    private fun getHackButtonShape(face: AttachFace, direction: Direction, powered: Boolean): VoxelShape {
         val f2 = (if (powered) 1 else 2) / 16.0
         return when (face) {
             AttachFace.CEILING -> Shapes.box(0.0, 1.0 - f2, 0.0, 1.0, 1.0, 1.0)

@@ -6,12 +6,15 @@
     "ExampleMixin",
     "IMapState",
     "IServerboundInteractPacket",
-    "MixinClipContext",
+    "MixinButtonBlock",
     "MixinConnection",
     "MixinEntity",
     "MixinItemStack",
+    "MixinLeverBlock",
     "MixinLivingEntity",
-    "MixinPacketProcessorListener"
+    "MixinMushroomBlock",
+    "MixinPacketProcessorListener",
+    "MixinSkullBlock"
   ],
   "injectors": {
     "defaultRequire": 1

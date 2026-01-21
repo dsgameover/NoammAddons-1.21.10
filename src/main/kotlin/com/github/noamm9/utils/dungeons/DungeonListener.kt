@@ -35,9 +35,6 @@ object DungeonListener {
     private val watcherMessageRegex = Regex("^\\[BOSS] The Watcher: .+$")
     private val runEndRegex = Regex("^\\s*(Master Mode)? ?(?:The)? Catacombs - (Floor (.{1,3})|Entrance)$") // https://regex101.com/r/W4UjWQ/3
 
-    const val WITHER_ESSENCE_ID = "e0f3e929-869e-3dca-9504-54c666ee6f23"
-    const val REDSTONE_KEY_ID = "fed95410-aba1-39df-9b95-1d4f361eb66e"
-
     val runPlayersNames = mutableMapOf<String, ResourceLocation>()
     var dungeonTeammates = mutableListOf<DungeonPlayer>()
     var dungeonTeammatesNoSelf = listOf<DungeonPlayer>()
