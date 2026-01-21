@@ -53,7 +53,7 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
 
     data class LeapMenuPlayer(val slotIndex: Int, val player: DungeonPlayer)
 
-    private val players = MutableList<LeapMenuPlayer?>(4) { null }
+    val players = MutableList<LeapMenuPlayer?>(4) { null }
     private val leapRegex = Regex("^You have teleported to (.+)!$")
     private val playerPattern = Regex("(?:\\[.+?] )?(?<name>\\w+)")
     private var shouldHide: Long = 0
@@ -223,7 +223,7 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
             && enabled
     }
 
-    private fun updateLeapMenu() {
+    fun updateLeapMenu() {
         players.fill(null)
 
         mc.player?.containerMenu?.let { menu ->

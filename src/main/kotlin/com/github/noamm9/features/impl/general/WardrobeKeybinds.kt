@@ -45,7 +45,7 @@ object WardrobeKeybinds: Feature("Make it possible to bind armor slots to your k
     }
 
     override fun init() {
-        register<MainThreadPacketRecivedEvent.Post> {
+        register<MainThreadPacketRecivedEvent.Pre> {
             if (event.packet is ClientboundOpenScreenPacket) {
                 inWardrobeMenu = event.packet.title.unformattedText.matches(wardrobeMenuRegex)
             }

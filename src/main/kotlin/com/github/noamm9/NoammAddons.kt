@@ -15,6 +15,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -126,7 +127,12 @@ object NoammAddons: ClientModInitializer {
                 ClientCommandManager.literal("test").executes {
                     ThreadUtils.scheduledTask(25) {
                         ChatUtils.modMessage("hi")
+                        scope.launch {
+                            PlayerUtils.leapAction(DungeonListener.dungeonTeammatesNoSelf.first())
+                        }
                     }
+
+
                     1
                 }
             )
