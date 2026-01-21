@@ -9,7 +9,6 @@ import com.github.noamm9.utils.ItemUtils.skyblockId
 import com.github.noamm9.utils.MathUtils
 import com.github.noamm9.utils.dungeons.Classes
 import com.github.noamm9.utils.dungeons.DungeonListener
-import com.github.noamm9.utils.dungeons.DungeonPlayer
 import com.github.noamm9.utils.dungeons.map.DungeonInfo
 import com.github.noamm9.utils.dungeons.map.core.*
 import com.github.noamm9.utils.dungeons.map.handlers.HotbarMapColorParser
@@ -278,19 +277,44 @@ object MapRenderer: HudElement() {
     private fun renderPlayerHeads(ctx: GuiGraphics) {
         if (LocationUtils.inBoss) return
 
-        if (DungeonListener.dungeonStarted) DungeonListener.dungeonTeammates.forEach { teammate ->
-            if (! teammate.isDead || teammate == DungeonListener.thePlayer) {
-                drawPlayerHead(ctx, teammate)
+        if (DungeonListener.dungeonStarted) {
+            DungeonListener.dungeonTeammates.forEach { player ->
+                if (! player.isDead || player == DungeonListener.thePlayer) {
+                    val entity = player.entity as? AbstractClientPlayer
+
+                    val (x, z, yaw) = if (entity == null || ! entity.isAlive) {
+                        Triple(player.mapIcon.mapX, player.mapIcon.mapZ, player.mapIcon.yaw)
+                    }
+                    else {
+                        val (mx, mz) = MapUtils.coordsToMap(entity.renderVec)
+                        Triple(mx, mz, entity.yRot)
+                    }
+
+                    val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) player.clazz.color
+                    else MapConfig.mapPlayerHeadColor.value
+
+                    val nameColor = if (MapConfig.mapPlayerNameClassColorBased.value && player.clazz != Classes.Empty) player.clazz.color
+                    else Color.WHITE
+
+                    drawPlayerHead(ctx, player.name, x, z, yaw, entity?.skin?.body?.id() ?: player.skin, borderColor, nameColor)
+                }
             }
         }
-        else DungeonListener.runPlayersNames.keys.forEach { name ->
-            mc.level !!.players().forEach { entity ->
-                if (entity.name.string == name) {
-                    drawPlayerHead(ctx, name, entity)
+        else {
+            val levelPlayers = mc.level?.players() ?: return
+            DungeonListener.runPlayersNames.keys.forEach { name ->
+                levelPlayers.find { it.name.string == name }?.let { entity ->
+                    val (x, z) = MapUtils.coordsToMap(entity.renderVec)
+
+                    val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) Classes.Empty.color
+                    else MapConfig.mapPlayerHeadColor.value
+
+                    drawPlayerHead(ctx, name, x, z, entity.yRot, entity.skin.body.id(), borderColor, Color.WHITE)
                 }
             }
         }
     }
+
 
     private fun drawCheckmark(ctx: GuiGraphics, tile: Tile, x: Number, y: Number, size: Number) {
         val checkmark = when (tile.state) {
@@ -304,64 +328,22 @@ object MapRenderer: HudElement() {
         Render2D.drawTexture(ctx, checkmark, x, y, size, size)
     }
 
-    private fun drawPlayerHead(ctx: GuiGraphics, player: DungeonPlayer) {
-        ctx.pose().pushMatrix()
-        val name = player.name
-        val entity = player.entity
-
-        val currentYaw: Float
-        if (entity != null && entity.isAlive) {
-            val (x, z) = MapUtils.coordsToMap(entity.renderVec)
-            ctx.pose().translate(x, z)
-            currentYaw = MathUtils.normalizeYaw(entity.yRot)
-        }
-        else {
-            ctx.pose().translate(player.mapIcon.mapX, player.mapIcon.mapZ)
-            currentYaw = MathUtils.normalizeYaw(player.mapIcon.yaw)
-        }
-
-        val headYaw = Math.toRadians((currentYaw + 180).toDouble()).toFloat()
-        ctx.pose().rotate(headYaw)
-        ctx.pose().scale(MapConfig.playerHeadScale.value)
-
-        if (MapConfig.mapVanillaMarker.value && name == mc.user.name) {
-            Render2D.drawTexture(ctx, ownPlayerMarker, - 6, - 6, 12, 12)
-        }
-        else {
-            Render2D.drawBorder(ctx, - 7, - 7, 14, 14,
-                if (MapConfig.mapPlayerHeadColorClassBased.value) player.clazz.color
-                else MapConfig.mapPlayerHeadColor.value
-            )
-
-            Render2D.drawPlayerHead(ctx, - 6, - 6, 12, player.skin)
-        }
-
-        val heldItem = mc.player?.mainHandItem
-        if (MapConfig.playerNames.value == 2 || (MapConfig.playerNames.value == 1
-                && (heldItem != null && (heldItem.skyblockId == "SPIRIT_LEAP" || heldItem.skyblockId == "INFINITE_SPIRIT_LEAP"
-                || heldItem.skyblockId == "HAUNT_ABILITY")))
-        ) {
-            ctx.pose().rotate(- headYaw)
-            ctx.pose().translate(0f, 8f)
-            ctx.pose().scale(MapConfig.playerNameScale.value)
-            Render2D.drawCenteredString(ctx, name, 0, 0,
-                if (MapConfig.mapPlayerNameClassColorBased.value && player.clazz != Classes.Empty)
-                    player.clazz.color
-                else Color.WHITE
-            )
-        }
-
-        ctx.pose().popMatrix()
-    }
-
-    private fun drawPlayerHead(ctx: GuiGraphics, name: String, entity: AbstractClientPlayer) {
+    private fun drawPlayerHead(
+        ctx: GuiGraphics,
+        name: String,
+        x: Float,
+        z: Float,
+        yaw: Float,
+        skin: ResourceLocation,
+        borderColor: Color,
+        nameColor: Color
+    ) {
         ctx.pose().pushMatrix()
 
-        val (x, z) = MapUtils.coordsToMap(entity.renderVec)
         ctx.pose().translate(x, z)
-        val currentYaw = MathUtils.normalizeYaw(entity.yRot)
-
+        val currentYaw = MathUtils.normalizeYaw(yaw)
         val headYaw = Math.toRadians((currentYaw + 180).toDouble()).toFloat()
+
         ctx.pose().rotate(headYaw)
         ctx.pose().scale(MapConfig.playerHeadScale.value)
 
@@ -369,23 +351,20 @@ object MapRenderer: HudElement() {
             Render2D.drawTexture(ctx, ownPlayerMarker, - 6, - 6, 12, 12)
         }
         else {
-            Render2D.drawBorder(ctx, - 7, - 7, 14, 14,
-                if (MapConfig.mapPlayerHeadColorClassBased.value) Classes.Empty.color
-                else MapConfig.mapPlayerHeadColor.value
-            )
-
-            Render2D.drawPlayerHead(ctx, - 6, - 6, 12, entity.skin.body.id())
+            Render2D.drawBorder(ctx, - 7, - 7, 14, 14, borderColor)
+            Render2D.drawPlayerHead(ctx, - 6, - 6, 12, skin)
         }
 
         val heldItem = mc.player?.mainHandItem
-        if (MapConfig.playerNames.value == 2 || (MapConfig.playerNames.value == 1
-                && (heldItem != null && (heldItem.skyblockId == "SPIRIT_LEAP" || heldItem.skyblockId == "INFINITE_SPIRIT_LEAP"
-                || heldItem.skyblockId == "HAUNT_ABILITY")))
-        ) {
+        val shouldDrawName = MapConfig.playerNames.value == 2 || (MapConfig.playerNames.value == 1
+            && (heldItem != null && (heldItem.skyblockId == "SPIRIT_LEAP" || heldItem.skyblockId == "INFINITE_SPIRIT_LEAP"
+            || heldItem.skyblockId == "HAUNT_ABILITY")))
+
+        if (shouldDrawName) {
             ctx.pose().rotate(- headYaw)
             ctx.pose().translate(0f, 8f)
             ctx.pose().scale(MapConfig.playerNameScale.value)
-            Render2D.drawCenteredString(ctx, name, 0, 0)
+            Render2D.drawCenteredString(ctx, name, 0, 0, nameColor)
         }
 
         ctx.pose().popMatrix()

@@ -2,7 +2,7 @@ package com.github.noamm9.mixin;
 
 import com.github.noamm9.event.EventBus;
 import com.github.noamm9.event.impl.EntityCheckRenderEvent;
-import com.github.noamm9.features.impl.visual.RenderOptimazier;
+import com.github.noamm9.features.impl.visual.RenderOptimizer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -28,7 +28,7 @@ public class MixinEntityRenderDispatcher {
 
     @WrapOperation(method = "submit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitFlame(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lorg/joml/Quaternionf;)V"))
     public void redirectDisplayFireAnimation(SubmitNodeCollector instance, PoseStack poseStack, EntityRenderState entityRenderState, Quaternionf quaternionf, Operation<Void> original) {
-        if (RenderOptimazier.INSTANCE.enabled && RenderOptimazier.INSTANCE.getHideFireOnEntities().getValue()) {
+        if (RenderOptimizer.INSTANCE.enabled && RenderOptimizer.INSTANCE.getHideFireOnEntities().getValue()) {
             return;
         }
 

@@ -21,9 +21,8 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
-object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
+object RenderOptimizer: Feature("Optimize Rendering by hiding useless shit.") {
     private val dungeonMobRegex = Regex("^(?:§.)*(.+).+§c❤$")
 
     private val hideStar by ToggleSetting("Hide Star Mobs's Nametag")
@@ -46,7 +45,6 @@ object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
         Regex("^.+ (?:§.)+0§c❤$")
     )
 
-    @Suppress("UNCHECKED_CAST")
     override fun init() {
         register<MainThreadPacketRecivedEvent.Pre> {
             if (! LocationUtils.inSkyblock) return@register
@@ -54,10 +52,15 @@ object RenderOptimazier: Feature("Optimize Rendering by hiding useless shit.") {
                 if (event.packet.id == mc.player?.id) return@register
                 if (! hide0HealthNames.value) return@register
                 for (entry in event.packet.packedItems) {
-                    val value = (entry.value() as? Optional<Component>)?.getOrNull() ?: return@register
-                    if (healthMatches.none { it.matches(value.formattedText) }) return@register
+                    val rawValue = entry.value()
+                    if (rawValue !is Optional<*>) continue
+                    val value = rawValue.orElse(null)
+                    if (value !is Component) continue
+                    if (healthMatches.none { it.matches(value.formattedText) }) continue
+
                     mc.level?.getEntity(event.packet.id)?.remove(Entity.RemovalReason.DISCARDED)
                     event.isCanceled = true
+                    break
                 }
             }
             else if (event.packet is ClientboundAddEntityPacket) {

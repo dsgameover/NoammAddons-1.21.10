@@ -33,8 +33,8 @@ object MapConfig {
     val limitRoomNameSize = ToggleSetting("Limit Room Name Size", true).showIf { dungeonMapCheckmarkStyle.value == 2 || dungeonMapCheckmarkStyle.value == 3 }
     val highlightMimicRoom = ToggleSetting("Hightlight Mimic Room", true)
 
-    val mapPlayerHeadColor = ColorSetting("Player Head Border", Color(0, 0, 0), true).section("Colors")
-    val mapPlayerHeadColorClassBased = ToggleSetting("Player Head Border Class Base", false)
+    val mapPlayerHeadColor = ColorSetting("Head Border", Color(0, 0, 0), true).section("Colors")
+    val mapPlayerHeadColorClassBased = ToggleSetting("Head Border Class Base", false)
     val mapPlayerNameClassColorBased = ToggleSetting("Player Names Class Base", false)
 
     val colorBlood = ColorSetting("Blood Room", Color(178, 0, 0), true)
