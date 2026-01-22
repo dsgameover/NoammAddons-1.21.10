@@ -7,6 +7,8 @@ import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.DungeonUtils
 import com.github.noamm9.utils.dungeons.DungeonUtils.isSecret
+import com.github.noamm9.utils.dungeons.map.core.UniqueRoom
+import com.github.noamm9.utils.dungeons.map.utils.ScanUtils
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.RenderContext
 import com.github.noamm9.utils.world.WorldUtils
@@ -104,6 +106,17 @@ object EventDispatcher {
 
                 EventBus.post(DungeonEvent.SecretEvent(type, pos))
             }
+        }
+    }
+
+    fun checkForRoomChange(currentRoom: UniqueRoom?, lastKnownRoom: UniqueRoom?) {
+        lastKnownRoom?.let {
+            EventBus.post(DungeonEvent.RoomEvent.onExit(it))
+        }
+        currentRoom?.let {
+            it.highestBlock = ScanUtils.getHighestY(it.mainRoom.x, it.mainRoom.z)
+            it.findRotation()
+            EventBus.post(DungeonEvent.RoomEvent.onEnter(it))
         }
     }
 }

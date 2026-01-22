@@ -1,7 +1,11 @@
 package com.github.noamm9.utils.dungeons.map.utils
 
 import com.github.noamm9.NoammAddons.mc
+import com.github.noamm9.event.EventBus.register
+import com.github.noamm9.event.EventDispatcher
+import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.utils.DataDownloader
+import com.github.noamm9.utils.ThreadUtils
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.map.DungeonInfo
 import com.github.noamm9.utils.dungeons.map.core.Room
@@ -10,6 +14,7 @@ import com.github.noamm9.utils.dungeons.map.core.UniqueRoom
 import com.github.noamm9.utils.dungeons.map.handlers.DungeonScanner
 import com.github.noamm9.utils.dungeons.map.handlers.DungeonScanner.startX
 import com.github.noamm9.utils.dungeons.map.handlers.DungeonScanner.startZ
+import com.github.noamm9.utils.location.LocationUtils.inDungeon
 import com.github.noamm9.utils.world.WorldUtils
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Blocks
@@ -18,6 +23,31 @@ import kotlin.math.round
 
 object ScanUtils {
     private val roomList by lazy { DataDownloader.loadJson<List<RoomData>>("rooms.json") }
+
+    init {
+        register<WorldChangeEvent> {
+            currentRoom = null
+            lastKnownRoom = null
+        }
+
+        ThreadUtils.loop(250) {
+            if (! inDungeon) return@loop
+
+            val room = getRoomFromPos(mc.player?.position() ?: return@loop)
+            if (currentRoom == room) return@loop
+
+            lastKnownRoom = currentRoom
+            currentRoom = room
+
+            EventDispatcher.checkForRoomChange(currentRoom, lastKnownRoom)
+        }
+    }
+
+    @JvmField
+    var currentRoom: UniqueRoom? = null
+
+    @JvmField
+    var lastKnownRoom: UniqueRoom? = null
 
     fun getRoomData(hash: Int) = roomList.find { hash in it.cores }
     fun getRoomData(name: String) = roomList.find { it.name == name }
@@ -28,17 +58,6 @@ object ScanUtils {
         val gridX = roomIndexX * 2
         val gridZ = roomIndexZ * 2
         return gridX.coerceIn(0, 10) to gridZ.coerceIn(0, 10)
-    }
-
-    fun getRoomCorner(pair: Pair<Int, Int>): Pair<Int, Int> {
-        return Pair(
-            - 200 + pair.first * 32,
-            - 200 + pair.second * 32
-        )
-    }
-
-    fun getRoomCenter(pair: Pair<Int, Int>): Pair<Int, Int> {
-        return Pair(pair.first + 15, pair.second + 15)
     }
 
     fun getRoomFromPos(vec: Vec3): UniqueRoom? {
@@ -69,7 +88,6 @@ object ScanUtils {
     }
 
     fun getHighestY(x: Int, z: Int): Int {
-        mc.level ?: return - 1
         var height = 0
 
         for (idx in 256 downTo 0) {

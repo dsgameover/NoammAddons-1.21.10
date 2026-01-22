@@ -4,8 +4,13 @@ import com.github.noamm9.NoammAddons
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.NoammAddons.scope
 import com.github.noamm9.event.EventBus
+import com.github.noamm9.event.EventBus.register
+import com.github.noamm9.event.EventPriority
 import com.github.noamm9.event.impl.PacketEvent
+import com.github.noamm9.event.impl.RenderOverlayEvent
+import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.utils.Utils.remove
+import com.github.noamm9.utils.render.Render2D
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.ChatFormatting
@@ -142,9 +147,25 @@ object ChatUtils {
         return " ".repeat(padding) + text
     }
 
-    fun showTitle(title: String = "", subtitle: String = "") {
-        mc.gui.setTimes(0, 20, 5)
-        mc.gui.setTitle(Component.literal(title.addColor()))
-        mc.gui.setSubtitle(Component.literal(subtitle.addColor()))
+    private var title = ""
+    private var subtitle = ""
+    private var time = 0
+
+
+    fun showTitle(title: Any? = "", subtitle: Any? = "") {
+        this.title = title.toString()
+        this.subtitle = subtitle.toString()
+        this.time = 40
+    }
+
+    init {
+        register<TickEvent.Start> { if (time > 0) time -- }
+
+        register<RenderOverlayEvent>(EventPriority.LOW) {
+            if (time > 0) {
+                Render2D.drawCenteredString(event.context, title, mc.window.guiScaledWidth / 2f, mc.window.guiScaledHeight / 2f - 10f, scale = 2.5)
+                Render2D.drawCenteredString(event.context, subtitle, mc.window.guiScaledWidth / 2f, mc.window.guiScaledHeight / 2f + 20f, scale = 1.5)
+            }
+        }
     }
 }

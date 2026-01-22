@@ -9,13 +9,16 @@ import com.github.noamm9.ui.clickgui.ClickGuiScreen
 import com.github.noamm9.ui.hud.HudEditorScreen
 import com.github.noamm9.utils.*
 import com.github.noamm9.utils.dungeons.DungeonListener
+import com.github.noamm9.utils.dungeons.map.handlers.DungeonScanner.roomSize
+import com.github.noamm9.utils.dungeons.map.handlers.DungeonScanner.startX
+import com.github.noamm9.utils.dungeons.map.handlers.DungeonScanner.startZ
+import com.github.noamm9.utils.dungeons.map.utils.ScanUtils
 import com.github.noamm9.utils.network.WebUtils
 import com.github.noamm9.utils.network.data.ElectionData
 import com.mojang.brigadier.arguments.StringArgumentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -118,7 +121,7 @@ object NoammAddons: ClientModInitializer {
                             ChatUtils.modMessage(msg)
                             EventBus.post(ChatMessageEvent(Component.literal(msg)))
 
-                            1 // Success
+                            1
                         }
                     ))
             )
@@ -127,12 +130,22 @@ object NoammAddons: ClientModInitializer {
                 ClientCommandManager.literal("test").executes {
                     ThreadUtils.scheduledTask(25) {
                         ChatUtils.modMessage("hi")
-                        scope.launch {
-                            PlayerUtils.leapAction(DungeonListener.dungeonTeammatesNoSelf.first())
-                        }
+                        ChatUtils.showTitle("Exmple Title", "Example subtitle")
+
                     }
+                    1
+                }
+            )
 
 
+            dispatcher.register(
+                ClientCommandManager.literal("core").executes {
+                    ScanUtils.getRoomGraf(mc.player !!.position()).let { (x, y) ->
+                        val wX = startX + x * (roomSize shr 1)
+                        val wZ = startZ + y * (roomSize shr 1)
+                        val core = ScanUtils.getCore(wX, wZ)
+                        ChatUtils.modMessage("Core: $core")
+                    }
                     1
                 }
             )

@@ -6,6 +6,7 @@
     "ExampleMixin",
     "IMapState",
     "IServerboundInteractPacket",
+    "LevelChunkMixin",
     "MixinButtonBlock",
     "MixinConnection",
     "MixinEntity",

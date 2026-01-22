@@ -29,7 +29,7 @@ object MapConfig {
 
     val dungeonMapCheckmarkStyle = DropdownSetting("Checkmark Style", 0, listOf("Checkmarks", "Secrets", "Room Name", "Room Name + Secrets")).section("Rooms")
     val centerStyle = ToggleSetting("Center Checkmark", true)
-    val hideQuestionCheckmarks = ToggleSetting("Hide Unknown Room Checkmark", false)
+    val hideQuestionCheckmarks = ToggleSetting("Hide Unknown Room Checkmark", false).showIf { dungeonMapCheckmarkStyle.value == 0 }
     val limitRoomNameSize = ToggleSetting("Limit Room Name Size", true).showIf { dungeonMapCheckmarkStyle.value == 2 || dungeonMapCheckmarkStyle.value == 3 }
     val highlightMimicRoom = ToggleSetting("Hightlight Mimic Room", true)
 
