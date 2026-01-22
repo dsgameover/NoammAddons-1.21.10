@@ -2,8 +2,11 @@ package com.github.noamm9.mixin;
 
 import com.github.noamm9.event.EventBus;
 import com.github.noamm9.event.impl.ContainerEvent;
+import com.github.noamm9.features.impl.dungeon.BreakerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import org.spongepowered.asm.mixin.Final;
@@ -12,6 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MultiPlayerGameMode.class)
 public class MixinMultiPlayerGameMode {
@@ -23,6 +27,13 @@ public class MixinMultiPlayerGameMode {
         var event = new ContainerEvent.SlotClick(minecraft.screen, j, k, clickType);
         if (EventBus.post(event)) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "startDestroyBlock", at = @At("HEAD"), cancellable = true)
+    private void onBlockHit(BlockPos blockPos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (BreakerHelper.onHitBlock(blockPos)) {
+            cir.setReturnValue(true);
         }
     }
 }
