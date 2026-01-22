@@ -9,6 +9,7 @@ import com.github.noamm9.mixin.IServerboundInteractPacket
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.ThreadUtils
 import com.github.noamm9.utils.dungeons.DungeonListener
+import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.*
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -31,6 +32,7 @@ object TerminalListener {
     val tickListener = register<TickEvent.Server> { onTick() }.unregister()
 
     fun onPacketReceived(packet: Packet<*>) {
+        if (LocationUtils.F7Phase != 3) return
         when (packet) {
             is ClientboundOpenScreenPacket -> {
                 val title = packet.title.string
@@ -75,6 +77,7 @@ object TerminalListener {
     }
 
     private fun onPacketSent(packet: Packet<*>, event: PacketEvent.Sent) {
+        if (LocationUtils.F7Phase != 3) return
         when (packet) {
             is ServerboundContainerClickPacket -> {
                 if (! inTerm) return
@@ -96,6 +99,7 @@ object TerminalListener {
     }
 
     private fun onTick() {
+        if (LocationUtils.F7Phase != 3) return
         if (interactCooldown > 0) interactCooldown --
     }
 

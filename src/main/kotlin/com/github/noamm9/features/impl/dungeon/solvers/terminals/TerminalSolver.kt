@@ -315,9 +315,11 @@ object TerminalSolver: Feature("Terminal Solver for floor 7 terminals") {
         }
         else if (TerminalListener.currentType == TerminalType.RUBIX) {
             val currentSolution = solution.find { it.slotId == click.slotId } ?: return
-            val newClick = TerminalClick(click.slotId, currentSolution.btn + if (click.btn == 0) - 1 else 1)
-            solution[solution.indexOf(currentSolution)] = newClick
-            if (solution.find { it.slotId == click.slotId }?.btn == 0) solution.remove(newClick)
+            val change = if (click.btn == 0) - 1 else 1
+            val newDiff = currentSolution.btn + change
+
+            if (newDiff == 0) solution.remove(currentSolution)
+            else solution[solution.indexOf(currentSolution)] = TerminalClick(click.slotId, newDiff)
         }
     }
 
@@ -415,30 +417,30 @@ object TerminalSolver: Feature("Terminal Solver for floor 7 terminals") {
 
             TerminalType.RUBIX -> {
                 val allowedSlots = listOf(12, 13, 14, 21, 22, 23, 30, 31, 32)
-                val panes = currentItems.filter { it.key in allowedSlots }
-                val order = TerminalType.rubixOrder
+                val panes = currentItems.filter { it.key in allowedSlots && TerminalType.rubixOrder.contains(it.value.item) }
                 val costs = IntArray(5) { 0 }
+
                 for (i in 0 until 5) {
-                    panes.forEach { (_, stack) ->
-                        val itemIdx = order.indexOf(stack.item)
-                        if (itemIdx == - 1) return@forEach
-                        val dist = abs(i - itemIdx)
-                        val clicksNeeded = if (dist > 2) 5 - dist else dist
-                        costs[i] += clicksNeeded
+                    panes.forEach { (_, itemStack) ->
+                        val itemIdx = TerminalType.rubixOrder.indexOf(itemStack.item)
+                        if (itemIdx != - 1) {
+                            val dist = abs(i - itemIdx)
+                            val clicksNeeded = if (dist > 2) 5 - dist else dist
+                            costs[i] += clicksNeeded
+                        }
                     }
                 }
-                val bestIndex = costs.indices.minByOrNull { costs[it] } ?: 0
-                if (TerminalType.lastRubixTarget == null || costs[TerminalType.lastRubixTarget !!] == 0) {
-                    TerminalType.lastRubixTarget = bestIndex
-                }
-                val origin = TerminalType.lastRubixTarget !!
-                panes.forEach { (slotId, itemstack) ->
-                    val currentIdx = order.indexOf(itemstack.item)
-                    if (currentIdx == - 1 || currentIdx == origin) return@forEach
-                    var diff = origin - currentIdx
-                    if (diff > 2) diff -= 5
-                    if (diff < - 2) diff += 5
-                    solution.add(TerminalClick(slotId, diff))
+
+                val origin = costs.indices.minByOrNull { costs[it] } ?: 0
+
+                panes.forEach { (slotId, itemStack) ->
+                    val currentIdx = TerminalType.rubixOrder.indexOf(itemStack.item)
+                    if (currentIdx != - 1 && currentIdx != origin) {
+                        var diff = origin - currentIdx
+                        if (diff > 2) diff -= 5
+                        if (diff < - 2) diff += 5
+                        solution.add(TerminalClick(slotId, diff))
+                    }
                 }
             }
 

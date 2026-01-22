@@ -116,4 +116,3 @@ object TerminalTitles: Feature("Reformats the Terminal completed title on P3.") 
         }
     }
 }
-
