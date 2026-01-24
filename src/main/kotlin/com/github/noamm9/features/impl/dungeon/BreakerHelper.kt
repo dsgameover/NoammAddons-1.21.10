@@ -21,6 +21,7 @@ object BreakerHelper: Feature("Zero Ping Dungeon Breaker") {
 
     @JvmStatic
     fun onHitBlock(pos: BlockPos) {
+        if (! enabled) return
         if (! LocationUtils.inDungeon) return
         if (LocationUtils.inBoss) return
         if (mc.player?.mainHandItem?.skyblockId != "DUNGEONBREAKER") return
