@@ -19,7 +19,6 @@ import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import com.github.noamm9.utils.render.RenderHelper.renderVec
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.resources.ResourceLocation
 import java.awt.Color
 import kotlin.math.max
@@ -277,27 +276,25 @@ object MapRenderer: HudElement() {
     private fun renderPlayerHeads(ctx: GuiGraphics) {
         if (LocationUtils.inBoss) return
 
-        if (DungeonListener.dungeonStarted) {
-            DungeonListener.dungeonTeammates.forEach { player ->
-                if (! player.isDead || player == DungeonListener.thePlayer) {
-                    val entity = player.entity as? AbstractClientPlayer
+        if (DungeonListener.dungeonStarted) DungeonListener.dungeonTeammates.forEach { player ->
+            if (! player.isDead || player == DungeonListener.thePlayer) {
+                val entity = player.entity
 
-                    val (x, z, yaw) = if (entity == null || ! entity.isAlive) {
-                        Triple(player.mapIcon.mapX, player.mapIcon.mapZ, player.mapIcon.yaw)
-                    }
-                    else {
-                        val (mx, mz) = MapUtils.coordsToMap(entity.renderVec)
-                        Triple(mx, mz, entity.yRot)
-                    }
-
-                    val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) player.clazz.color
-                    else MapConfig.mapPlayerHeadColor.value
-
-                    val nameColor = if (MapConfig.mapPlayerNameClassColorBased.value && player.clazz != Classes.Empty) player.clazz.color
-                    else Color.WHITE
-
-                    drawPlayerHead(ctx, player.name, x, z, yaw, entity?.skin?.body?.id() ?: player.skin, borderColor, nameColor)
+                val (x, z, yaw) = if (entity == null || ! entity.isAlive) {
+                    Triple(player.mapX, player.mapZ, player.yaw)
                 }
+                else {
+                    val (mx, mz) = MapUtils.coordsToMap(entity.renderVec)
+                    Triple(mx, mz, entity.yRot)
+                }
+
+                val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) player.clazz.color
+                else MapConfig.mapPlayerHeadColor.value
+
+                val nameColor = if (MapConfig.mapPlayerNameClassColorBased.value && player.clazz != Classes.Empty) player.clazz.color
+                else Color.WHITE
+
+                drawPlayerHead(ctx, player.name, x, z, yaw, entity?.skin?.body?.id() ?: player.skin, borderColor, nameColor)
             }
         }
         else {

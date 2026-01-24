@@ -16,13 +16,13 @@ import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.map.DungeonInfo
 import com.github.noamm9.utils.dungeons.map.core.RoomState
 import com.github.noamm9.utils.location.LocationUtils.inDungeon
-import com.github.noamm9.utils.render.Render2D
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
-import net.minecraft.network.protocol.game.ClientboundTabListPacket
+import net.minecraft.client.player.AbstractClientPlayer
+import net.minecraft.client.resources.DefaultPlayerSkin
+import net.minecraft.network.protocol.game.*
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.EntityType
 
 
 object DungeonListener {
@@ -68,9 +68,8 @@ object DungeonListener {
                     if (actions.contains(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME) || actions.contains(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER)) {
                         for (entry in packet.entries()) {
                             val text = entry.displayName()?.formattedText ?: continue
-                            val skin = Render2D.getSkin(entry.profileId())
 
-                            updateDungeonTeammates(text, skin)
+                            updateDungeonTeammates(text)
                             updatePuzzleCount(text)
                             updatePuzzles(text)
                         }
@@ -87,6 +86,17 @@ object DungeonListener {
 
                 is ClientboundContainerSetSlotPacket -> {
                     thePlayer?.isDead = PlayerUtils.getHotbarSlot(0)?.skyblockId == "HAUNT_ABILITY"
+                }
+
+                is ClientboundRemoveEntitiesPacket -> dungeonTeammates.forEach {
+                    val id = it.entity?.id ?: return@forEach
+                    if (id in packet.entityIds) it.entity = null
+                }
+
+                is ClientboundAddEntityPacket -> {
+                    if (packet.type != EntityType.PLAYER) return@register
+                    val entity = mc.level?.getEntity(packet.id) as? AbstractClientPlayer ?: return@register
+                    dungeonTeammates.find { it.entity == null && it.name == entity.name.string }?.entity = entity
                 }
             }
         }
@@ -194,7 +204,7 @@ object DungeonListener {
         }
     }
 
-    private fun updateDungeonTeammates(tabName: String, infoSkin: ResourceLocation) {
+    private fun updateDungeonTeammates(tabName: String) {
         if (NoammAddons.debugFlags.contains("dev")) {
             listOf(
                 DungeonPlayer("Noamm", Classes.Mage, 50, isDead = false),
@@ -205,18 +215,21 @@ object DungeonListener {
                 dungeonTeammates.clear()
                 dungeonTeammates.addAll(list)
 
-                thePlayer = dungeonTeammates.find { it.entity == mc.player }
+                thePlayer = dungeonTeammates.find { it.name == mc.user.name }
                 dungeonTeammatesNoSelf = dungeonTeammates.filterNot { it == thePlayer }
                 leapTeammates = dungeonTeammatesNoSelf.sortedBy { it.clazz }
+
+                dungeonTeammates.onEach { teammate ->
+                    teammate.entity = mc.level?.players()?.find { it.name.string == teammate.name } ?: teammate.entity
+                }
 
                 return
             }
         }
 
-
         var (_, name, clazz, clazzLevel) = tablistRegex.find(tabName.removeFormatting())?.destructured ?: return
         if (runPlayersNames.isEmpty()) name = mc.user.name
-        val skin = if (runPlayersNames.isEmpty()) mc.player !!.skin.body.texturePath() else infoSkin
+        val skin = if (runPlayersNames.isEmpty()) mc.player !!.skin.body.texturePath() else mc.connection?.getPlayerInfo(name)?.skin?.body?.texturePath() ?: DefaultPlayerSkin.getDefaultTexture()
         runPlayersNames[name] = skin
         if (clazz == "EMPTY") return
 
@@ -240,6 +253,10 @@ object DungeonListener {
         thePlayer = dungeonTeammates.find { it.name == mc.user.name }
         dungeonTeammatesNoSelf = dungeonTeammates.filter { it != thePlayer }
         leapTeammates = dungeonTeammatesNoSelf.sortedBy { it.clazz }
+
+        dungeonTeammates.onEach { teammate ->
+            teammate.entity = mc.level?.players()?.find { it.name.string == teammate.name } ?: teammate.entity
+        }
     }
 
     private fun updatePuzzleCount(tabName: String) {

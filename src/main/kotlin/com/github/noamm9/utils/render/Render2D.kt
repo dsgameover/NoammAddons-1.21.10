@@ -5,17 +5,11 @@ import com.github.noamm9.utils.ChatUtils.addColor
 import com.github.noamm9.utils.NumbersUtils.minus
 import com.github.noamm9.utils.NumbersUtils.plus
 import com.github.noamm9.utils.NumbersUtils.times
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
-import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.jvm.optionals.getOrNull
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -108,19 +102,6 @@ object Render2D {
         graphics.fill(ix + iw - 1, iy + 1, ix + iw, iy + ih, dark)
         graphics.fill(ix + 1, iy + ih - 1, ix + iw - 1, iy + ih, dark)
         graphics.fill(ix + 1, iy + 1, ix + iw - 1, iy + ih - 1, base)
-    }
-
-    private val skinCache: Cache<UUID, ResourceLocation> = CacheBuilder.newBuilder()
-        .maximumSize(500).expireAfterAccess(5, TimeUnit.MINUTES).build()
-
-    fun getSkin(uuid: UUID): ResourceLocation {
-        return skinCache.getIfPresent(uuid) ?: run {
-            mc.connection?.getPlayerInfo(uuid)?.profile?.let {
-                mc.skinManager.get(it).getNow(Optional.empty()).getOrNull()?.body?.texturePath()?.apply {
-                    skinCache.put(uuid, this)
-                }
-            } ?: DefaultPlayerSkin.get(uuid).body.texturePath()
-        }
     }
 
     fun drawPlayerHead(context: GuiGraphics, x: Int, y: Int, size: Int, skin: ResourceLocation) {

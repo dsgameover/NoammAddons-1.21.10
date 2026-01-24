@@ -7,7 +7,6 @@ import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.addColor
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.Classes
-import com.github.noamm9.utils.dungeons.ClearInfo
 import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.dungeons.DungeonPlayer
 import com.github.noamm9.utils.dungeons.map.core.RoomData
@@ -32,21 +31,21 @@ object ClearInfoUpdater {
         if (! oldState.equalsOneOf(RoomState.UNDISCOVERED, RoomState.DISCOVERED, RoomState.UNOPENED)) return
         if (! newState.equalsOneOf(RoomState.CLEARED, RoomState.GREEN)) return
 
-        if (players.size == 1) ClearInfo.get(players[0].name)?.clearedRooms?.first?.add(room.name)
-        else players.forEach { ClearInfo.get(it.name)?.clearedRooms?.second?.add(room.name) }
+        if (players.size == 1) DungeonPlayer.get(players[0].name)?.clearedRooms?.first?.add(room.name)
+        else players.forEach { DungeonPlayer.get(it.name)?.clearedRooms?.second?.add(room.name) }
     }
 
     fun updateDeaths(player: String, reason: String) {
         if (! DungeonMap.enabled) return
         if (! MapConfig.printPlayersClearInfo.value) return
-        ClearInfo.get(player)?.deaths?.add(reason)
+        DungeonPlayer.get(player)?.deaths?.add(reason)
     }
 
     fun initStartSecrets() = NoammAddons.scope.launch(Dispatchers.IO) {
         if (! DungeonMap.enabled) return@launch
         if (! MapConfig.printPlayersClearInfo.value) return@launch
         DungeonListener.runPlayersNames.keys.toList().forEach { name ->
-            val ci = ClearInfo.get(name) ?: return@forEach
+            val ci = DungeonPlayer.get(name) ?: return@forEach
             ProfileUtils.getSecrets(name).onSuccess { secrets ->
                 ci.secretsBeforeRun = secrets
                 if (cdebug) ChatUtils.modMessage("$name has $secrets")
@@ -64,16 +63,16 @@ object ClearInfoUpdater {
         val teammates = DungeonListener.dungeonTeammates.toList()
 
         val msgList = teammates.map { teammate ->
-            val before = teammate.clearInfo.secretsBeforeRun
+            val before = teammate.secretsBeforeRun
             val secretsAfterRun = if (before != 0L) ProfileUtils.getSecrets(teammate.name).getOrDefault(before) else 0L
             if (cdebug) ChatUtils.modMessage("${teammate.name} has $secretsAfterRun after run")
             val playerFormatted = "${Classes.getColorCode(teammate.clazz)}${teammate.name}"
             val foundSecrets = secretsAfterRun - before
 
             val baseComp = createComponent("${NoammAddons.PREFIX} $playerFormatted&f:&r ")
-            val solo = teammate.clearInfo.clearedRooms.first
-            val stacked = teammate.clearInfo.clearedRooms.second
-            val deaths = teammate.clearInfo.deaths
+            val solo = teammate.clearedRooms.first
+            val stacked = teammate.clearedRooms.second
+            val deaths = teammate.deaths
 
             val comps = listOfNotNull(
                 getRoomsClearedComponent(solo, stacked),

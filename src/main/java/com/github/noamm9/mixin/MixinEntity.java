@@ -2,7 +2,6 @@ package com.github.noamm9.mixin;
 
 import com.github.noamm9.event.EventBus;
 import com.github.noamm9.event.impl.CheckEntityGlowEvent;
-import com.github.noamm9.interfaces.IEntityGlow;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -11,25 +10,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity implements IEntityGlow {
-
-    @Unique
-    private int customGlowColor = 0xFFFFFF;
-    @Unique
-    private boolean glowForced = false;
-
-    @Override
-    public int getCustomGlowColor() { return customGlowColor; }
-
-    @Override
-    public void setCustomGlowColor(int color) { this.customGlowColor = color; }
-
-    @Override
-    public boolean isGlowForced() { return glowForced; }
-
-    @Override
-    public void setGlowForced(boolean forced) { this.glowForced = forced; }
-
+public abstract class MixinEntity {
+    @Unique private int customGlowColor = 0xFFFFFF;
+    @Unique private boolean glowForced = false;
 
     @Inject(method = "isCurrentlyGlowing", at = @At("HEAD"), cancellable = true)
     private void onIsCurrentlyGlowing(CallbackInfoReturnable<Boolean> cir) {
@@ -41,9 +24,7 @@ public abstract class MixinEntity implements IEntityGlow {
         this.glowForced = event.getShouldGlow();
         this.customGlowColor = event.getColor().getRGB();
 
-        if (this.glowForced) {
-            cir.setReturnValue(true);
-        }
+        if (this.glowForced) cir.setReturnValue(true);
     }
 
     @Inject(method = "getTeamColor", at = @At("HEAD"), cancellable = true)

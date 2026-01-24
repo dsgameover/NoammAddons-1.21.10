@@ -6,7 +6,7 @@ import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.dungeons.DungeonListener.dungeonTeammatesNoSelf
 import com.github.noamm9.utils.dungeons.DungeonListener.thePlayer
-import com.github.noamm9.utils.dungeons.DungeonMapPlayer
+import com.github.noamm9.utils.dungeons.DungeonPlayer
 import com.github.noamm9.utils.dungeons.map.DungeonInfo
 import com.github.noamm9.utils.dungeons.map.core.*
 import com.github.noamm9.utils.dungeons.map.utils.LegacyRegistry
@@ -24,30 +24,26 @@ object MapUpdater {
     val playerJobs = ConcurrentHashMap<String, Job>()
 
     fun updatePlayers() {
-        // 1. Safe Cast & Early Return
         val mapData = DungeonInfo.mapData as? IMapState ?: return
         val decorations = mapData.decorations ?: return
-
-        // 2. Filter teammates once (Assuming this list is stable for this frame)
         val livingTeammates = dungeonTeammatesNoSelf.filter { ! it.isDead }
 
-        // 3. Assign Icons (Setup Phase)
         decorations.forEach { (key, decoration) ->
             if (decoration.type.value() == MapDecorationTypes.FRAME.value()) {
-                thePlayer?.mapIcon?.icon = key
+                thePlayer?.icon = key
             }
             else {
                 val index = key.lastOrNull()?.digitToIntOrNull()
                 if (index != null && index in livingTeammates.indices) {
-                    livingTeammates[index].mapIcon.icon = key
+                    livingTeammates[index].icon = key
                 }
             }
         }
 
         DungeonListener.dungeonTeammates.forEach { teammate ->
             if (teammate.isDead) return@forEach
-            val decoration = decorations[teammate.mapIcon.icon] ?: return@forEach
-            smoothUpdatePlayer(teammate.mapIcon, decoration.mapX.toFloat(), decoration.mapZ.toFloat(), decoration.yaw)
+            val decoration = decorations[teammate.icon] ?: return@forEach
+            smoothUpdatePlayer(teammate, decoration.mapX.toFloat(), decoration.mapZ.toFloat(), decoration.yaw)
         }
     }
 
@@ -56,7 +52,7 @@ object MapUpdater {
         playerJobs.clear()
     }
 
-    private fun smoothUpdatePlayer(player: DungeonMapPlayer, targetX: Float, targetZ: Float, targetYaw: Float) {
+    private fun smoothUpdatePlayer(player: DungeonPlayer, targetX: Float, targetZ: Float, targetYaw: Float) {
         if (player.mapX == 0f && player.mapZ == 0f && player.yaw == 0f) {
             player.mapX = targetX
             player.mapZ = targetZ
@@ -65,12 +61,12 @@ object MapUpdater {
         }
 
         if (player.mapX == targetX && player.mapZ == targetZ && player.yaw == targetYaw) {
-            playerJobs.remove(player.teammate.name)?.cancel()
+            playerJobs.remove(player.name)?.cancel()
             return
         }
 
         playerHeadScope.launch {
-            val oldJob = playerJobs.put(player.teammate.name, this.coroutineContext.job)
+            val oldJob = playerJobs.put(player.name, this.coroutineContext.job)
             oldJob?.cancelAndJoin()
 
             val startX = player.mapX
