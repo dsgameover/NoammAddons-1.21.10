@@ -34,13 +34,13 @@ object ScoreCalculation {
 
     private var bloodDone = false
 
-    private var alerted300 = false
+    private var had300 = false
         set(value) {
             field = value
             if (value) EventBus.post(DungeonEvent.Score(300))
         }
 
-    private var alerted270 = false
+    private var had270 = false
         set(value) {
             field = value
             if (value) EventBus.post(DungeonEvent.Score(270))
@@ -91,14 +91,8 @@ object ScoreCalculation {
 
         score = secretsScore + completedRoomScore + (20 + skillRooms - puzzlePenalty - deathPenalty).coerceIn(20, 100) + bonusScore + speedScore
 
-        if (score >= 270 && ! alerted270) {
-            alerted270 = true
-            EventBus.post(DungeonEvent.Score(score))
-        }
-        else if (score >= 300 && ! alerted300) {
-            alerted300 = true
-            EventBus.post(DungeonEvent.Score(score))
-        }
+        if (score >= 270 && ! had270) had270 = true
+        else if (score >= 300 && ! had300) had300 = true
     }
 
     fun onPacket(packet: Packet<*>) {
@@ -175,8 +169,8 @@ object ScoreCalculation {
 
     fun reset() {
         bloodDone = false
-        alerted300 = false
-        alerted270 = false
+        had300 = false
+        had270 = false
         mimicKilled = false
         princeKilled = false
         deathCount = 0

@@ -57,7 +57,6 @@ object MapRenderer: HudElement() {
     }
 
     private fun renderExtraInfo(ctx: GuiGraphics) {
-
         if (! MapConfig.mapExtraInfo.value) return
         if (! MapConfig.dungeonMapCheater.value && ! DungeonListener.dungeonStarted) return
 
