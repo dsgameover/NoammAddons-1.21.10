@@ -28,25 +28,15 @@ import java.awt.Color
 object StarMobEsp: Feature("Hightlights all starred mobs in a dungeon.") {
     private val dungeonMobRegex = Regex("^.+❤$")
 
-    @JvmStatic
-    val starMobs = HashSet<Int>()
-    val checked = HashSet<Int>()
+    private val starMobs = HashSet<Int>()
+    private val checked = HashSet<Int>()
 
     private val espBats by ToggleSetting("Highlight Bats", true).withDescription("Highlights Bats in Dungeons.")
     private val espFels by ToggleSetting("Highlight Fels", true).withDescription("Highlights Fels, even when they are invisible.")
-    private val customMinibossesColors by ToggleSetting("Custom Minibosses Colors", false).withDescription("Enable this to override individual mini-boss colors below.")
 
     private val starMobColor by ColorSetting("Star Mob Color", Color.YELLOW, false).section("General Colors").withDescription("Default color for all Starred mobs.")
     private val batColor by ColorSetting("Bat Color", Color.GREEN, false).withDescription("The color used for highlighted bats.").showIf { espBats.value }
     private val felColor by ColorSetting("Fel Color", Color.PINK, false).withDescription("The color used for fels.").showIf { espFels.value }
-
-    private val shadowAssassinColor by ColorSetting("Shadow Assassin", Color.BLACK, false).section("Mini-Boss Colors") { customMinibossesColors.value }.showIf { customMinibossesColors.value }
-    private val angryArchaeologistColor by ColorSetting("Angry Archaeologist", Color.RED, false).showIf { customMinibossesColors.value }
-    private val frozenAdventurerColor by ColorSetting("Frozen Adventurer", Color.CYAN, false).showIf { customMinibossesColors.value }
-    private val superiorDragonColor by ColorSetting("Superior Dragon", Color.YELLOW, false).showIf { customMinibossesColors.value }
-    private val unstableDragonColor by ColorSetting("Unstable Dragon", Color(100, 0, 100), false).showIf { customMinibossesColors.value }
-    private val youngDragonColor by ColorSetting("Young Dragon", Color.WHITE, false).showIf { customMinibossesColors.value }
-    private val holyDragonColor by ColorSetting("Holy Dragon", Color.GREEN, false).showIf { customMinibossesColors.value }
 
 
     override fun init() {
@@ -98,32 +88,14 @@ object StarMobEsp: Feature("Hightlights all starred mobs in a dungeon.") {
         if (entity is EnderMan) return if (espFels.value && entity.name.unformattedText == "Dinnerbone") felColor.value else null
         if (entity is Player) {
             val name = entity.name.unformattedText.takeUnless { it.isBlank() } ?: return null
-            if (name.contains("Shadow Assassin")) return if (customMinibossesColors.value) {
-                shadowAssassinColor.value
-            }
-            else starMobColor.value
+            if (name.contains("Shadow Assassin")) return starMobColor.value
 
             if (dungeonFloorNumber != 4 && ! inBoss) {
                 val bootsName = entity.getItemBySlot(EquipmentSlot.FEET).takeUnless { it.isEmpty }?.hoverName?.unformattedText ?: return null
 
                 return when (name) {
-                    "Lost Adventurer" -> {
-                        if (! customMinibossesColors.value) return starMobColor.value
-                        when {
-                            "Unstable" in bootsName -> unstableDragonColor
-                            "Young" in bootsName -> youngDragonColor
-                            "Superior" in bootsName -> superiorDragonColor
-                            "Holy" in bootsName -> holyDragonColor
-                            "Frozen Blaze" in bootsName -> frozenAdventurerColor
-                            else -> starMobColor
-                        }.value
-                    }
-
-                    "Diamond Guy" -> if (customMinibossesColors.value && "Perfect Boots" in bootsName) {
-                        angryArchaeologistColor.value
-                    }
-                    else starMobColor.value
-
+                    "Lost Adventurer" -> starMobColor.value
+                    "Diamond Guy" -> if ("Perfect Boots" in bootsName) starMobColor.value else null
                     else -> null
                 }
             }
