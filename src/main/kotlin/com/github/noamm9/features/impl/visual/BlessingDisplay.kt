@@ -44,7 +44,7 @@ object BlessingDisplay: Feature("Displays the current active blessings of the du
             val (enabled, color) = getBlessingConfig(blessing)
 
             val value = if (example) 5 else blessing.current
-            if (enabled || value <= 0) return@forEach
+            if (! enabled || value <= 0) return@forEach
 
             val text = "${blessing.displayString} §f$value"
 
