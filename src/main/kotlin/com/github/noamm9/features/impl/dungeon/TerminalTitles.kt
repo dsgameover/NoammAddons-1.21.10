@@ -22,11 +22,12 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket
 import java.awt.Color
 
-object TerminalTitles: Feature("Reformats the Terminal completed title on P3.") {
+object TerminalTitles: Feature("Reformats the Terminal titles on P3.") {
     private val duration by SliderSetting("Duration", 2.5, 0.5, 6, 0.5).withDescription("Duration of the title in seconds")
     private val mode by DropdownSetting("Mode", 0, listOf("Name + Term + Progress", "Term + Progress", "Progress"))
     private val bracket by DropdownSetting("Bracket Type", 0, listOf("()", "[]", "<>", "{}"))
     private val phaseDone by ToggleSetting("Phase Done").withDescription("Renders Phase Done instead of 7/7 or 8/8")
+    private val gateTitles by ToggleSetting("Gate Titles").withDescription("Reformats Gate related Titles.")
 
     private val hud = object: HudElement() {
         override val toggle get() = TerminalTitles.enabled
@@ -64,6 +65,26 @@ object TerminalTitles: Feature("Reformats the Terminal completed title on P3.") 
         register<MainThreadPacketRecivedEvent.Pre> {
             if (! LocationUtils.inDungeon || LocationUtils.F7Phase != 3) return@register
             if (event.packet !is ClientboundSetSubtitleTextPacket) return@register
+            val title = event.packet.text.unformattedText
+
+            if (gateTitles.value) when (title) {
+                "The gate has been destroyed!" -> {
+                    titleStr = "&cGate Destroyed!"
+                    timer = duration.value.toInt() * 1000
+                    tickListener.register()
+                    event.isCanceled = true
+                    return@register
+                }
+
+                "The gate will open in 5 seconds!" -> {
+                    titleStr = "&c&lGATE!"
+                    timer = duration.value.toInt() * 1000
+                    tickListener.register()
+                    event.isCanceled = true
+                    return@register
+                }
+            }
+
             val (name, type, min, max) = mainRegex.find(event.packet.text().unformattedText)?.destructured ?: return@register
             titleStr = handleTitle(name, type, min.toInt(), max.toInt())
             timer = duration.value.toInt() * 1000
@@ -82,8 +103,9 @@ object TerminalTitles: Feature("Reformats the Terminal completed title on P3.") 
             this.listener.unregister()
             titleStr = ""
         }
+
         timer -= 50
-    }.unregister()
+    }
 
     private fun handleTitle(name: String, type: String, min: Int, max: Int): String {
         val color = ColorUtils.colorCodeByPresent(min, max)

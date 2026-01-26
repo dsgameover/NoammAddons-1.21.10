@@ -16,6 +16,7 @@ import net.minecraft.core.Direction
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.DROP_ALL_ITEMS
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.DROP_ITEM
+import org.lwjgl.glfw.GLFW
 
 object AbilityKeybinds: Feature("Allows you do use your dungeon class ult/ability with a keybind") {
     private val classUltimate by ToggleSetting("Class Ultimate", true)
@@ -27,6 +28,7 @@ object AbilityKeybinds: Feature("Allows you do use your dungeon class ult/abilit
         register<KeyboardEvent> {
             if (! LocationUtils.inDungeon || ! DungeonListener.dungeonStarted) return@register
             if (mc.screen != null) return@register
+            if (event.modifiers != GLFW.GLFW_PRESS) return@register
             if (classUltimate.value && ultKeybind.value == event.key) {
                 event.isCanceled = true
                 return@register useDungeonClassAbility(true)

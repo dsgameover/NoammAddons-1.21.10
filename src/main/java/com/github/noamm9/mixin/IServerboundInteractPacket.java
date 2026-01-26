@@ -8,5 +8,4 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface IServerboundInteractPacket {
     @Accessor("entityId")
     int getEntityId();
-
 }
