@@ -8,6 +8,7 @@
     "IMapState",
     "IServerboundInteractPacket",
     "LevelChunkMixin",
+    "MixinBlockItem",
     "MixinBossEvent",
     "MixinButtonBlock",
     "MixinConnection",

@@ -130,7 +130,8 @@ object F7Titles: Feature(name = "F7 Titles", description = "Custom Titles for F7
     }
 
     private val timerRenderer = EventBus.register<RenderOverlayEvent> {
-        val timeLeft = timerTime - DungeonListener.currentTime / 20.0
+        if (! enabled) return@register
+        val timeLeft = (timerTime - DungeonListener.currentTime) / 20.0
 
         if (timeLeft <= 0) {
             this.listener.unregister()
@@ -148,7 +149,7 @@ object F7Titles: Feature(name = "F7 Titles", description = "Custom Titles for F7
             height / 2f - height / 13f,
             scale = 3f
         )
-    }
+    }.unregister()
 
 
     private fun showTitle(subtitle: String) {

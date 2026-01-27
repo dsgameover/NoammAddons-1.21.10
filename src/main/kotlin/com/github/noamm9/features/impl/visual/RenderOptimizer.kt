@@ -99,7 +99,6 @@ object RenderOptimizer: Feature("Optimize Rendering by hiding useless shit.") {
             }
 
             if (! LocationUtils.inDungeon) return@register
-            if (LocationUtils.inBoss) return@register
             val name = event.entity.displayName?.formattedText ?: return@register
             if (! dungeonMobRegex.matches(name)) return@register
 

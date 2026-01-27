@@ -27,12 +27,14 @@ object AbilityKeybinds: Feature("Allows you do use your dungeon class ult/abilit
     override fun init() {
         register<KeyboardEvent> {
             if (! LocationUtils.inDungeon || ! DungeonListener.dungeonStarted) return@register
+            if (event.scanCode != GLFW.GLFW_PRESS) return@register
             if (mc.screen != null) return@register
-            if (event.modifiers != GLFW.GLFW_PRESS) return@register
+
             if (classUltimate.value && ultKeybind.value == event.key) {
                 event.isCanceled = true
                 return@register useDungeonClassAbility(true)
             }
+
             if (classAbility.value && abilityKeybind.value == event.key) {
                 event.isCanceled = true
                 return@register useDungeonClassAbility(false)

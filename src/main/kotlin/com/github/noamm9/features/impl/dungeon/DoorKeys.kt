@@ -38,6 +38,8 @@ object DoorKeys: Feature("ESP box & Tracer for wither doors and blood door") {
     private var doorKey: Pair<Entity, Color>? = null
 
     override fun init() {
+        register<WorldChangeEvent> { doorKey = null }
+
         register<MainThreadPacketRecivedEvent.Post> {
             val packet = event.packet as? ClientboundSetEquipmentPacket ?: return@register
             if (! LocationUtils.inDungeon || LocationUtils.inBoss) return@register
