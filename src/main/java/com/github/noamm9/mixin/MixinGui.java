@@ -5,8 +5,10 @@ import com.github.noamm9.event.impl.ActionBarMessageEvent;
 import com.github.noamm9.event.impl.RenderOverlayEvent;
 import com.github.noamm9.features.impl.general.FEAT_ItemRarity;
 import com.github.noamm9.features.impl.tweaks.Camera;
+import com.github.noamm9.features.impl.visual.DarkMode;
 import com.github.noamm9.features.impl.visual.PlayerHud;
 import com.github.noamm9.features.impl.visual.Scoreboard;
+import com.github.noamm9.utils.ColorUtils;
 import com.github.noamm9.utils.DebugHUD;
 import com.github.noamm9.utils.location.LocationUtils;
 import net.minecraft.client.DeltaTracker;
@@ -26,6 +28,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.awt.*;
 
 @Mixin(Gui.class)
 public abstract class MixinGui {
@@ -77,6 +81,16 @@ public abstract class MixinGui {
         EventBus.post(new RenderOverlayEvent(guiGraphics, deltaTracker));
 
         DebugHUD.render(guiGraphics);
+    }
+
+    @Inject(method = "render", at = @At(value = "TAIL"))
+    public void onRenderHudPost(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (DarkMode.INSTANCE.enabled) guiGraphics.fill(
+            0, 0,
+            minecraft.getWindow().getGuiScaledWidth(),
+            minecraft.getWindow().getGuiScaledHeight(),
+            ColorUtils.INSTANCE.withAlpha(Color.BLACK, DarkMode.getOpacity()).getRGB()
+        );
     }
 
     @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
