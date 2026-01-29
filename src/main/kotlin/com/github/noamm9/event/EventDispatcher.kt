@@ -172,7 +172,7 @@ object EventDispatcher {
     private fun finishInventoryLoading() {
         if (! invAccept) return
         invAccept = false
-        
+
         val winId = invWindowId
         val slotCount = invSlotCount
         val title = invTitle ?: return
@@ -182,7 +182,7 @@ object EventDispatcher {
         if (invWindowId != winId) return
 
         invFired = true
-        EventBus.post(InventoryFullyOpenedEvent(title, winId, slotCount, items))
+        EventBus.post(ContainerFullyOpenedEvent(title, winId, slotCount, items))
     }
 
     private fun getSlotCount(type: MenuType<*>): Int {

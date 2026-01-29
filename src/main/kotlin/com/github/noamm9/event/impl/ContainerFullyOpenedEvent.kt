@@ -4,7 +4,7 @@ import com.github.noamm9.event.Event
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 
-class InventoryFullyOpenedEvent(
+class ContainerFullyOpenedEvent(
     val title: Component,
     val winId: Int,
     val slotCount: Int,
