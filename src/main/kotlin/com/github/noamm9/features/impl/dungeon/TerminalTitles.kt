@@ -1,6 +1,6 @@
 package com.github.noamm9.features.impl.dungeon
 
-import com.github.noamm9.event.impl.MainThreadPacketRecivedEvent
+import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.componnents.Style
@@ -62,7 +62,7 @@ object TerminalTitles: Feature("Reformats the Terminal titles on P3.") {
     override fun init() {
         hudElements.add(hud)
 
-        register<MainThreadPacketRecivedEvent.Pre> {
+        register<MainThreadPacketReceivedEvent.Pre> {
             if (! LocationUtils.inDungeon || LocationUtils.F7Phase != 3) return@register
             if (event.packet !is ClientboundSetSubtitleTextPacket) return@register
             val title = event.packet.text.unformattedText

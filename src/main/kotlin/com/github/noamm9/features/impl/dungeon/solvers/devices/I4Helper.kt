@@ -70,7 +70,7 @@ object I4Helper: Feature(name = "I4 Helper") {
             onComplete()
         }
 
-        register<MainThreadPacketRecivedEvent.Post> {
+        register<MainThreadPacketReceivedEvent.Post> {
             if (LocationUtils.P3Section != 4) return@register
             val packet = event.packet as? ClientboundSetEntityDataPacket ?: return@register
             if (mc.level?.getEntity(packet.id)?.name?.string == "Active") onComplete()
