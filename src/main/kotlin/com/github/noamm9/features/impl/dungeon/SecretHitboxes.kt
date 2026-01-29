@@ -5,6 +5,8 @@ import com.github.noamm9.ui.clickgui.componnents.getValue
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.componnents.provideDelegate
 import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.utils.location.LocationUtils
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.ButtonBlock
 import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock
@@ -14,9 +16,7 @@ import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 
 object SecretHitboxes: Feature("Changes the hitboxes of secret blocks to be larger.") {
-
-    @JvmStatic
-    val lever by ToggleSetting("Lever").withDescription("Full block Lever hitbox.")
+    private val lever by ToggleSetting("Lever").withDescription("Full block Lever hitbox.")
 
     @JvmStatic
     val button by ToggleSetting("Button").withDescription("Full block button hitbox.")
@@ -46,5 +46,21 @@ object SecretHitboxes: Feature("Changes the hitboxes of secret blocks to be larg
                 Direction.DOWN -> Shapes.box(0.0, 1.0 - f2, 0.0, 1.0, 1.0, 1.0)
             }
         }
+    }
+
+    private val blackListedLevers = listOf(
+        BlockPos(61, 136, 142), BlockPos(60, 136, 142), BlockPos(59, 136, 142),
+        BlockPos(62, 135, 142), BlockPos(61, 135, 142), BlockPos(59, 135, 142),
+        BlockPos(58, 135, 142), BlockPos(62, 134, 142), BlockPos(61, 134, 142),
+        BlockPos(59, 134, 142), BlockPos(58, 134, 142), BlockPos(61, 133, 142),
+        BlockPos(60, 133, 142), BlockPos(59, 133, 142)
+    )
+
+    @JvmStatic
+    fun isValidLever(pos: BlockPos): Boolean {
+        if (! enabled) return false
+        if (! lever.value) return false
+        if (pos in blackListedLevers && LocationUtils.dungeonFloorNumber == 7) return false
+        return true
     }
 }
