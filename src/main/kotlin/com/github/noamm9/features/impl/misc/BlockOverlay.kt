@@ -13,10 +13,9 @@ import com.github.noamm9.utils.Utils
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.render.Render3D
 import com.github.noamm9.utils.render.RenderContext
-import com.github.noamm9.utils.world.WorldUtils
-import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.world.phys.BlockHitResult
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+import net.minecraft.client.renderer.state.BlockOutlineRenderState
 
 object BlockOverlay: Feature() {
     private val mode by DropdownSetting("Mode", 2, listOf("Outline", "Fill", "Filled Outline"))
@@ -25,14 +24,21 @@ object BlockOverlay: Feature() {
     private val lineWidth by SliderSetting("Line Width", 2.5, 1, 10, 0.1).hideIf { mode.value == 1 }
     private val phase by ToggleSetting("Phase")
 
-    fun render(bufferSource: MultiBufferSource.BufferSource, poseStack: PoseStack) {
-        if (mc.options.hideGui) return
-        val blockHitResult = mc.hitResult as? BlockHitResult ?: return
-        if (WorldUtils.getStateAt(blockHitResult.blockPos).isAir) return
+    override fun init() {
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, blockOutlineContext ->
+            if (! enabled) return@register false
+            render(context, blockOutlineContext)
+            true
+        }
+    }
+
+    fun render(ctx: WorldRenderContext, blockCtx: BlockOutlineRenderState): Boolean {
+        if (mc.options.hideGui) return false
+        // if (WorldUtils.getStateAt(blockHitResult.blockPos).isAir) return
 
         Render3D.renderBlock(
-            RenderContext(poseStack, bufferSource, mc.gameRenderer.mainCamera),
-            blockHitResult.blockPos,
+            RenderContext.fromContext(ctx),
+            blockCtx.pos,
             outlineColor.value,
             fillColor.value,
             mode.value.equalsOneOf(0, 2),
@@ -40,5 +46,6 @@ object BlockOverlay: Feature() {
             phase = phase.value,
             lineWidth.value
         )
+        return true
     }
 }

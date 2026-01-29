@@ -49,7 +49,6 @@
     "MixinGuiGraphics",
     "MixinItemInHandRenderer",
     "MixinLerpingBossEvent",
-    "MixinLevelRenderer",
     "MixinLightTexture",
     "MixinMinecraft",
     "MixinMouseHandler",
