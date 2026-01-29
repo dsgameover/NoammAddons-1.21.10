@@ -18,7 +18,7 @@ object PetDisplay: Feature("Pet Features") {
     private val chatSpawnRegex = Regex("§aYou summoned your (?<pet>.*)§a!")
     private val chatDespawnRegex = Regex("§aYou despawned your .*§a!")
 
-    val petDisplayHud = hudElement("PetDisplay", { LocationUtils.inSkyblock && cacheData.getData()["pet"] != null }) { context, example ->
+    val petDisplayHud = hudElement("PetDisplay", toggled = { petDisplay.value }, enabled = { LocationUtils.inSkyblock && cacheData.getData()["pet"] != null }) { context, example ->
         val text = if (example) "&6Golden Dragon" else cacheData.getData()["pet"].toString()
         Render2D.drawString(context, text, 0, 0)
         return@hudElement text.width().toFloat() to text.height().toFloat()

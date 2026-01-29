@@ -5,20 +5,22 @@ import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.Utils.endsWithOneOf
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.Utils.startsWithOneOf
+import com.github.noamm9.utils.dungeons.enums.WitherRelic
 import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.world.item.context.BlockPlaceContext
 
 object NoItemPlace: Feature("Stops you from placing skull blocks/Items") {
-    private val WitherRelicRegex = Regex("Corrupted .+ Relic")
+
     @JvmStatic
     fun placeHook(context: BlockPlaceContext): Boolean {
         if (! enabled) return false
         val item = context.player?.mainHandItem ?: return false
+        val name = item.hoverName.unformattedText
         val id = item.skyblockId
 
         return when {
-            LocationUtils.F7Phase == 5 && WitherRelicRegex.matches(item.item.name.unformattedText) -> true
+            LocationUtils.F7Phase == 5 && WitherRelic.fromName(name) != null -> true
 
             id.startsWithOneOf("ABIPHONE") -> true
 
@@ -39,7 +41,6 @@ object NoItemPlace: Feature("Stops you from placing skull blocks/Items") {
                 "JINGLE_BELLS",
                 "FIRE_FREEZE_STAFF",
                 "UMBERELLA",
-                "ASCENSION_ROPE"
             )
         }
     }

@@ -13,8 +13,8 @@ import com.github.noamm9.ui.clickgui.componnents.withDescription
 import com.github.noamm9.ui.hud.HudElement
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.ColorUtils
-import com.github.noamm9.utils.dungeons.Classes
 import com.github.noamm9.utils.dungeons.DungeonListener
+import com.github.noamm9.utils.dungeons.enums.Classes
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
