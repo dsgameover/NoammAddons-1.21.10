@@ -5,6 +5,7 @@ import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.EventPriority
 import com.github.noamm9.event.impl.*
+import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.MathUtils
 import com.github.noamm9.utils.Utils.remove
 import com.github.noamm9.utils.Utils.startsWithOneOf
@@ -65,7 +66,7 @@ object LocationUtils {
             }
             else if (event.packet is ClientboundSetPlayerTeamPacket) {
                 val prams = event.packet.parameters.getOrNull() ?: return@register
-                val text = prams.playerPrefix.string + prams.playerSuffix.string
+                val text = (prams.playerPrefix.string + prams.playerSuffix.string).removeFormatting()
                 lobbyRegex.find(text)?.groupValues?.get(1)?.let { lobbyId = it }
 
                 if (! inDungeon && text.contains("The Catacombs (") && ! text.contains("Queue")) {

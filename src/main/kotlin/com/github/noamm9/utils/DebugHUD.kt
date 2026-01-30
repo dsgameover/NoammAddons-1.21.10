@@ -111,8 +111,8 @@ object DebugHUD {
         draw("§d§lDUNGEON STATE", 0xFF55FF)
         draw("In Dungeon: ${if (LocationUtils.inDungeon) "§aYES" else "§cNO"}")
         draw("Floor: §f${LocationUtils.dungeonFloor ?: "N/A"} §8(Num: ${LocationUtils.dungeonFloorNumber ?: "None"})")
-        draw("Master Mode: ${if (LocationUtils.isMasterMode) "§aYES" else "§7NO"}")
-        draw("In Boss Room: ${if (LocationUtils.inBoss) "§cYES" else "§aNO"}")
+        draw("Master Mode: ${if (LocationUtils.isMasterMode) "§aYES" else "§cNO"}")
+        draw("In Boss Room: ${if (LocationUtils.inBoss) "§cYES" else "§cNO"}")
 
         y += 5
         draw("§c§lFLOOR 7 / M7 DATA", 0xFF5555)

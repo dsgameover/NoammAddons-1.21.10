@@ -2,8 +2,6 @@ package com.github.noamm9.features.impl.visual
 
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.features.impl.dungeon.map.MapRenderer.x
-import com.github.noamm9.features.impl.dungeon.map.MapRenderer.y
 import com.github.noamm9.ui.clickgui.componnents.getValue
 import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
@@ -28,7 +26,7 @@ object FreezeDisplay: Feature("Shows how long the server froze after a chosen th
             { (! dungeonsOnly.value || LocationUtils.inDungeon) && System.currentTimeMillis() - lastTick > threshold.value }
         ) { context, example ->
             val text = if (example) "567ms" else "${System.currentTimeMillis() - lastTick}ms"
-            Render2D.drawString(context, text, x, y, color.value, scale = 1.5)
+            Render2D.drawString(context, text, 0, 0, color.value)
             return@hudElement text.width().toFloat() to text.height().toFloat()
         }
 
