@@ -19,9 +19,9 @@ public class MixinClientPacketListener {
             target = "Lnet/minecraft/network/protocol/Packet;handle(Lnet/minecraft/network/PacketListener;)V"
         )
     )
-    private void redirectPacketHandle(Packet packet, PacketListener listener, Operation<Void> original) {
+    private void wrapPacketHandle(Packet packet, PacketListener listener, Operation<Void> original) {
         if (EventBus.post(new MainThreadPacketReceivedEvent.Pre(packet))) return;
-        packet.handle(listener);
+        original.call(packet, listener);
         EventBus.post(new MainThreadPacketReceivedEvent.Post(packet));
     }
 }
