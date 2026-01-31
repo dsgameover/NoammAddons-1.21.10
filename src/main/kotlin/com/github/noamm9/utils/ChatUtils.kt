@@ -3,13 +3,11 @@ package com.github.noamm9.utils
 import com.github.noamm9.NoammAddons
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.NoammAddons.scope
-import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.EventBus.register
 import com.github.noamm9.event.EventPriority
 import com.github.noamm9.event.impl.PacketEvent
 import com.github.noamm9.event.impl.RenderOverlayEvent
 import com.github.noamm9.event.impl.TickEvent
-import com.github.noamm9.utils.Utils.remove
 import com.github.noamm9.utils.render.Render2D
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,7 +30,7 @@ object ChatUtils {
     private var lastSentTime = 0L
 
     fun init() {
-        EventBus.register<PacketEvent.Sent> {
+        register<PacketEvent.Sent> {
             if (event.packet !is ServerboundChatPacket &&
                 event.packet !is ServerboundChatCommandPacket &&
                 event.packet !is ServerboundChatCommandSignedPacket
@@ -60,8 +58,7 @@ object ChatUtils {
 
                     lastSentTime = System.currentTimeMillis()
                 }
-            }
-            finally {
+            } finally {
                 isProcessing.set(false)
                 if (queue.isNotEmpty()) process()
             }
@@ -78,8 +75,57 @@ object ChatUtils {
         process()
     }
 
-    val formattingRegex = "(?i)[§&]([0-9a-fk-or]|x[0-9a-f]{6})".toRegex()
-    fun String.removeFormatting() = remove(formattingRegex)
+    fun String.removeFormatting(): String {
+        if (this.isEmpty()) return ""
+
+        val len = this.length
+        val out = CharArray(len)
+        var outPos = 0
+        var i = 0
+
+        while (i < len) {
+            val c = this[i]
+            var skipped = false
+
+            if ((c == '§' || c == '&') && i + 1 < len) {
+                val next = this[i + 1]
+
+                if ((next == 'x' || next == 'X') && i + 7 < len) {
+                    var isHexSequence = true
+                    for (k in 2 .. 7) {
+                        val h = this[i + k]
+                        if (! ((h in '0' .. '9') || (h in 'a' .. 'f') || (h in 'A' .. 'F'))) {
+                            isHexSequence = false
+                            break
+                        }
+                    }
+
+                    if (isHexSequence) {
+                        i += 8
+                        skipped = true
+                    }
+                }
+
+                if (! skipped) {
+                    if ((next in '0' .. '9') ||
+                        (next in 'a' .. 'f') || (next in 'A' .. 'F') ||
+                        (next in 'k' .. 'o') || (next in 'K' .. 'O') ||
+                        next == 'r' || next == 'R'
+                    ) {
+                        i += 2
+                        skipped = true
+                    }
+                }
+            }
+
+            if (! skipped) {
+                out[outPos ++] = c
+                i ++
+            }
+        }
+
+        return String(out, 0, outPos)
+    }
 
     fun modMessage(msg: Any?) = chat("${NoammAddons.PREFIX} $msg")
 

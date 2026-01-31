@@ -21,7 +21,6 @@ import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.phys.Vec3
-import org.lwjgl.glfw.GLFW
 import java.awt.Color
 
 object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics features") {
@@ -34,8 +33,6 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
 
     private val relicPickUpRegex = Regex("^(\\w{3,16}) picked the Corrupted (\\w{3,6}) Relic!$")
     private val relicTimes = mutableListOf<RelicEntry>()
-    private var isP5Active = false
-    private var shouldDrawSpawnOutlines = true
     private var spawnTimerTicks: Long = 0
     private var p5StartTime = 0L
 
@@ -50,9 +47,7 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
 
     override fun init() {
         register<WorldChangeEvent> {
-            isP5Active = false
             spawnTimerTicks = 0
-            shouldDrawSpawnOutlines = true
             relicTimes.clear()
         }
 
@@ -61,15 +56,10 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
             val msg = event.unformattedText
 
             when {
-                msg == "[BOSS] Wither King: You... again?" -> {
-                    if (relicBox.value) shouldDrawSpawnOutlines = false
-                }
-
                 msg == "[BOSS] Necron: All this, for nothing..." -> {
                     p5StartTime = DungeonListener.currentTime
-                    isP5Active = true
                     if (relicSpawnTimer.value) {
-                        spawnTimerTicks = DungeonListener.currentTime + 50
+                        spawnTimerTicks = DungeonListener.currentTime + 42
                     }
                 }
 
@@ -84,13 +74,11 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
 
         register<MouseClickEvent> {
             if (! blockWrongRelic.value || LocationUtils.F7Phase != 5) return@register
-            if (event.action != GLFW.GLFW_PRESS || event.button != 1) return@register
             val item = mc.player?.inventory?.getItem(8) ?: return@register
             val relic = WitherRelic.fromName(item.hoverName.string) ?: return@register
-            val lookPos = PlayerUtils.getSelectionBlock() ?: return@register
-            if (relic.cauldronPos.x.toInt() != lookPos.x || relic.cauldronPos.z.toInt() != lookPos.z) {
-                event.cancel()
-            }
+            val pos = PlayerUtils.getSelectionBlock() ?: return@register
+            if (pos.x == relic.cauldronPos.x.toInt() && pos.z == relic.cauldronPos.z.toInt()) return@register
+            event.cancel()
         }
 
         register<MainThreadPacketReceivedEvent.Pre> {
@@ -123,26 +111,12 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
         }
 
         register<RenderWorldEvent> {
+            if (! relicBox.value) return@register
             if (LocationUtils.F7Phase != 5) return@register
-
-            if (relicBox.value) {
-                val heldItem = mc.player?.inventory?.getItem(8)?.hoverName?.string ?: ""
-
-                WitherRelic.fromName(heldItem)?.let {
-                    Render3D.renderBlock(event.ctx, it.cauldronPos.toPos(), it.color, phase = true)
-                    Render3D.renderTracer(event.ctx, it.cauldronPos.add(0.5, 0.5, 0.5), it.color)
-                }
-            }
-
-            if (relicBox.value && shouldDrawSpawnOutlines) {
-                WitherRelic.entries.forEach { r ->
-                    Render3D.renderBox(
-                        event.ctx,
-                        r.spawnPos.x + 0.25, r.spawnPos.y + 0.3, r.spawnPos.z + 0.25,
-                        width = 0.5, height = 0.5,
-                        color = r.color,
-                    )
-                }
+            val heldItem = mc.player?.inventory?.getItem(8)?.hoverName?.string ?: return@register
+            WitherRelic.fromName(heldItem)?.let {
+                Render3D.renderBlock(event.ctx, it.cauldronPos.toPos(), it.color, phase = true)
+                Render3D.renderTracer(event.ctx, it.cauldronPos.add(0.5, 0.5, 0.5), it.color)
             }
         }
 

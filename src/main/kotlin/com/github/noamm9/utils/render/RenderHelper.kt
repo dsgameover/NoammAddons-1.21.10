@@ -6,7 +6,7 @@ import net.minecraft.world.phys.Vec3
 
 object RenderHelper {
     val partialTicks get() = mc.deltaTracker.getGameTimeDeltaPartialTick(true)
-    
+
     val Entity.renderX get() = xo + (x - xo) * partialTicks
     val Entity.renderY get() = yo + (y - yo) * partialTicks
     val Entity.renderZ get() = zo + (z - zo) * partialTicks
