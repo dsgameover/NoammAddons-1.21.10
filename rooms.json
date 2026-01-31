@@ -490,7 +490,8 @@
     "type": "NORMAL",
     "shape": "1x1",
     "cores": [
-      153580070
+      153580070,
+      549854306
     ],
     "secretDetails": {
       "redstoneKey": 0,
