@@ -3,6 +3,7 @@ package com.github.noamm9.utils.world
 import com.github.noamm9.NoammAddons.mc
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.status.ChunkStatus
 import net.minecraft.world.phys.Vec3
 
@@ -12,6 +13,8 @@ object WorldUtils {
     fun getBlockAt(pos: BlockPos) = getStateAt(pos).block
     fun getBlockAt(vec3: Vec3) = getBlockAt(BlockPos(vec3.x.toInt(), vec3.y.toInt(), vec3.z.toInt()))
     fun getBlockAt(x: Int, y: Int, z: Int) = getBlockAt(BlockPos(x, y, z))
+
+    fun setBlockAt(pos: BlockPos, state: BlockState) = mc.level?.setBlock(pos, state, 19)
 
     fun isChunkLoaded(x: Int, z: Int): Boolean {
         return mc.level?.getChunk(x shr 4, z shr 4, ChunkStatus.FULL, false) != null
