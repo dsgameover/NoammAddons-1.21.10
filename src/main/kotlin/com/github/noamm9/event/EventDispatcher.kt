@@ -65,13 +65,14 @@ object EventDispatcher {
             EventBus.post(EntityDeathEvent(entity))
         }
 
-        register<PacketEvent.Received> {
+        register<MainThreadPacketReceivedEvent.Post> {
             if (event.packet is ClientboundPingPacket) {
-                if (event.packet.id != 0) {
-                    EventBus.post(TickEvent.Server)
-                }
+                if (event.packet.id != 0) EventBus.post(TickEvent.Server)
             }
-            else if (event.packet is ClientboundSystemChatPacket) {
+        }
+
+        register<PacketEvent.Received> {
+            if (event.packet is ClientboundSystemChatPacket) {
                 if (EventBus.post(ChatMessageEvent(event.packet.content))) {
                     event.isCanceled = true
                 }
