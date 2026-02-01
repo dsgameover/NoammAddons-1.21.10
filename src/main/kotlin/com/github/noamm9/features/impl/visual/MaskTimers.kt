@@ -9,7 +9,6 @@ import com.github.noamm9.ui.clickgui.componnents.getValue
 import com.github.noamm9.ui.clickgui.componnents.impl.DropdownSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.section
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.items.ItemUtils.skyblockId
@@ -18,186 +17,126 @@ import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.world.entity.EquipmentSlot
 
-object MaskTimers : Feature("Mask Timers") {
-    private val onlyInDungeon by ToggleSetting("Dungeons Only", true)
-    private val procNotification by ToggleSetting("Proc Notification").section("Notifications")
-    private val comeBackNotification by ToggleSetting("Comeback Notification")
-    private val invulnerabilityTimers by ToggleSetting("Invulnerability Timers", true)
-    private val maskTimerStyle by DropdownSetting("Style", 1, listOf("Normal", "Fuck ass noam style"))
+object MaskTimers: Feature("Mask Cooldwon Timers, Invulnerability Timers and more") {
+    private val onlyInDungeon by ToggleSetting("Dungeons Only")
+    private val maskTimerStyle by DropdownSetting("Style", 0, listOf("NoammAddons", "Zyryon"))
 
-    // --- Style 0 Logic (Trackers) ---
-    private class MaskTracker(
-        val name: String,
-        val colorCode: String,
-        val cooldownMs: Int,
+    private val invulnerabilityTimers by ToggleSetting("Invulnerability Timers")
+    private val procNotification by ToggleSetting("Proc Notification")
+    private val readyNotification by ToggleSetting("Ready Notification")
+
+    private enum class Mask(
+        val displayName: String,
+        val color: String,
+        val cooldownTicks: Int,
+        val invulnTicks: Int,
         val regex: Regex,
-        val checkActive: () -> Boolean
+        val checkWorn: () -> Boolean
     ) {
-        var remainingMs = 0
-        var isActive = false
-        var wasOnCooldown = false
+        BONZO("Bonzo", "&9", 180 * 20, 3 * 20, Regex("Your (?:.+ )?Bonzo's Mask saved your life!"), {
+            mc.player?.getItemBySlot(EquipmentSlot.HEAD)?.skyblockId?.contains("BONZO_MASK") == true
+        }),
+        SPIRIT("Spirit", "&f", 30 * 20, 3 * 20, Regex("Second Wind Activated! Your Spirit Mask saved your life!"), {
+            mc.player?.getItemBySlot(EquipmentSlot.HEAD)?.skyblockId?.contains("SPIRIT_MASK") == true
+        }),
+        PHOENIX("Phoenix", "&c", 60 * 20, 4 * 20, Regex("Your Phoenix Pet saved you from certain death!"), {
+            cacheData.getData()["pet"].toString().contains("Phoenix")
+        });
+
+        var cdLeft = 0
+        var invulnLeft = 0
+        var isWorn = false
+        var notifiedReady = true
 
         fun reset() {
-            remainingMs = 0
-            isActive = false
-            wasOnCooldown = false
-        }
-    }
-
-    private val trackers = listOf(
-        MaskTracker("Bonzo", "&9", 180000, Regex("Your (?:.+ )?Bonzo's Mask saved your life!")) {
-            mc.player?.getItemBySlot(EquipmentSlot.HEAD)?.skyblockId?.contains("BONZO_MASK") == true
-        },
-        MaskTracker("Spirit", "&5", 30000, Regex("Second Wind Activated! Your Spirit Mask saved your life!")) {
-            mc.player?.getItemBySlot(EquipmentSlot.HEAD)?.skyblockId?.contains("SPIRIT_MASK") == true
-        },
-        MaskTracker("Phoenix", "&c", 60000, Regex("Your Phoenix Pet saved you from certain death!")) {
-            true
-        }
-    )
-
-    private enum class Masks(
-        val maskName: String,
-        val color: String,
-        val regex: Regex,
-        val cooldownMax: Int,
-        val invulnMax: Int
-    ) {
-        PHOENIX_PET("Phoenix Pet", "&c", Regex("^Your Phoenix Pet saved you from certain death!$"), 60 * 20, 20 * 4),
-        SPIRIT_MASK("Spirit Mask", "&f", Regex("^Second Wind Activated! Your Spirit Mask saved your life!$"), 30 * 20, 3 * 20),
-        BONZO_MASK("Bonzo Mask", "&9", Regex("^Your (?:. )?Bonzo's Mask saved your life!$"), 180 * 20, 3 * 20);
-
-        val cleanName = maskName.replace("Pet", "").replace("Mask", "").replace(" ", "")
-        var timer = -40
-        var invTicks = -1
-        val cooldownTime get() = timer / 20f
-
-        companion object {
-            val activeMasks = ArrayList<Masks>()
-
-            fun updateTimers() {
-                activeMasks.removeIf { mask ->
-                    if (mask.invTicks != -1) mask.invTicks--
-                    if (mask.timer > -40) {
-                        mask.timer--
-                        false
-                    } else true
-                }
-            }
-
-            fun reset() {
-                activeMasks.clear()
-                entries.forEach {
-                    it.timer = -40
-                    it.invTicks = -1
-                }
-            }
+            cdLeft = 0
+            invulnLeft = 0
+            isWorn = false
+            notifiedReady = true
         }
     }
 
     private val hudElement = hudElement("Mask Timers") { context, example ->
-        if (onlyInDungeon.value && !LocationUtils.inDungeon && !example) return@hudElement 0f to 0f
+        if (onlyInDungeon.value && ! LocationUtils.inDungeon && ! example) return@hudElement 0f to 0f
 
-        if (maskTimerStyle.value == 0) {
-            val lines = trackers.map { tracker ->
-                val displayCooldown = if (example) (tracker.cooldownMs / 2) else tracker.remainingMs
-                val arrow = if (tracker.isActive) "&a>" else "&c>"
+        var maxWidth = 0f
+        var yOffset = 0f
 
-                if (displayCooldown > 0) {
-                    "${tracker.colorCode}${tracker.name} $arrow &e${(displayCooldown / 1000.0).toFixed(2)}"
-                } else {
-                    "${tracker.colorCode}${tracker.name} $arrow &aReady"
-                }
+        Mask.entries.forEach { mask ->
+            val cd = if (example) mask.cooldownTicks / 2 else mask.cdLeft
+            if (maskTimerStyle.value == 0 && cd <= 0 && ! example) return@forEach
+
+            val text = if (maskTimerStyle.value == 0) {
+                val time = if (example) mask.cooldownTicks / 40f else cd / 20f
+                if (time > 0) "${mask.color}${mask.displayName} Mask: &a${time.toFixed(1)}"
+                else "${mask.color}${mask.displayName} Mask: &aREADY"
             }
-            if (lines.isEmpty() && !example) return@hudElement 0f to 0f
-            lines.forEachIndexed { i, text -> Render2D.drawString(context, text, 0, i * 10) }
-            return@hudElement (lines.maxOfOrNull { it.width().toFloat() } ?: 0f) to (lines.size * 10f)
-
-        } else {
-            val masksToShow = if (example) Masks.entries else Masks.activeMasks
-            var maxWidth = 0f
-            var yOffset = 0f
-
-            for (mask in masksToShow) {
-                val timeDisplay = if (example) mask.cooldownMax / 40f else mask.cooldownTime
-                val text = if (timeDisplay > 0) {
-                    "${mask.color}${mask.maskName}: &a${timeDisplay.toFixed(1)}"
-                } else {
-                    "${mask.color}${mask.maskName}: &aREADY"
-                }
-
-                Render2D.drawString(context, text, 0, yOffset.toInt())
-                val w = text.width().toFloat()
-                if (w > maxWidth) maxWidth = w
-                yOffset += 10f
+            else {
+                val arrow = if (mask.isWorn || example) "&a>" else "&c>"
+                if (cd > 0) "${mask.color}${mask.displayName} $arrow &e${(cd / 20.0).toFixed(2)}"
+                else "${mask.color}${mask.displayName} $arrow &aReady"
             }
-            return@hudElement maxWidth to yOffset
+
+            Render2D.drawString(context, text, 0, yOffset.toInt())
+            maxWidth = maxOf(maxWidth, text.width().toFloat())
+            yOffset += 10f
         }
+        maxWidth to yOffset
     }
 
     override fun init() {
-        register<TickEvent.Start> {
-            if (!LocationUtils.inSkyblock || (onlyInDungeon.value && !LocationUtils.inDungeon)) return@register
-            trackers.forEach { it.isActive = it.checkActive() }
-        }
-
         register<TickEvent.Server> {
-            if (!LocationUtils.inSkyblock) return@register
+            if (! LocationUtils.inSkyblock) return@register
+            val inDungeon = LocationUtils.inDungeon
 
-            trackers.forEach { tracker ->
-                if (tracker.remainingMs > 0) {
-                    tracker.remainingMs -= 50
-                    tracker.wasOnCooldown = true
-                } else if (tracker.wasOnCooldown) {
-                    tracker.wasOnCooldown = false
-                    if (comeBackNotification.value) ChatUtils.showTitle("${tracker.colorCode}${tracker.name} is Ready!")
+            Mask.entries.forEach { mask ->
+                if (maskTimerStyle.value == 1) {
+                    mask.isWorn = mask.checkWorn()
+                }
+
+                if (mask.invulnLeft > 0) mask.invulnLeft --
+
+                if (mask.cdLeft > 0) {
+                    mask.cdLeft --
+                    mask.notifiedReady = false
+                }
+                else if (! mask.notifiedReady) {
+                    mask.notifiedReady = true
+                    if (readyNotification.value && (! onlyInDungeon.value || inDungeon)) {
+                        ChatUtils.showTitle("${mask.color}${mask.displayName} is Ready!")
+                    }
                 }
             }
-
-            Masks.updateTimers()
         }
 
         register<ChatMessageEvent> {
-            if (!LocationUtils.inSkyblock || (onlyInDungeon.value && !LocationUtils.inDungeon)) return@register
+            if (! LocationUtils.inSkyblock || (onlyInDungeon.value && ! LocationUtils.inDungeon)) return@register
             val msg = event.unformattedText
-
-            trackers.forEach { tracker ->
-                if (tracker.regex.matches(msg)) {
-                    tracker.remainingMs = tracker.cooldownMs
-                    if (procNotification.value && maskTimerStyle.value == 0) {
-                        ChatUtils.showTitle("${tracker.colorCode}${tracker.name} Procced!")
-                    }
-                }
-            }
-
-            for (mask in Masks.entries) {
+            Mask.entries.forEach { mask ->
                 if (mask.regex.matches(msg)) {
-                    mask.timer = mask.cooldownMax
-                    if (!Masks.activeMasks.contains(mask)) Masks.activeMasks.add(mask)
-                    if (procNotification.value && maskTimerStyle.value == 1) {
-                        ChatUtils.showTitle("${mask.color}${mask.maskName}")
-                    }
-                    if (invulnerabilityTimers.value) mask.invTicks = mask.invulnMax
-                    break
+                    mask.cdLeft = mask.cooldownTicks
+                    if (invulnerabilityTimers.value) mask.invulnLeft = mask.invulnTicks
+                    if (procNotification.value) ChatUtils.showTitle("${mask.color}${mask.displayName} Procced!")
                 }
             }
         }
 
         register<RenderOverlayEvent> {
-            if (!LocationUtils.inSkyblock || Masks.activeMasks.isEmpty() || !invulnerabilityTimers.value) return@register
-            val mask = Masks.activeMasks.maxByOrNull { it.invTicks }?.takeIf { it.invTicks != -1 } ?: return@register
+            if (! invulnerabilityTimers.value) return@register
+            val active = Mask.entries.filter { it.invulnLeft > 0 }.maxByOrNull { it.invulnLeft } ?: return@register
 
-            val color = if (mask.invTicks < 20) "&c" else "&a"
-            val str = "${mask.color}${mask.cleanName}: $color${(mask.invTicks / 20.0).toFixed(1)}"
+            val color = if (active.invulnLeft < 20) "&c" else "&a"
+            val name = active.displayName.replace("Pet", "").replace("Mask", "").trim()
+            val str = "${active.color}$name: $color${(active.invulnLeft / 20.0).toFixed(1)}"
 
-            val x = mc.window.guiScaledWidth / 2f
-            val y = mc.window.guiScaledHeight / 3f
-            Render2D.drawCenteredString(event.context, str, x, y, scale = 1.5f)
+            Render2D.drawCenteredString(
+                event.context, str,
+                mc.window.guiScaledWidth / 2f,
+                mc.window.guiScaledHeight / 3f,
+                scale = 1.5f
+            )
         }
 
-        register<WorldChangeEvent> {
-            trackers.forEach { it.reset() }
-            Masks.reset()
-        }
+        register<WorldChangeEvent> { Mask.entries.forEach { it.reset() } }
     }
 }
