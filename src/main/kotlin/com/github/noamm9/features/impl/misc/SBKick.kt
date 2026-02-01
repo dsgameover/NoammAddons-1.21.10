@@ -8,6 +8,7 @@ import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.componnents.provideDelegate
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.unformattedText
+import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.location.LocationUtils.inSkyblock
 import com.github.noamm9.utils.render.Render2D
 
@@ -53,7 +54,7 @@ object SBKick: Feature("Shows a timer on screen for when u can join skyblock aga
             if (timeSinceKick >= 60_000) showTime = false
             else Render2D.drawCenteredString(
                 event.context,
-                "§cLast kicked from SkyBlock §b${String.format("%.2f", timeSinceKick / 1000.0)}s ago",
+                "§cLast kicked from SkyBlock §b${(timeSinceKick / 1000.0).toFixed(2)}s ago",
                 mc.window.guiScaledWidth / 2f,
                 mc.window.guiScaledHeight / 2f - 20,
                 scale = 1.5f

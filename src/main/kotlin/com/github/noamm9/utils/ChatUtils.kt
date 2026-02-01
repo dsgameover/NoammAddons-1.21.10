@@ -198,7 +198,7 @@ object ChatUtils {
 
         mainComponent.style = style
 
-        ChatUtils.chat(if (prefix) Component.literal(NoammAddons.PREFIX).append(mainComponent) else mainComponent)
+        ChatUtils.chat(if (prefix) Component.literal(NoammAddons.PREFIX + " ").append(mainComponent) else mainComponent)
     }
 
     init {

@@ -1,6 +1,6 @@
 package com.github.noamm9.utils
 
-import java.util.TreeMap
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -46,7 +46,6 @@ object NumbersUtils {
 
     @JvmStatic
     fun format(value: String): String = format(value.filter { it.isDigit() }.toLong())
-
 
     @JvmStatic
     fun unformat(value: String): Long {
@@ -183,11 +182,11 @@ object NumbersUtils {
     fun formatMilis(milliseconds: Number): String {
         val totalSeconds = milliseconds.toDouble() / 1000.0
 
-        if (totalSeconds < 60) return String.format("%.3f sec", totalSeconds)
+        if (totalSeconds < 60) return totalSeconds.toFixed(3) + " sec"
         else {
             val minutes = (totalSeconds / 60).toInt()
             val remainingSeconds = totalSeconds % 60
-            return String.format("%d min %.3f seconds", minutes, remainingSeconds)
+            return "$minutes min ${remainingSeconds.toFixed(3)} seconds"
         }
     }
 

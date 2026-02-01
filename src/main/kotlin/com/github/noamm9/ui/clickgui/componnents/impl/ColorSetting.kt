@@ -12,6 +12,7 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.client.gui.GuiGraphics
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
+import java.util.*
 
 class ColorSetting(name: String, defaultValue: Color, val withAlpha: Boolean = true): Setting<Color>(name, defaultValue), Savable {
     private var expanded = false
@@ -45,8 +46,8 @@ class ColorSetting(name: String, defaultValue: Color, val withAlpha: Boolean = t
     }
 
     private fun updateHexText() {
-        hexText = if (withAlpha) String.format("%02x%02x%02x%02x", value.alpha, value.red, value.green, value.blue)
-        else String.format("%02x%02x%02x", value.red, value.green, value.blue)
+        hexText = if (withAlpha) String.format(Locale.US, "%02x%02x%02x%02x", value.alpha, value.red, value.green, value.blue)
+        else String.format(Locale.US, "%02x%02x%02x", value.red, value.green, value.blue)
         hexText = hexText.uppercase()
     }
 
