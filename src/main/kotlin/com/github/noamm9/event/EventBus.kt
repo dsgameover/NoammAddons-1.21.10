@@ -20,10 +20,9 @@ object EventBus {
             try {
                 val callback = handler.callback as EventContext<Event>.() -> Unit
                 callback.invoke(EventContext(event, handler as EventListener<Event>))
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 NoammAddons.logger.error("EventBus Error in ${event.javaClass.name}", e)
-                ChatUtils.modMessage("EventBus Error: class ${event.javaClass.name}. message: ${e.message}")
+                ChatUtils.clickableChat("EventBus Error: class ${event.javaClass.name}. message: ${e.message}", true, copy = e.stackTrace.joinToString("\n"))
             }
         }
 

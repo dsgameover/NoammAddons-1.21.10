@@ -45,8 +45,8 @@ object WitherDragons: Feature(
     val sendArrowHit by ToggleSetting("Send Arrows Hit", true)
 
     val dragonPriorityToggle by ToggleSetting("Dragon Priority", false).section("Dragon Priority")
-    val normalPower by SliderSetting("Normal Power", 22f, 0f, 32f, 1f).showIf { dragonPriorityToggle.value }
-    val easyPower by SliderSetting("Easy Power", 19f, 0f, 32f, 1f).showIf { dragonPriorityToggle.value }
+    val normalPower by SliderSetting("Normal Power", 0f, 0f, 32f, 0.5f).showIf { dragonPriorityToggle.value }
+    val easyPower by SliderSetting("Easy Power", 0f, 0f, 32f, 0.5f).showIf { dragonPriorityToggle.value }
     val soloDebuff by DropdownSetting("Purple Solo Debuff", 0, listOf("Tank", "Healer")).showIf { dragonPriorityToggle.value }
     val soloDebuffOnAll by ToggleSetting("Solo Debuff on All Splits", true).showIf { dragonPriorityToggle.value }
 

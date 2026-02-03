@@ -19,7 +19,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
-import net.minecraft.network.protocol.common.ClientboundPingPacket
 import net.minecraft.network.protocol.game.*
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.item.ItemEntity
@@ -65,11 +64,6 @@ object EventDispatcher {
             EventBus.post(EntityDeathEvent(entity))
         }
 
-        register<MainThreadPacketReceivedEvent.Post> {
-            if (event.packet is ClientboundPingPacket) {
-                if (event.packet.id != 0) EventBus.post(TickEvent.Server)
-            }
-        }
 
         register<PacketEvent.Received> {
             if (event.packet is ClientboundSystemChatPacket) {
