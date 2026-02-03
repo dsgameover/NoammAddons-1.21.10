@@ -1,7 +1,6 @@
 package com.github.noamm9.features.impl.dungeon.dragons
 
-import com.github.noamm9.NoammAddons
-import com.github.noamm9.features.impl.dungeon.dragons.WitherDragons.priorityDragon
+import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.utils.MathUtils.xzInAABB
 import com.github.noamm9.utils.dungeons.DungeonListener
 import net.minecraft.core.particles.ParticleTypes
@@ -25,34 +24,22 @@ object DragonCheck {
         if (particle.yDist != 3f) return
         if (particle.zDist != 2f) return
 
-        if (WitherDragonEnum.dragonSpawnCount >= 2) {
-            val spawningDragon = WitherDragonEnum.entries.find {
-                particle.x in it.xRange && particle.z in it.zRange && it.state == WitherDragonState.DEAD
-            } ?: return
+        val dragons = mutableListOf<WitherDragonEnum>()
 
-            spawningDragon.state = WitherDragonState.SPAWNING
-            WitherDragons.priorityDragon = spawningDragon
-            return
-        }
-
-        val (spawned, dragons) = WitherDragonEnum.entries.fold(0 to mutableListOf<WitherDragonEnum>()) { (spawned, dragons), dragon ->
-            val newSpawned = spawned + dragon.timesSpawned
-
-            if (dragon.state != WitherDragonState.DEAD) {
-                if (dragon !in dragons) dragons.add(dragon)
-                return@fold newSpawned to dragons
+        WitherDragonEnum.entries.forEach { dragon ->
+            if (dragon.state == WitherDragonState.SPAWNING) {
+                dragons.add(dragon)
+                return@forEach
             }
 
-            if (particle.x !in dragon.xRange || particle.z !in dragon.zRange) return@fold newSpawned to dragons
-
-            dragon.state = WitherDragonState.SPAWNING
-            dragons.add(dragon)
-            newSpawned to dragons
+            if (particle.x in dragon.xRange && particle.z in dragon.zRange) {
+                dragon.state = WitherDragonState.SPAWNING
+                dragons.add(dragon)
+            }
         }
 
-        if (dragons.isNotEmpty() && (dragons.size == 2 || spawned >= 2)) {
+        if (dragons.isNotEmpty()) {
             WitherDragons.priorityDragon = DragonPriority.findPriority(dragons)
-            if (WitherDragons.priorityDragon.state != WitherDragonState.SPAWNING) WitherDragons.priorityDragon = dragons.first { it != WitherDragons.priorityDragon }
         }
     }
 
@@ -80,7 +67,7 @@ object DragonCheck {
 
     fun dragonSprayed(packet: ClientboundSetEquipmentPacket) {
         if (packet.slots.none { it.second.item == Items.PACKED_ICE }) return
-        val sprayedEntity = NoammAddons.mc.level?.getEntity(packet.entity) as? ArmorStand ?: return
+        val sprayedEntity = mc.level?.getEntity(packet.entity) as? ArmorStand ?: return
 
         WitherDragonEnum.entries.forEach { dragon ->
             if (dragon.sprayedTime != null || dragon.state != WitherDragonState.ALIVE || dragon.entity == null || sprayedEntity.distanceTo(dragon.entity) > 8) return@forEach
@@ -90,7 +77,7 @@ object DragonCheck {
 
     fun trackArrows(packet: ClientboundSoundPacket) {
         if (packet.sound.value() != SoundEvents.ARROW_HIT_PLAYER) return
-        priorityDragon.takeUnless { it == WitherDragonEnum.None }?.let {
+        WitherDragons.priorityDragon.takeUnless { it == WitherDragonEnum.None }?.let {
             if (it.state == WitherDragonState.ALIVE && DungeonListener.currentTime - it.spawnedTime <= it.skipKillTime) {
                 it.arrowsHit ++
             }
