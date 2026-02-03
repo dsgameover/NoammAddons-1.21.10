@@ -1,8 +1,7 @@
 package com.github.noamm9.features.impl.visual
 
-import com.github.noamm9.features.Feature
-import com.github.noamm9.utils.render.Render2D
-import com.github.noamm9.utils.render.Render2D.width
+/*
+useless now ):
 
 object LifelineHud: Feature("Lifeline HUD") {
     override fun init() {
@@ -22,4 +21,4 @@ object LifelineHud: Feature("Lifeline HUD") {
             return@hudElement text.width().toFloat() to 9f
         }
     }
-}
+}*/
