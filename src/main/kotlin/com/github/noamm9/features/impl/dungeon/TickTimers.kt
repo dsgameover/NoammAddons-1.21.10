@@ -44,17 +44,20 @@ object TickTimers: Feature("Shows various types of server tick timers for F7 bos
 
         register<ChatMessageEvent> {
             when (event.unformattedText) {
-                "[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!" -> if (p1.value) startTickTime = 150
+                "[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!" -> if (p1.value) startTickTime = 167
 
                 "[BOSS] Maxor: I'M TOO YOUNG TO DIE AGAIN!" -> if (p2.value) startTickTime = 120
 
                 "[BOSS] Storm: I should have known that I stood no chance." -> {
                     if (p3.value) startTickTime = 104
-                    if (goldorDeathTickTimer.value) goldorTickTime = 60
                     if (stormActive) {
                         stormActive = false
                         padTickTime = - 1
                     }
+                }
+
+                "[BOSS] Goldor: Who dares trespass into my domain?" -> {
+                    if (goldorDeathTickTimer.value) goldorTickTime = 60
                 }
 
                 "[BOSS] Necron: I'm afraid, your journey ends now." -> if (p4.value) startTickTime = 60
@@ -90,7 +93,7 @@ object TickTimers: Feature("Shows various types of server tick timers for F7 bos
             }
         }
 
-        register<TickEvent.Start> {
+        register<TickEvent.Server> {
             if (startTickTime != - 1) startTickTime --
 
             if (stormActive && padTickTime != - 1) {
@@ -99,8 +102,8 @@ object TickTimers: Feature("Shows various types of server tick timers for F7 bos
             }
 
             if (goldorTickTime >= 0) {
+                goldorTickTime --
                 if (goldorTickTime == 0) goldorTickTime = 60
-                else goldorTickTime --
             }
 
             if (deathTickTimer.value && deathTickTime >= 0) {

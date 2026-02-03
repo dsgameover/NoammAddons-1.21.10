@@ -126,7 +126,7 @@ object PartyHelper: Feature("Party commands and reformatting.") {
 
             canRun("!ping") && cmd == "ping" -> ChatUtils.sendPartyMessage("Ping: ${ServerUtils.currentPing}ms")
 
-            canRun("!tps") && cmd == "tps" -> ChatUtils.sendPartyMessage("TPS: ${ServerUtils.averageTps.toFixed(1)}")
+            canRun("!tps") && cmd == "tps" -> ChatUtils.sendPartyMessage("TPS: ${ServerUtils.tps.toFixed(1)}")
 
             canRun("!kick") && (cmd == "kick" || cmd == "k") -> {
                 if (args.isEmpty()) return

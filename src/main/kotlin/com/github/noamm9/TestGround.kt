@@ -5,51 +5,50 @@ import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.impl.PacketEvent
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
-import com.github.noamm9.utils.ThreadUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 
 object TestGround {
-    private var lastGameTime = - 1L
-    private var ticks = 0
+    private var lastServerTime = - 1L
+    private var lastRealTime = - 1L
 
     init {
-        ThreadUtils.loop(1000) {
-            ticks = 0
-        }
-
         EventBus.register<WorldChangeEvent> {
-            ticks = 0
-            lastGameTime = - 1
+            lastServerTime = - 1
+            lastRealTime = - 1
         }
 
         EventBus.register<PacketEvent.Received> {
-            if (event.packet is ClientboundSetTimePacket) {
-                val currentGameTime = event.packet.gameTime
-                if (lastGameTime == - 1L) {
-                    lastGameTime = currentGameTime
-                    return@register
-                }
+            if (event.packet !is ClientboundSetTimePacket) return@register
 
-                val diff = (currentGameTime - lastGameTime).toInt()
-                lastGameTime = currentGameTime
-                if (diff <= 0) return@register
+            val newServerTime = event.packet.gameTime
+            val newRealTime = System.currentTimeMillis()
 
-                val delayTime = (1000 / diff).coerceAtLeast(1).toLong()
+            if (lastServerTime == - 1L) {
+                lastServerTime = newServerTime
+                lastRealTime = newRealTime
+                return@register
+            }
 
-                NoammAddons.scope.launch {
-                    repeat(diff) {
-                        serverTick()
-                        delay(delayTime)
+            val tickDiff = (newServerTime - lastServerTime).toInt()
+            if (tickDiff <= 0) return@register
+
+            val timePassed = newRealTime - lastRealTime
+            val instantTickDuration = timePassed / tickDiff
+
+            lastServerTime = newServerTime
+            lastRealTime = newRealTime
+
+            NoammAddons.scope.launch {
+                repeat(tickDiff) {
+                    mc.execute {
+                        EventBus.post(TickEvent.Server)
                     }
+
+                    delay(instantTickDuration)
                 }
             }
         }
-    }
-
-    private fun serverTick() {
-        ticks ++
-        mc.execute { EventBus.post(TickEvent.Server) }
     }
 }

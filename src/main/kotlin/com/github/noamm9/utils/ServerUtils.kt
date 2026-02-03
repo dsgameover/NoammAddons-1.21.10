@@ -13,7 +13,7 @@ import net.minecraft.network.protocol.ping.ServerboundPingRequestPacket
 import kotlin.math.min
 
 object ServerUtils {
-    var averageTps = 20f
+    var tps = 20f
         private set
 
     var currentPing = 0L
@@ -29,7 +29,7 @@ object ServerUtils {
 
     fun init() {
         register<WorldChangeEvent>(EventPriority.HIGHEST) {
-            averageTps = 20f
+            tps = 20f
             currentPing = 0
             averagePing = 0
             lastTimePacket = 0L
@@ -55,8 +55,7 @@ object ServerUtils {
                 val now = System.currentTimeMillis()
                 if (lastTimePacket != 0L) {
                     val diff = now - lastTimePacket
-                    val instantTps = (20000f / diff).coerceIn(0f, 20f)
-                    averageTps = (averageTps * 0.8f) + (instantTps * 0.2f)
+                    tps = (20_000f / diff).coerceIn(0f, 20f)
                 }
                 lastTimePacket = now
             }
