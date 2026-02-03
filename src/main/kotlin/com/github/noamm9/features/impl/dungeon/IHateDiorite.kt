@@ -18,8 +18,8 @@ object IHateDiorite: Feature("I Hate Diorite") {
     )
 
     private val flattenedPositions by lazy {
-        val list = mutableListOf<Pair<BlockPos, BlockState>>()
         val data = DataDownloader.loadJson<Map<String, List<Map<String, Double>>>>("iHateDioriteBlocks.json")
+        val list = mutableListOf<Pair<BlockPos, BlockState>>()
 
         data.forEach { (key, coords) ->
             val state = blockStates[key] ?: return@forEach

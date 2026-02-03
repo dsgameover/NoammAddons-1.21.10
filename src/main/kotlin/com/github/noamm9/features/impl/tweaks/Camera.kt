@@ -6,6 +6,8 @@ import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 
 object Camera: Feature() {
+    private val fullBright by ToggleSetting("Full Bright")
+
     @JvmStatic
     val legacySneakHeight by ToggleSetting("1.8 Sneak height").withDescription("Changes the sneak height back to its 1.8 height while maitaining all vanilla behevior (visual only)").section("Camera")
 
@@ -20,9 +22,6 @@ object Camera: Feature() {
 
     @JvmStatic
     val cameraDistance by SliderSetting("Camera Distance", 4, 1, 10, 0.1).withDescription("The distance of the camera from ur player").showIf { customCameraDistance.value }
-
-    private val fullBright by ToggleSetting("Full Bright").section("Full Bright")
-    private val gamma by SliderSetting("Gamma", 5, 0, 15, 1).withDescription("Control how strong the FullBright is").showIf { fullBright.value }
 
     @JvmStatic
     val hideFireOverlay by ToggleSetting("Hide Fire Overlay").withDescription("Hides the fire overlay on ur screen").section("Hide Overlays")
@@ -47,9 +46,4 @@ object Camera: Feature() {
 
     @JvmStatic
     val isFullBright get() = enabled && fullBright.value
-
-    @JvmStatic
-    fun getGamma(): Double {
-        return gamma.value.toDouble()
-    }
 }

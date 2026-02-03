@@ -22,6 +22,7 @@ import net.minecraft.network.protocol.game.ServerboundChatPacket
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.roundToInt
 
 object ChatUtils {
     private val queue = ConcurrentLinkedQueue<String>()
@@ -206,8 +207,12 @@ object ChatUtils {
 
         register<RenderOverlayEvent>(EventPriority.LOW) {
             if (time > 0) {
-                Render2D.drawCenteredString(event.context, title, mc.window.guiScaledWidth / 2f, mc.window.guiScaledHeight / 2f - 50f, scale = 2.5)
-                Render2D.drawCenteredString(event.context, subtitle, mc.window.guiScaledWidth / 2f, mc.window.guiScaledHeight / 2f + 20f, scale = 1.5)
+                val x = mc.window.guiScaledWidth / 2f
+                val height = mc.window.guiScaledHeight
+                val y = height / 2f - (height * 0.056).roundToInt()
+
+                Render2D.drawCenteredString(event.context, title, x, y, scale = 2.5)
+                Render2D.drawCenteredString(event.context, subtitle, x, y + (height / 15.42f).roundToInt(), scale = 1.5)
             }
         }
     }
