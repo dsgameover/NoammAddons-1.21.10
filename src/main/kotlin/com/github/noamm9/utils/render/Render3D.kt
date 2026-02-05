@@ -10,7 +10,9 @@ import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.Shapes
 import org.joml.Matrix4f
 import java.awt.Color
 
@@ -31,7 +33,7 @@ object Render3D {
         val mstack = ctx.matrixStack ?: return
         val consumers = ctx.consumers ?: return
         val camPos = ctx.camera.position
-        val shape = state.getShape(mc.level !!, pos)
+        val shape = if (state.block != Blocks.AIR) state.getShape(mc.level !!, pos) else Shapes.block()
         val adjustedLineWidth = lineWidth.toDouble()
 
         val outlineR = outlineColor.red / 255f

@@ -5,6 +5,8 @@ import com.github.noamm9.event.EventBus.register
 import com.github.noamm9.event.EventDispatcher
 import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.utils.DataDownloader
+import com.github.noamm9.utils.MathUtils.add
+import com.github.noamm9.utils.MathUtils.destructured
 import com.github.noamm9.utils.ThreadUtils
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.map.DungeonInfo
@@ -22,7 +24,7 @@ import net.minecraft.world.phys.Vec3
 import kotlin.math.round
 
 object ScanUtils {
-    private val roomList by lazy { DataDownloader.loadJson<List<RoomData>>("rooms.json") }
+    val roomList by lazy { DataDownloader.loadJson<List<RoomData>>("rooms.json") }
 
     init {
         register<WorldChangeEvent> {
@@ -77,16 +79,6 @@ object ScanUtils {
         return sb.toString().hashCode()
     }
 
-    fun BlockPos.rotate(degree: Int): BlockPos {
-        return when ((degree % 360 + 360) % 360) {
-            0 -> BlockPos(x, y, z)
-            90 -> BlockPos(z, y, - x)
-            180 -> BlockPos(- x, y, - z)
-            270 -> BlockPos(- z, y, x)
-            else -> BlockPos(x, y, z)
-        }
-    }
-
     fun getHighestY(x: Int, z: Int): Int {
         var height = 0
 
@@ -100,5 +92,26 @@ object ScanUtils {
         }
 
         return height
+    }
+
+    fun BlockPos.rotate(degree: Int): BlockPos {
+        return when ((degree % 360 + 360) % 360) {
+            0 -> BlockPos(x, y, z)
+            90 -> BlockPos(z, y, - x)
+            180 -> BlockPos(- x, y, - z)
+            270 -> BlockPos(- z, y, x)
+            else -> BlockPos(x, y, z)
+        }
+    }
+
+    fun getRealCoord(pos: BlockPos, roomCenter: BlockPos, rotation: Int): BlockPos {
+        val (cx, _, cz) = roomCenter.destructured()
+        return pos.rotate(rotation).add(cx, 0, cz)
+    }
+
+    fun getRelativeCoord(realPos: BlockPos, roomCenter: BlockPos, rotation: Int): BlockPos {
+        val (cx, _, cz) = roomCenter.destructured()
+        val centeredPos = realPos.add(- cx, 0, - cz)
+        return centeredPos.rotate(- rotation)
     }
 }
