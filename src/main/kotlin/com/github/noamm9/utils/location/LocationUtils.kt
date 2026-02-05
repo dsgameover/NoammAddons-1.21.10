@@ -80,7 +80,7 @@ object LocationUtils {
             }
         }
 
-        EventBus.register<TickEvent.Server>(EventPriority.HIGHEST) {
+        EventBus.register<TickEvent.Start>(EventPriority.HIGHEST) {
             inBoss = isInBossRoom().also {
                 if (it && DungeonListener.bossEntryTime == null) {
                     DungeonListener.bossEntryTime = DungeonListener.currentTime

@@ -18,6 +18,10 @@ class Panel(val category: CategoryType, var x: Int, var y: Int) {
     private val width = 110
     private val headerHeight = 22
     private val buttonHeight = 16
+
+    private val maxDisplayHeight = 350
+    private var scrollOffset = 0f
+
     private var dragging = false
     private var dragX = 0
     private var dragY = 0
@@ -42,44 +46,73 @@ class Panel(val category: CategoryType, var x: Int, var y: Int) {
 
         Render2D.drawRect(context, x, y, width, headerHeight, headerBg)
         Render2D.drawRect(context, x, y, width, 2, Style.accentColor)
-
-        /*
-        val icon = if (collapsed) "+" else "-"
-        Render2D.drawString(context, icon, x + width - 12, y + 7, Color.GRAY)
-        */
-
         Render2D.drawCenteredString(context, "§l${category.name}", x + width / 2, y + 7)
 
         if (openAnim.value > 0.01f || features.size != filteredFeatures.size) {
-            var currentY = y + headerHeight
+            val totalContentHeight = filteredFeatures.size * buttonHeight
+            val visibleHeight = totalContentHeight.coerceAtMost(maxDisplayHeight)
+            val currentScissorHeight = (visibleHeight * openAnim.value).toInt()
+            val maxScroll = (totalContentHeight - visibleHeight).coerceAtLeast(0)
+            if (scrollOffset > maxScroll) scrollOffset = maxScroll.toFloat()
+            if (scrollOffset < 0) scrollOffset = 0f
 
-            val scissorHeight = (filteredFeatures.size * buttonHeight * openAnim.value).toInt()
-            context.enableScissor(x, y + headerHeight, x + width, y + headerHeight + scissorHeight)
+            var currentY = y + headerHeight - scrollOffset.toInt()
+
+            context.enableScissor(x, y + headerHeight, x + width, y + headerHeight + currentScissorHeight)
 
             filteredFeatures.forEach { feature ->
-                val isHovered = mouseX >= x && mouseX <= x + width && mouseY >= currentY && mouseY <= currentY + buttonHeight
+                if (currentY + buttonHeight > y + headerHeight && currentY < y + headerHeight + visibleHeight) {
+                    val isHovered = mouseX >= x && mouseX <= x + width &&
+                        mouseY >= currentY && mouseY <= currentY + buttonHeight &&
+                        mouseY >= y + headerHeight && mouseY <= y + headerHeight + visibleHeight
 
-                Render2D.drawRect(context, x, currentY, width, buttonHeight, bodyBg)
+                    Render2D.drawRect(context, x, currentY, width, buttonHeight, bodyBg)
 
-                if (feature.enabled) {
-                    Render2D.drawRect(context, x, currentY, width, buttonHeight, Style.accentColor.withAlpha(100))
-                    Render2D.drawRect(context, x, currentY, 2, buttonHeight, Style.accentColor)
+                    if (feature.enabled) {
+                        Render2D.drawRect(context, x, currentY, width, buttonHeight, Style.accentColor.withAlpha(100))
+                        Render2D.drawRect(context, x, currentY, 2, buttonHeight, Style.accentColor)
+                    }
+
+                    if (isHovered) {
+                        Render2D.drawRect(context, x, currentY, width, buttonHeight, hoverColor)
+                    }
+
+                    Render2D.drawCenteredString(context, feature.name, x + width / 2, currentY + 4)
+
+                    if (isHovered && ClickGuiScreen.selectedFeature == null) {
+                        TooltipManager.hover(feature.description, mouseX, mouseY)
+                    }
                 }
-
-                if (isHovered) {
-                    Render2D.drawRect(context, x, currentY, width, buttonHeight, hoverColor)
-                }
-
-                Render2D.drawCenteredString(context, feature.name, x + width / 2, currentY + 4)
-
-                if (isHovered && ClickGuiScreen.selectedFeature == null) {
-                    TooltipManager.hover(feature.description, mouseX, mouseY)
-                }
-
                 currentY += buttonHeight
             }
             context.disableScissor()
+
+            if (maxScroll > 0 && ! collapsed) {
+                val barHeight = (visibleHeight.toFloat() / totalContentHeight.toFloat()) * visibleHeight
+                val barY = (y + headerHeight) + ((scrollOffset / maxScroll) * (visibleHeight - barHeight))
+
+                Render2D.drawRect(context, x + width - 2, barY, 2, barHeight, Color.WHITE)
+            }
         }
+    }
+
+    fun handleScroll(delta: Double) {
+        if (collapsed) return
+        val filteredFeatures = features.filter { it.name.contains(ClickGuiScreen.searchQuery, ignoreCase = true) }
+        val totalContentHeight = filteredFeatures.size * buttonHeight
+        val visibleHeight = totalContentHeight.coerceAtMost(maxDisplayHeight)
+
+        if (totalContentHeight <= visibleHeight) return
+
+        scrollOffset -= (delta * 15).toFloat()
+    }
+
+    fun isMouseOver(mx: Int, my: Int): Boolean {
+        val filteredFeatures = features.filter { it.name.contains(ClickGuiScreen.searchQuery, ignoreCase = true) }
+        val totalContentHeight = filteredFeatures.size * buttonHeight
+        val visibleHeight = totalContentHeight.coerceAtMost(maxDisplayHeight)
+
+        return mx >= x && mx <= x + width && my >= y && my <= y + headerHeight + visibleHeight
     }
 
     fun isMouseOverHeader(mx: Double, my: Double): Boolean {
@@ -102,10 +135,15 @@ class Panel(val category: CategoryType, var x: Int, var y: Int) {
             return
         }
 
-        var currentY = y + headerHeight
         val filteredFeatures = features.filter { it.name.contains(ClickGuiScreen.searchQuery, ignoreCase = true) }
-
         if (collapsed && features.size == filteredFeatures.size) return
+
+        val totalContentHeight = filteredFeatures.size * buttonHeight
+        val visibleHeight = totalContentHeight.coerceAtMost(maxDisplayHeight)
+
+        if (mouseY < y + headerHeight || mouseY > y + headerHeight + visibleHeight) return
+
+        var currentY = y + headerHeight - scrollOffset.toInt()
 
         filteredFeatures.forEach { feature ->
             if (mouseX >= x && mouseX <= x + width && mouseY >= currentY && mouseY <= currentY + buttonHeight) {

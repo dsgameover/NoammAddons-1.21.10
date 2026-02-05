@@ -70,7 +70,7 @@ object RenderOptimizer: Feature("Optimize Rendering by hiding useless shit.") {
                 is ClientboundAddEntityPacket -> {
                     val isBlock = packet.type == EntityType.FALLING_BLOCK && hideFallingBlocks.value
                     val isLightning = packet.type == EntityType.LIGHTNING_BOLT && hideLightning.value
-                    val isArmor = packet.type == EntityType.ARMOR_STAND && hideArmorstands.value
+                    val isArmor = packet.type == EntityType.ARMOR_STAND && hideArmorstands.value && LocationUtils.F7Phase == 5
 
                     if (isBlock || isLightning || isArmor) event.isCanceled = true
                 }

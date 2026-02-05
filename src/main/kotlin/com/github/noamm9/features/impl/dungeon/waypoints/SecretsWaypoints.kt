@@ -52,5 +52,5 @@ object SecretsWaypoints {
         }
     }
 
-    fun onWorldUnload() = currentRoomWaypoints.clear()
+    fun clear() = currentRoomWaypoints.clear()
 }

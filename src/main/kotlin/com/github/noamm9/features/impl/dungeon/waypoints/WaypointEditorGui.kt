@@ -1,11 +1,12 @@
 package com.github.noamm9.features.impl.dungeon.waypoints
 
 import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.utils.componnents.UIButton
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import java.awt.Color
@@ -35,12 +36,13 @@ class WaypointEditorGui(
     private val bodyBg = Color(15, 15, 15, 200)
     private val headerBg = Color(20, 20, 20, 255)
 
+    private val buttons = mutableListOf<UIButton>()
+
     override fun init() {
         if (initialState != null) {
             filled = initialState.filled
             outline = initialState.outline
             phase = initialState.phase
-
             val initialRgb = initialState.color.rgb and 0xFFFFFF
             colorIndex = colors.indexOfFirst { (it.rgb and 0xFFFFFF) == initialRgb }
             if (colorIndex == - 1) colorIndex = 0
@@ -53,33 +55,36 @@ class WaypointEditorGui(
         val startY = centerY - 40
         val spacing = 24
 
-        addStyledButton(centerX - 100, startY, btnWidth, btnHeight, "Filled: ${colorBoolean(filled)}") { btn ->
+        buttons.add(UIButton(centerX - 100, startY, btnWidth, btnHeight, "Filled: ${colorBoolean(filled)}") { btn ->
             filled = ! filled
-            btn.message = Component.literal("Filled: ${colorBoolean(filled)}")
-        }
+            btn.text = "Filled: ${colorBoolean(filled)}"
+        })
 
-        addStyledButton(centerX - 100, startY + spacing, btnWidth, btnHeight, "Outline: ${colorBoolean(outline)}") { btn ->
+        buttons.add(UIButton(centerX - 100, startY + spacing, btnWidth, btnHeight, "Outline: ${colorBoolean(outline)}") { btn ->
             outline = ! outline
-            btn.message = Component.literal("Outline: ${colorBoolean(outline)}")
-        }
+            btn.text = "Outline: ${colorBoolean(outline)}"
+        })
 
-        addStyledButton(centerX - 100, startY + spacing * 2, btnWidth, btnHeight, "Phase (See-Thru): ${colorBoolean(phase)}") { btn ->
+        buttons.add(UIButton(centerX - 100, startY + spacing * 2, btnWidth, btnHeight, "Phase (See-Thru): ${colorBoolean(phase)}") { btn ->
             phase = ! phase
-            btn.message = Component.literal("Phase (See-Thru): ${colorBoolean(phase)}")
-        }
+            btn.text = "Phase (See-Thru): ${colorBoolean(phase)}"
+        })
 
-        addStyledButton(
-            centerX - 100, startY + 75, 200, 20, "&fColor: ${colorNames[colorIndex]}", colorProvider = { colors[colorIndex] }) { btn ->
+        buttons.add(UIButton(
+            centerX - 100,
+            startY + 75,
+            200,
+            20,
+            "&fColor: ${colorNames[colorIndex]}",
+            colorProvider = { colors[colorIndex] }
+        ) { btn ->
             colorIndex ++
             if (colorIndex >= colors.size) colorIndex = 0
-            btn.message = Component.literal("Color: ${colorNames[colorIndex]}")
-        }
+            btn.text = "Color: ${colorNames[colorIndex]}"
+        })
 
-        addStyledButton(centerX - 100, startY + spacing * 5, 98, btnHeight, "§aSave") {
-            if (! filled && ! outline) {
-                ChatUtils.modMessage("§cBoth Filled and Outline cannot be false")
-                return@addStyledButton
-            }
+        buttons.add(UIButton(centerX - 100, startY + spacing * 5, 98, btnHeight, "§aSave") {
+            if (! filled && ! outline) return@UIButton ChatUtils.modMessage("§cBoth Filled and Outline cannot be false")
 
             val baseColor = colors[colorIndex]
             val finalColor = if (filled) Color(baseColor.red, baseColor.green, baseColor.blue, 60) else baseColor
@@ -90,11 +95,15 @@ class WaypointEditorGui(
                 filled, outline, phase
             )
             onClose()
-        }
+        }.apply {
+            overrideColor = Color.GREEN
+        })
 
-        addStyledButton(centerX + 2, startY + spacing * 5, 98, btnHeight, "§cCancel") {
+        buttons.add(UIButton(centerX + 2, startY + spacing * 5, 98, btnHeight, "§cCancel") {
             onClose()
-        }
+        }.apply {
+            overrideColor = Color.RED
+        })
     }
 
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -113,44 +122,22 @@ class WaypointEditorGui(
         Render2D.drawRect(context, panelX, panelY + panelHeight - 1, panelWidth, 1, Style.accentColor)
 
         Render2D.drawCenteredString(context, "§l${if (initialState == null) "New" else "Edit"} Waypoint", centerX, panelY + 8)
-
         Render2D.drawCenteredString(context, "§b$roomName", centerX, panelY + 30)
-
         Render2D.drawCenteredString(context, "§7[${absolutePos.x}, ${absolutePos.y}, ${absolutePos.z}]", centerX, panelY + 43)
 
-        super.render(context, mouseX, mouseY, partialTicks)
+        buttons.forEach { it.render(context, mouseX, mouseY) }
     }
 
-    private fun addStyledButton(
-        x: Int, y: Int, w: Int, h: Int,
-        text: String,
-        colorProvider: (() -> Color)? = null,
-        action: (Button) -> Unit
-    ): Button {
-        val customBtn = object: Button(x, y, w, h, Component.literal(text), {
-            action(it)
-            it.playDownSound(minecraft !!.soundManager)
-        }, DEFAULT_NARRATION) {
-            override fun renderWidget(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
-                val bgColor = if (isHovered) Color(40, 40, 40, 200) else Color(30, 30, 30, 200)
-                Render2D.drawRect(context, x, y, width, height, bgColor)
 
-                val specificColor = colorProvider?.invoke()
+    override fun mouseClicked(event: MouseButtonEvent, bl: Boolean): Boolean {
+        val x = event.x
+        val y = event.y
+        val button = event.button()
 
-                val borderColor = if (isHovered) Style.accentColor else specificColor ?: Color(60, 60, 60)
-                val textColor = if (isHovered) Style.accentColor else specificColor ?: Color.WHITE
-
-                Render2D.drawRect(context, x, y, width, 1, borderColor)
-                Render2D.drawRect(context, x, y + height - 1, width, 1, borderColor)
-                Render2D.drawRect(context, x, y, 1, height, borderColor)
-                Render2D.drawRect(context, x + width - 1, y, 1, height, borderColor)
-
-                Render2D.drawCenteredString(context, message.string, x + width / 2, y + (height - 8) / 2, textColor)
-            }
+        for (btn in buttons) {
+            if (btn.mouseClicked(x, y, button)) return true
         }
-
-        addRenderableWidget(customBtn)
-        return customBtn
+        return super.mouseClicked(event, bl)
     }
 
     private fun colorBoolean(bl: Boolean) = if (bl) "&atrue" else "&cfalse"

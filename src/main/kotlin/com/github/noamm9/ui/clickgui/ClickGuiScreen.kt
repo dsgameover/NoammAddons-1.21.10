@@ -193,6 +193,15 @@ object ClickGuiScreen: Screen(Component.literal("ClickGUI")) {
             scrollTarget += (vertical * 30).toFloat()
             return true
         }
+
+        val mx = Resolution.getMouseX(mouseX)
+        val my = Resolution.getMouseY(mouseY)
+
+        panels.asReversed().find { it.isMouseOver(mx, my) }?.let { panel ->
+            panel.handleScroll(vertical)
+            return true
+        }
+
         return super.mouseScrolled(mouseX, mouseY, horizontal, vertical)
     }
 
@@ -245,6 +254,4 @@ object ClickGuiScreen: Screen(Component.literal("ClickGUI")) {
     }
 
     override fun isPauseScreen(): Boolean = false
-
-    val isTyping: Boolean get() = searchHandler.listening
 }

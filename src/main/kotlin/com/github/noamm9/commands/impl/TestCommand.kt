@@ -2,6 +2,8 @@ package com.github.noamm9.commands.impl
 
 import com.github.noamm9.commands.BaseCommand
 import com.github.noamm9.commands.CommandNodeBuilder
+import com.github.noamm9.event.EventBus
+import com.github.noamm9.event.impl.DungeonEvent
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ThreadUtils
 
@@ -11,6 +13,7 @@ object TestCommand: BaseCommand("test") {
             ThreadUtils.scheduledTask(25) {
                 ChatUtils.modMessage("hi")
                 ChatUtils.showTitle("Example", "Subtitle")
+                EventBus.post(DungeonEvent.BossEnterEvent)
             }
         }
     }

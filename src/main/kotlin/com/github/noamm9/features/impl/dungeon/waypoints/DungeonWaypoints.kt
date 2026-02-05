@@ -31,17 +31,6 @@ object DungeonWaypoints: Feature("Add a custom waypoint with /dw add while looki
     val secretWaypoints by ToggleSetting("Secret Waypoints")
 
     override fun init() {
-        val reader = configFile.takeIf(File::exists)?.let(::FileReader) ?: return
-        val type = object: TypeToken<MutableMap<String, List<DungeonWaypoint>>>() {}.type
-        val loadedData = runCatching { JsonUtils.gsonBuilder.fromJson<MutableMap<String, List<DungeonWaypoint>>?>(reader, type) }.getOrNull()
-
-        if (loadedData != null) {
-            waypoints.clear()
-            waypoints.putAll(loadedData)
-        }
-
-        reader.close()
-
         register<DungeonEvent.RoomEvent.onEnter> {
             SecretsWaypoints.onRoomEnter(event.room)
             currentRoomWaypoints.clear()
@@ -59,6 +48,7 @@ object DungeonWaypoints: Feature("Add a custom waypoint with /dw add while looki
         }
 
         register<DungeonEvent.BossEnterEvent> {
+            SecretsWaypoints.clear()
             currentRoomWaypoints.clear()
             waypoints["B" + LocationUtils.dungeonFloorNumber]?.let { currentRoomWaypoints.addAll(it) }
         }
@@ -75,8 +65,18 @@ object DungeonWaypoints: Feature("Add a custom waypoint with /dw add while looki
         }
 
         register<WorldChangeEvent> {
-            SecretsWaypoints.onWorldUnload()
+            SecretsWaypoints.clear()
             currentRoomWaypoints.clear()
+        }
+
+        configFile.takeIf(File::exists)?.let(::FileReader).use {
+            val type = object: TypeToken<MutableMap<String, List<DungeonWaypoint>>>() {}.type
+            val loadedData = runCatching { JsonUtils.gsonBuilder.fromJson<MutableMap<String, List<DungeonWaypoint>>?>(it, type) }.getOrNull()
+
+            if (loadedData != null) {
+                waypoints.clear()
+                waypoints.putAll(loadedData)
+            }
         }
     }
 

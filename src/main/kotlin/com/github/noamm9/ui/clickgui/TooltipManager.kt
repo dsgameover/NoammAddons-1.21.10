@@ -1,6 +1,6 @@
 package com.github.noamm9.ui.clickgui
 
-import com.github.noamm9.NoammAddons
+import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.ui.clickgui.componnents.Style
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
@@ -22,7 +22,7 @@ object TooltipManager {
 
     fun hover(text: String?, mouseX: Int, mouseY: Int) {
         if (text.isNullOrEmpty()) return
-        if (abs(mouseX - lastMouseX) > 0 || abs(mouseY - lastMouseY) > 0) {
+        if (abs(mouseX - lastMouseX) > 5 || abs(mouseY - lastMouseY) > 5) {
             displayStartTime = System.currentTimeMillis()
         }
 
@@ -35,13 +35,10 @@ object TooltipManager {
         val text = hoveredText ?: return
         if (System.currentTimeMillis() - displayStartTime < displayDelay) return
 
-        val mc = NoammAddons.mc
-        val font = mc.font
-
-        val lines = font.split(Component.literal(text), 150)
+        val lines = mc.font.split(Component.literal(text), 150)
         val padding = 6
-        val textWidth = lines.maxOfOrNull { font.width(it) } ?: return
-        val textHeight = lines.size * (font.lineHeight + 2)
+        val textWidth = lines.maxOfOrNull { mc.font.width(it) } ?: return
+        val textHeight = lines.size * (mc.font.lineHeight + 2)
 
         var tx = lastMouseX + 12f
         var ty = lastMouseY + 12f
@@ -58,8 +55,8 @@ object TooltipManager {
 
         var currentY = ty + padding
         lines.forEach { line ->
-            context.drawString(font, line, (tx + padding).toInt(), currentY.toInt(), -1, true)
-            currentY += font.lineHeight + 2
+            context.drawString(mc.font, line, (tx + padding).toInt(), currentY.toInt(), - 1, true)
+            currentY += mc.font.lineHeight + 2
         }
     }
 }
