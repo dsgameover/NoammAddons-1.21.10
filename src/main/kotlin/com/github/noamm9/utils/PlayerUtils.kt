@@ -41,6 +41,10 @@ object PlayerUtils {
         }
     }
 
+    fun toggleSneak(bl: Boolean) {
+        mc.options.keyShift.isDown = bl
+    }
+
     fun leftClick() {
         (mc.options.keyAttack as IKeyMapping).clickCount += 1
     }
