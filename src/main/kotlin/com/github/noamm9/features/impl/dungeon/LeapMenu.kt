@@ -252,23 +252,21 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
     }
 
     fun odinSorting(players: List<DungeonPlayer>): List<DungeonPlayer> {
-        val result = mutableListOf<DungeonPlayer>()
-
+        val result = arrayOfNulls<DungeonPlayer>(4)
         val secondRound = mutableListOf<DungeonPlayer>()
 
         for (player in players.sortedBy { it.clazz.priority }) {
             val i = player.clazz.quadIndex
-            if (result.getOrNull(i) == null) result[i] = player
+            if (i in 0 .. 3 && result[i] == null) result[i] = player
             else secondRound.add(player)
         }
 
-        if (secondRound.isEmpty()) return result
-
-        for (i in result.indices) if (result.getOrNull(i) == null) {
-            result[i] = secondRound.removeAt(0)
-            if (secondRound.isEmpty()) return result
+        for (i in result.indices) {
+            if (result[i] == null && secondRound.isNotEmpty()) {
+                result[i] = secondRound.removeAt(0)
+            }
         }
 
-        return result
+        return result.filterNotNull()
     }
 }
