@@ -6,14 +6,13 @@ import com.github.noamm9.utils.dungeons.map.core.*
 import com.github.noamm9.utils.dungeons.map.utils.ScanUtils
 import com.github.noamm9.utils.world.WorldUtils
 import net.minecraft.world.level.block.Blocks
-import kotlin.math.floor
 
 object DungeonScanner {
-    const val roomSize = 32
     const val startX = - 185
     const val startZ = - 185
 
-    val halfRoomSize = floor((roomSize - 1.0) / 2.0)
+    const val roomSize = 32
+    const val halfRoomSize = 15
 
     val clayBlocksCorners = listOf(
         Pair(- halfRoomSize, - halfRoomSize),

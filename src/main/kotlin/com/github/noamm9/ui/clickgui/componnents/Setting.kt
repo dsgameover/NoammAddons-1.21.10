@@ -36,7 +36,7 @@ abstract class Setting<T>(val name: String, val defaultValue: T) {
     open fun charTyped(codePoint: Char, modifiers: Int) = false
 }
 
-fun <T: Setting<*>> T.section(name: String, showIf: () -> Boolean = { true }): T {
+fun <T: Setting<*>> T.section(name: String): T {
     this.headerName = name
     return this
 }
