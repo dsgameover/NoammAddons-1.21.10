@@ -10,7 +10,7 @@ import com.github.noamm9.ui.hud.getValue
 import com.github.noamm9.ui.hud.provideDelegate
 import com.github.noamm9.utils.ActionBarParser
 import com.github.noamm9.utils.ChatUtils.unformattedText
-import com.github.noamm9.utils.ColorUtils.colorCodeByPresent
+import com.github.noamm9.utils.ColorUtils
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.Utils
 import com.github.noamm9.utils.Utils.equalsOneOf
@@ -80,7 +80,7 @@ object Secrets: Feature() {
         else {
             val max = ActionBarParser.maxSecrets ?: return@hudElement 0f to 0f
             val current = ActionBarParser.secrets ?: return@hudElement 0f to 0f
-            "&7Secrets: ${colorCodeByPresent(current, max)}$current&7/&a$max"
+            "&7Secrets: ${ColorUtils.colorCodeByPresent(current, max)}$current&7/&a$max"
         }
 
         Render2D.drawString(ctx, line, 0, 0)

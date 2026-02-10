@@ -7,8 +7,6 @@ import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.EventBus.register
 import com.github.noamm9.event.EventPriority
 import com.github.noamm9.event.impl.*
-import com.github.noamm9.features.impl.dungeon.LeapMenu
-import com.github.noamm9.features.impl.dungeon.LeapMenu.odinSorting
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.NumbersUtils.romanToDecimal
@@ -43,7 +41,6 @@ object DungeonListener {
     val runPlayersNames = mutableMapOf<String, ResourceLocation>()
     var dungeonTeammates = mutableListOf<DungeonPlayer>()
     var dungeonTeammatesNoSelf = listOf<DungeonPlayer>()
-    var leapTeammates = listOf<DungeonPlayer>()
     var thePlayer: DungeonPlayer? = null
 
     var maxPuzzleCount = 0
@@ -184,7 +181,6 @@ object DungeonListener {
             runPlayersNames.clear()
             dungeonTeammates = mutableListOf()
             dungeonTeammatesNoSelf = mutableListOf()
-            leapTeammates = mutableListOf()
             thePlayer = null
             maxPuzzleCount = 0
             puzzles.clear()
@@ -221,13 +217,6 @@ object DungeonListener {
 
             thePlayer = dungeonTeammates.find { it.name == mc.user.name }
             dungeonTeammatesNoSelf = dungeonTeammates.filterNot { it == thePlayer }
-            leapTeammates = when (LeapMenu.sorting.value) {
-                0 -> dungeonTeammatesNoSelf.sortedWith(compareBy({ it.clazz.ordinal }, { it.name }))
-                1 -> dungeonTeammatesNoSelf.sortedBy { it.name }
-                2 -> odinSorting(dungeonTeammatesNoSelf.sortedBy { it.clazz.priority }).toList()
-                3 -> dungeonTeammatesNoSelf.sortedBy { LeapMenu.customLeapOrder.indexOf(it.name.lowercase()).takeUnless { i -> i == - 1 } ?: Int.MAX_VALUE }
-                else -> dungeonTeammatesNoSelf
-            }
 
             dungeonTeammates.onEach { teammate ->
                 teammate.entity = mc.level?.players()?.find { it.name.string == teammate.name } ?: teammate.entity
@@ -261,14 +250,6 @@ object DungeonListener {
 
         thePlayer = dungeonTeammates.find { it.name == mc.user.name }
         dungeonTeammatesNoSelf = dungeonTeammates.filter { it != thePlayer }
-
-        leapTeammates = when (LeapMenu.sorting.value) {
-            0 -> dungeonTeammatesNoSelf.sortedWith(compareBy({ it.clazz.ordinal }, { it.name }))
-            1 -> dungeonTeammatesNoSelf.sortedBy { it.name }
-            2 -> odinSorting(dungeonTeammatesNoSelf.sortedBy { it.clazz.priority }).toList()
-            3 -> dungeonTeammatesNoSelf.sortedBy { LeapMenu.customLeapOrder.indexOf(it.name.lowercase()).takeIf { index -> index != - 1 } ?: Int.MAX_VALUE }
-            else -> dungeonTeammatesNoSelf
-        }
 
         dungeonTeammates.onEach { teammate ->
             teammate.entity = mc.level?.players()?.find { it.name.string == teammate.name } ?: teammate.entity
