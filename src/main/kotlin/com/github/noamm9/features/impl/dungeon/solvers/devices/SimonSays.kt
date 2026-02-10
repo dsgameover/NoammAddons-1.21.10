@@ -1,5 +1,6 @@
 package com.github.noamm9.features.impl.dungeon.solvers.devices
 
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.event.impl.*
 import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.componnents.*
@@ -31,6 +32,9 @@ object SimonSays: Feature("Simon Says Solver") {
     private val color2 by ColorSetting("Second Color", Color.YELLOW).withDescription("Color of the second button.")
     private val color3 by ColorSetting("Other Color", Color.RED).withDescription("Color of the rest of the buttons.")
 
+    private val autoStart by ToggleSetting("Auto start").withDescription("Automatically start the device.").section("Auto")
+    private val autoStartDelay by SliderSetting("Auto start delay", 70, 50, 200, 1)
+        .withDescription("Delay in miliseconds between clicks.").showIf { autoStart.value }
 
     private val isSimonSaysActive get() = enabled && LocationUtils.F7Phase == 3
     private val solution = ArrayList<BlockPos>()
@@ -49,6 +53,22 @@ object SimonSays: Feature("Simon Says Solver") {
     override fun init() {
         register<WorldChangeEvent> { reset() }
 
+        register<MainThreadPacketReceivedEvent.Post> {
+            if (! isSimonSaysActive) return@register
+            if (! autoStart.value) return@register
+            if (job?.isActive == true) return@register
+            val packet = event.packet as? ClientboundSetEntityDataPacket ?: return@register
+            if (PlayerUtils.getSelectionBlock() != startButton) return@register
+            val armorstand = mc.level?.getEntity(packet.id) as? ArmorStand ?: return@register
+            if (armorstand.name.unformattedText != "Device") return@register
+
+            job = scope.launch {
+                repeat(3) {
+                    delay(autoStartDelay.value.toLong())
+                    PlayerUtils.rightClick()
+                }
+            }
+        }
 
         register<TickEvent.Start> {
             if (! isSimonSaysActive) return@register
@@ -70,6 +90,17 @@ object SimonSays: Feature("Simon Says Solver") {
                     lastExisted = true
                     skipOver = true
 
+                    if (NoammAddons.debugFlags.contains("autoss")) {
+                        val firstClick = solution[0]
+                        job = scope.launch {
+                            for (_pos in solution.toList()) {
+                                val pos = _pos.west()
+                                PlayerUtils.rotateSmoothly(pos.west().center, 200)
+                                PlayerUtils.rightClick()
+                            }
+                            PlayerUtils.rotateSmoothly(firstClick.west().center, 300)
+                        }
+                    }
                 }
             }
 
