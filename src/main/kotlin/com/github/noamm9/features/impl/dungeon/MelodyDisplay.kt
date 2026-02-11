@@ -67,7 +67,7 @@ object MelodyDisplay: Feature("Displays the current progress someone for melody 
       val message = event.unformattedText
       if (!message.startsWith("Party > ")) return@register
 
-      val name = Regex("""Party > (\w+):""").find(message)?.groupValues?.get(1) ?: return@register
+      val name = Regex("""Party > (?:\[[^]]+]\s)?(\w+):""").find(message)?.groupValues?.get(1) ?: return@register
 
       for (i in 0..4) {
         if (message.contains("${i}/4") || message.contains("${i*25}%")) {
