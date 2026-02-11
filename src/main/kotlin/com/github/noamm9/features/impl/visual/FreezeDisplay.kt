@@ -36,33 +36,14 @@ object FreezeDisplay: Feature("Shows how long the server froze after a chosen th
                 return (System.currentTimeMillis() - lastPacketTime) > threshold.value
             }
 
+        override val centered = true
+
         override fun draw(ctx: GuiGraphics, example: Boolean): Pair<Float, Float> {
             val diff = System.currentTimeMillis() - lastPacketTime
             val text = if (example) "567ms" else "${diff}ms"
 
             Render2D.drawCenteredString(ctx, text, 0, 0, color.value)
             return text.width().toFloat() to text.height().toFloat()
-        }
-
-        override fun isHovered(mx: Int, my: Int): Boolean {
-            val visualWidth = width * scale
-            val visualHeight = height * scale
-            val halfWidth = visualWidth / 2f
-            return mx >= x - halfWidth && mx <= x + halfWidth && my >= y && my <= y + visualHeight
-        }
-
-        override fun drawBackground(ctx: GuiGraphics, mx: Int, my: Int) {
-            val scaledW = width * scale
-            val scaledH = height * scale
-            val drawX = x - (scaledW / 2)
-            val drawY = y
-
-            val hovered = isHovered(mx, my)
-            val borderColor = if (isDragging || hovered) Style.accentColor else Color(255, 255, 255, 40)
-
-            Render2D.drawRect(ctx, drawX, drawY, scaledW.toDouble(), scaledH.toDouble(), Color(10, 10, 10, 150))
-            Render2D.drawRect(ctx, drawX, drawY, scaledW.toDouble(), 1.0, borderColor)
-            Render2D.drawRect(ctx, drawX, drawY + scaledH - 1, scaledW.toDouble(), 1.0, borderColor)
         }
     }
 
