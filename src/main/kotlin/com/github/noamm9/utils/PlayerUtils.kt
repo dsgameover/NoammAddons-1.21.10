@@ -13,7 +13,6 @@ import com.github.noamm9.utils.MathUtils.lerp
 import com.github.noamm9.utils.Utils.containsOneOf
 import com.github.noamm9.utils.dungeons.DungeonListener.thePlayer
 import com.github.noamm9.utils.dungeons.DungeonPlayer
-import com.github.noamm9.utils.items.ItemUtils.customData
 import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import com.github.noamm9.utils.network.PacketUtils.send
 import kotlinx.coroutines.delay
@@ -62,11 +61,6 @@ object PlayerUtils {
     fun useDungeonClassAbility(ult: Boolean) {
         val action = if (ult) DROP_ITEM else DROP_ALL_ITEMS
         ServerboundPlayerActionPacket(action, BlockPos.ZERO, Direction.DOWN).send()
-    }
-
-    fun isHoldingEtherwarpItem(itemstack: ItemStack): Boolean {
-        if (mc.isSingleplayer && itemstack.`is`(Items.DIAMOND_SHOVEL)) return true
-        return itemstack.skyblockId == "ETHERWARP_CONDUIT" || itemstack.customData.getBoolean("ethermerge").orElse(false)
     }
 
     fun rotate(yaw_: Float, pitch_: Float) = mc.player?.apply {
@@ -165,6 +159,7 @@ object PlayerUtils {
     fun swapToSlot(slot: Int) {
         if (! Inventory.isHotbarSlot(slot)) return
         if (mc.player?.inventory?.selectedSlot == slot) return
+        modMessage("Swapeed to hotbar Slot $slot")
         mc.player?.inventory?.selectedSlot = slot
     }
 

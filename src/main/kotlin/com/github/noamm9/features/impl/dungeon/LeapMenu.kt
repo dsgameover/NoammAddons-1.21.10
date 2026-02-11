@@ -15,6 +15,7 @@ import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.GuiUtils
 import com.github.noamm9.utils.MathUtils
 import com.github.noamm9.utils.dungeons.DungeonListener
+import com.github.noamm9.utils.dungeons.DungeonListener.dungeonTeammatesNoSelf
 import com.github.noamm9.utils.dungeons.DungeonPlayer
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
@@ -78,7 +79,7 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
             if (event.entity !is Player) return@register
             if (event.entity == mc.player) return@register
             if (event.entity.distanceToSqr(mc.player) > 4) return@register
-            if (DungeonListener.dungeonTeammatesNoSelf.none { it.name == event.entity.name.unformattedText }) return@register
+            if (dungeonTeammatesNoSelf.none { it.name == event.entity.name.unformattedText }) return@register
             event.isCanceled = true
         }
 
@@ -225,19 +226,35 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
     }
 
     fun updateLeapMenu() {
-        players.fill(null)
+        players.clear()
+        val loadedHeads = mutableMapOf<String, Int>()
 
         mc.player?.containerMenu?.let { menu ->
-            for (i in (menu.slots.indices - 36)) {
-                val stack = menu.slots[i].item
-                if (! stack.`is`(Items.PLAYER_HEAD)) continue
-                val headName = playerRegex.find(stack.hoverName.unformattedText)?.groups?.get("name")?.value ?: continue
+            for (i in 0 until (menu.slots.size - 36)) {
+                val stack = menu.slots[i].item ?: continue
+                if (stack.isEmpty || ! stack.`is`(Items.PLAYER_HEAD)) continue
+                val headName = playerRegex.find(stack.hoverName.string)?.groups?.get("name")?.value ?: continue
+                loadedHeads[headName] = i
+            }
+        }
 
-                DungeonListener.leapTeammates.forEachIndexed { index, teammate ->
-                    if (index > players.lastIndex) return@forEachIndexed
-                    if (headName != teammate.name) return@forEachIndexed
-                    players[index] = LeapMenuPlayer(i, teammate)
-                }
+        val leapTeammates: List<DungeonPlayer?> = when (sorting.value) {
+            0 -> dungeonTeammatesNoSelf.sortedWith(compareBy({ it.clazz.ordinal }, { it.name }))
+            1 -> dungeonTeammatesNoSelf.sortedBy { it.name }
+            2 -> odinSorting(dungeonTeammatesNoSelf.sortedBy { it.clazz.priority }).toList()
+            3 -> dungeonTeammatesNoSelf.sortedBy {
+                customLeapOrder.indexOf(it.name.lowercase()).takeIf { i -> i != - 1 } ?: Int.MAX_VALUE
+            }
+
+            else -> dungeonTeammatesNoSelf
+        }
+
+        leapTeammates.forEach { player ->
+            if (player == null) players.add(null)
+            else {
+                val slotIndex = loadedHeads[player.name]
+                if (slotIndex != null) players.add(LeapMenuPlayer(slotIndex, player))
+                else players.add(null)
             }
         }
     }
@@ -248,15 +265,16 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
 
         mc.soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1F))
         GuiUtils.clickSlot(entry.slotIndex, ButtonType.LEFT)
-        mc.player !!.closeContainer()
+        mc.player?.closeContainer()
     }
 
-    fun odinSorting(players: List<DungeonPlayer>): List<DungeonPlayer> {
+    fun odinSorting(players: List<DungeonPlayer>): Array<DungeonPlayer?> {
         val result = arrayOfNulls<DungeonPlayer>(4)
         val secondRound = mutableListOf<DungeonPlayer>()
 
         for (player in players.sortedBy { it.clazz.priority }) {
             val i = player.clazz.quadIndex
+
             if (i in 0 .. 3 && result[i] == null) result[i] = player
             else secondRound.add(player)
         }
@@ -266,7 +284,6 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
                 result[i] = secondRound.removeAt(0)
             }
         }
-
-        return result.filterNotNull()
+        return result
     }
 }

@@ -5,7 +5,10 @@ import com.github.noamm9.event.impl.PlayerInteractEvent;
 import com.github.noamm9.features.impl.visual.CpsDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -27,6 +30,7 @@ public abstract class MixinMinecraft {
     public HitResult hitResult;
     @Shadow
     public LocalPlayer player;
+    @Shadow @Nullable public ClientLevel level;
 
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
@@ -41,8 +45,8 @@ public abstract class MixinMinecraft {
         CpsDisplay.addRightClick();
     }
 
-    @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"), cancellable = true)
-    private void cancelEntityUse(CallbackInfo ci) {
+    @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
+    private void preUseItem(CallbackInfo ci) {
         handleHitResult(ci, false);
     }
 
@@ -52,37 +56,41 @@ public abstract class MixinMinecraft {
     }
 
     @Inject(method = "continueAttack", at = @At("HEAD"), cancellable = true)
-    private void preWhileAttack(boolean bl, CallbackInfo ci) {
-        if (!bl) return;
+    private void preWhileAttack(boolean leftClickPressed, CallbackInfo ci) {
+        if (!leftClickPressed) return;
         handleHitResult(ci, true);
     }
 
     @Unique
-    private void handleHitResult(CallbackInfo ci, Boolean left) {
+    private void handleHitResult(CallbackInfo ci, boolean isLeftClick) {
+        if (this.player == null || this.level == null) return;
         ItemStack itemStack = player.getMainHandItem();
-        PlayerInteractEvent event = hitResult == null ? new PlayerInteractEvent.LEFT_CLICK.AIR(itemStack) :
-            switch (hitResult.getType()) {
-                case ENTITY: {
-                    EntityHitResult ehr = (EntityHitResult) this.hitResult;
-                    yield (left
-                        ? new PlayerInteractEvent.LEFT_CLICK.ENTITY(itemStack, ehr.getEntity())
-                        : new PlayerInteractEvent.RIGHT_CLICK.ENTITY(itemStack, ehr.getEntity())
-                    );
+
+        PlayerInteractEvent event;
+
+        if (this.hitResult == null || this.hitResult.getType() == HitResult.Type.MISS) {
+            event = isLeftClick
+                ? new PlayerInteractEvent.LEFT_CLICK.AIR(itemStack)
+                : new PlayerInteractEvent.RIGHT_CLICK.AIR(itemStack);
+        } else {
+            event = switch (this.hitResult.getType()) {
+                case ENTITY -> {
+                    Entity entity = ((EntityHitResult) this.hitResult).getEntity();
+                    yield isLeftClick
+                        ? new PlayerInteractEvent.LEFT_CLICK.ENTITY(itemStack, entity)
+                        : new PlayerInteractEvent.RIGHT_CLICK.ENTITY(itemStack, entity);
                 }
-                case BLOCK: {
-                    BlockHitResult bhr = (BlockHitResult) this.hitResult;
-                    yield (left
-                        ? new PlayerInteractEvent.LEFT_CLICK.BLOCK(itemStack, bhr.getBlockPos())
-                        : new PlayerInteractEvent.RIGHT_CLICK.BLOCK(itemStack, bhr.getBlockPos())
-                    );
+                case BLOCK -> {
+                    BlockPos pos = ((BlockHitResult) this.hitResult).getBlockPos();
+                    yield isLeftClick
+                        ? new PlayerInteractEvent.LEFT_CLICK.BLOCK(itemStack, pos)
+                        : new PlayerInteractEvent.RIGHT_CLICK.BLOCK(itemStack, pos);
                 }
-                case MISS: {
-                    yield (left
-                        ? new PlayerInteractEvent.LEFT_CLICK.AIR(itemStack)
-                        : new PlayerInteractEvent.RIGHT_CLICK.AIR(itemStack)
-                    );
-                }
+                default -> isLeftClick
+                    ? new PlayerInteractEvent.LEFT_CLICK.AIR(itemStack)
+                    : new PlayerInteractEvent.RIGHT_CLICK.AIR(itemStack);
             };
+        }
 
         if (EventBus.post(event)) ci.cancel();
     }

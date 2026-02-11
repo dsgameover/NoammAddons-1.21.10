@@ -5,7 +5,6 @@ import com.github.noamm9.utils.MathUtils
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.dungeons.DungeonListener.dungeonTeammatesNoSelf
-import com.github.noamm9.utils.dungeons.DungeonListener.thePlayer
 import com.github.noamm9.utils.dungeons.DungeonPlayer
 import com.github.noamm9.utils.dungeons.map.DungeonInfo
 import com.github.noamm9.utils.dungeons.map.core.*
@@ -30,7 +29,7 @@ object MapUpdater {
 
         decorations.forEach { (key, decoration) ->
             if (decoration.type.value() == MapDecorationTypes.FRAME.value()) {
-                thePlayer?.icon = key
+                DungeonListener.thePlayer?.icon = key
             }
             else {
                 val index = key.lastOrNull()?.digitToIntOrNull()

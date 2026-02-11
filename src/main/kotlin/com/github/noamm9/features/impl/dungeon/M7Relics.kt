@@ -10,6 +10,8 @@ import com.github.noamm9.ui.clickgui.componnents.provideDelegate
 import com.github.noamm9.ui.clickgui.componnents.showIf
 import com.github.noamm9.ui.clickgui.componnents.withDescription
 import com.github.noamm9.utils.ChatUtils
+import com.github.noamm9.utils.ChatUtils.unformattedText
+import com.github.noamm9.utils.MathUtils.center
 import com.github.noamm9.utils.MathUtils.toPos
 import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.PlayerUtils
@@ -19,6 +21,7 @@ import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render3D
 import kotlinx.coroutines.launch
+import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -74,23 +77,24 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
             }
         }
 
-        register<MouseClickEvent> {
-            if (! blockWrongRelic.value || LocationUtils.F7Phase != 5) return@register
-            if (mc.screen != null) return@register
-            val item = mc.player?.mainHandItem ?: return@register
-            val relic = WitherRelic.fromName(item.hoverName.string) ?: return@register
-            val pos = PlayerUtils.getSelectionBlock() ?: return@register
-            if (pos.x == relic.cauldronPos.x.toInt() && pos.z == relic.cauldronPos.z.toInt()) return@register
+        fun onInteract(event: PlayerInteractEvent, pos: BlockPos) {
+            if (! blockWrongRelic.value || LocationUtils.F7Phase != 5) return
+            val item = event.item?.hoverName?.string ?: return
+            val relic = WitherRelic.fromName(item) ?: return
+            if (pos.x == relic.cauldronPos.x.toInt() && pos.z == relic.cauldronPos.z.toInt()) return
             event.cancel()
         }
 
-        register<MainThreadPacketReceivedEvent.Pre> {
-            if (! relicLook.value || LocationUtils.F7Phase != 5) return@register
-            val packet = event.packet as? ClientboundContainerSetSlotPacket ?: return@register
-            val relic = WitherRelic.fromName(packet.item.hoverName.string) ?: return@register
+        register<PlayerInteractEvent.LEFT_CLICK.BLOCK> { onInteract(event, event.pos) }
+        register<PlayerInteractEvent.RIGHT_CLICK.BLOCK> { onInteract(event, event.pos) }
 
+        register<MainThreadPacketReceivedEvent.Post> {
+            if (! relicLook.value || LocationUtils.F7Phase != 5) return@register
+            if (event.packet is ClientboundContainerSetSlotPacket) return@register
+            val item = PlayerUtils.getHotbarSlot(8)?.hoverName ?: return@register
+            val relic = WitherRelic.fromName(item.unformattedText) ?: return@register
             if (relic == WitherRelic.RED || relic == WitherRelic.ORANGE) scope.launch {
-                PlayerUtils.rotateSmoothly(relic.cauldronPos.add(0.5, 0.5, 0.5), relicLookTime.value)
+                PlayerUtils.rotateSmoothly(relic.cauldronPos.center(), relicLookTime.value)
             }
         }
 

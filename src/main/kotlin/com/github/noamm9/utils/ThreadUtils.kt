@@ -10,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 import java.util.concurrent.*
 
 object ThreadUtils {
-    private data class TickTask(var ticks: Int, val action: () -> Unit)
+    data class TickTask(var ticks: Int, val action: () -> Unit)
 
     private fun createDaemonFactory(name: String): ThreadFactory {
         return ThreadFactory { r ->
@@ -41,8 +41,10 @@ object ThreadUtils {
         clientTickTasks.add(TickTask(ticks, block))
     }
 
-    fun scheduledTaskServer(ticks: Int = 0, block: () -> Unit) {
-        serverTickTasks.add(TickTask(ticks, block))
+    fun scheduledTaskServer(ticks: Int = 0, block: () -> Unit): TickTask {
+        val task = TickTask(ticks, block)
+        serverTickTasks.add(task)
+        return task
     }
 
     fun loop(delayProvider: () -> Number, stopCondition: suspend () -> Boolean = { false }, block: suspend () -> Unit) {

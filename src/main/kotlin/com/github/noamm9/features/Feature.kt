@@ -10,9 +10,17 @@ import com.github.noamm9.features.annotations.AlwaysActive
 import com.github.noamm9.features.annotations.Dev
 import com.github.noamm9.ui.clickgui.CategoryType
 import com.github.noamm9.ui.clickgui.componnents.Setting
+import com.github.noamm9.ui.clickgui.componnents.impl.ButtonSetting
+import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.componnents.impl.SoundSetting
+import com.github.noamm9.ui.clickgui.componnents.showIf
+import com.github.noamm9.ui.clickgui.componnents.withDescription
 import com.github.noamm9.ui.hud.HudElement
 import com.github.noamm9.utils.Utils.spaceCaps
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
 
 open class Feature(
     val description: String? = null,
@@ -82,6 +90,34 @@ open class Feature(
             override fun draw(ctx: GuiGraphics, example: Boolean): Pair<Float, Float> = render(ctx, example)
         }.also(hudElements::add)
     }
+
+    data class SoundSettings(val sound: SoundSetting, val volume: SliderSetting<Float>, val pitch: SliderSetting<Float>, val play: ButtonSetting)
+
+    fun createSoundSettings(name: String, sound: SoundEvent, showIf: () -> Boolean = { true }): SoundSettings {
+        val sound = SoundSetting("Sound", SoundEvents.EXPERIENCE_ORB_PICKUP)
+            .withDescription("The internal Minecraft sound key to play.")
+            .showIf(showIf)
+
+        val volume = SliderSetting("Volume", 0.5f, 0f, 1f, 0.1f)
+            .withDescription("The loudness of the sound.")
+            .showIf(showIf)
+
+        val pitch = SliderSetting("Pitch", 1f, 0f, 2f, 0.1f)
+            .withDescription("The pitch/frequency of the sound.")
+            .showIf(showIf)
+
+        val play = ButtonSetting("Play Sound", false) {
+            repeat(5) { mc.soundManager.play(SimpleSoundInstance.forUI(sound.value, pitch.value, volume.value)) }
+        }.withDescription("Click to test the current sound configuration.").showIf(showIf)
+
+        configSettings.add(sound)
+        configSettings.add(volume)
+        configSettings.add(pitch)
+        configSettings.add(play)
+
+        return SoundSettings(sound, volume, pitch, play)
+    }
+
 
     fun getSettingByName(key: String?): Setting<*>? {
         return configSettings.find { it.name == key && it is Savable }

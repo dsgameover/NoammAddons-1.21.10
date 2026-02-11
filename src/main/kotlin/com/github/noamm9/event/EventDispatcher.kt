@@ -54,16 +54,26 @@ object EventDispatcher {
             EventBus.post(WorldChangeEvent)
         }
 
-        ClientTickEvents.START_CLIENT_TICK.register { _ ->
+        ClientTickEvents.START_CLIENT_TICK.register { mc ->
             mc.level?.let { EventBus.post(TickEvent.Start) }
         }
 
-        ClientTickEvents.END_CLIENT_TICK.register { _ ->
+        ClientTickEvents.END_CLIENT_TICK.register { mc ->
             mc.level?.let { EventBus.post(TickEvent.End) }
         }
 
         ClientEntityEvents.ENTITY_UNLOAD.register { entity, _ ->
             EventBus.post(EntityDeathEvent(entity))
+
+            // for items that are in the personal deletor
+            if (! LocationUtils.inDungeon || LocationUtils.inBoss) return@register
+            val entity = entity as? ItemEntity ?: return@register
+            if (entity.item.hoverName.unformattedText !in DungeonUtils.dungeonItemDrops) return@register
+            if (mc.player !!.distanceTo(entity) > 6) return@register
+
+            EventBus.post(
+                DungeonEvent.SecretEvent(SecretType.ITEM, entity.blockPosition())
+            )
         }
 
 
