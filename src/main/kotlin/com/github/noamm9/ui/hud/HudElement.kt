@@ -49,7 +49,8 @@ abstract class HudElement {
                 if (randX < element.x + otherW &&
                     randX + estW > element.x &&
                     randY < element.y + otherH &&
-                    randY + estH > element.y) {
+                    randY + estH > element.y
+                ) {
                     collides = true
                     break
                 }
