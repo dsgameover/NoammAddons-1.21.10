@@ -31,7 +31,7 @@ public class MixinGameRenderer {
 
     @Inject(method = "getNightVisionScale", at = @At("HEAD"), cancellable = true)
     private static void onGetNightVisionScale(LivingEntity entity, float partialTicks, CallbackInfoReturnable<Float> cir) {
-        if (Camera.isFullBright()) {
+        if (Camera.INSTANCE.enabled && Camera.getFullBright().getValue()) {
             cir.setReturnValue(0.0f);
         }
     }
@@ -63,5 +63,19 @@ public class MixinGameRenderer {
         }
 
         original.call(instance, guiGraphics, i, j, f);
+    }
+
+    @WrapOperation(method = "getFov", at = @At(value = "INVOKE", target = "Ljava/lang/Integer;intValue()I"))
+    private int onFOVChange(Integer instance, Operation<Integer> original) {
+        if (!Camera.INSTANCE.enabled) return original.call(instance);
+        if (!Camera.getCustomFOV().getValue()) return original.call(instance);
+        return Camera.getCustomFOVSlider().getValue();
+    }
+
+    @WrapOperation(method = "getProjectionMatrixForCulling", at = @At(value = "INVOKE", target = "Ljava/lang/Integer;intValue()I"))
+    private int onFOVChange2(Integer instance, Operation<Integer> original) {
+        if (!Camera.INSTANCE.enabled) return original.call(instance);
+        if (!Camera.getCustomFOV().getValue()) return original.call(instance);
+        return Camera.getCustomFOVSlider().getValue();
     }
 }

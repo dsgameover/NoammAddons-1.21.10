@@ -9,7 +9,7 @@ import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.PlayerUtils
 import com.github.noamm9.utils.items.ItemUtils.customData
 import com.github.noamm9.utils.location.LocationUtils
-import com.github.noamm9.utils.render.Render2D
+import com.github.noamm9.utils.render.Render2D.highlight
 import java.awt.Color
 import kotlin.jvm.optionals.getOrNull
 
@@ -24,13 +24,7 @@ object SalvageOverlay: Feature("highlights salvageable dungeon gear.") {
             if (stack in PlayerUtils.getArmor()) return@register
             if (stack.hoverName.string.contains("✪")) return@register
             val statBoost = stack.customData.getInt("baseStatBoostPercentage").getOrNull() ?: return@register
-            Render2D.drawRect(
-                event.context,
-                event.slot.x, event.slot.y,
-                16, 16,
-                if (statBoost == 50) base50.value
-                else under50.value
-            )
+            event.slot.highlight(event.context, if (statBoost == 50) base50.value else under50.value)
         }
     }
 }

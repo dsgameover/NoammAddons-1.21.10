@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinLightTexture {
     @ModifyExpressionValue(method = "updateLightTexture(F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;", ordinal = 2))
     private Object injectFullBright(Object original) {
-        if (Camera.isFullBright()) return 99999.0;
+        if (Camera.INSTANCE.enabled && Camera.getFullBright().getValue()) return 99999.0;
         return original;
     }
 

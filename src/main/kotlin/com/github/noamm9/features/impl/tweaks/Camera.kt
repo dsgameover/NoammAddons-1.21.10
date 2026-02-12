@@ -6,7 +6,8 @@ import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 
 object Camera: Feature() {
-    private val fullBright by ToggleSetting("Full Bright")
+    @JvmStatic
+    val fullBright by ToggleSetting("Full Bright")
 
     @JvmStatic
     val legacySneakHeight by ToggleSetting("1.8 Sneak height").withDescription("Changes the sneak height back to its 1.8 height while maitaining all vanilla behevior (visual only)").section("Camera")
@@ -45,5 +46,9 @@ object Camera: Feature() {
     val disableNausea by ToggleSetting("Disable Nausea").withDescription("Disables the Nausea potion effect")
 
     @JvmStatic
-    val isFullBright get() = enabled && fullBright.value
+    val customFOV by ToggleSetting("Custom FOV").section("Custom FOV")
+
+    @JvmStatic
+    val customFOVSlider by SliderSetting("Custom FOV", 70, 30, 200, 5).hideIf { ! customFOV.value }
+
 }
