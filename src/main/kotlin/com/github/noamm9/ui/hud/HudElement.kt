@@ -15,6 +15,7 @@ abstract class HudElement {
     open val name = this::class.simpleName ?: this::class.jvmName
     abstract val toggle: Boolean
     open val shouldDraw = true
+    open val centered = false
     var width = 0f
     var height = 0f
 
@@ -48,7 +49,8 @@ abstract class HudElement {
                 if (randX < element.x + otherW &&
                     randX + estW > element.x &&
                     randY < element.y + otherH &&
-                    randY + estH > element.y) {
+                    randY + estH > element.y
+                ) {
                     collides = true
                     break
                 }
@@ -113,17 +115,21 @@ abstract class HudElement {
     open fun drawBackground(ctx: GuiGraphics, mx: Int, my: Int) {
         val scaledW = width * scale
         val scaledH = height * scale
-        val hovered = mx >= x && mx <= x + scaledW && my >= y && my <= y + scaledH
+        val centeredOffset = if (centered) scaledW / 2f else 0f
+        val hovered = mx >= x - centeredOffset && mx <= x - centeredOffset + scaledW && my >= y && my <= y + scaledH
 
         val borderColor = if (isDragging || hovered) Style.accentColor else Color(255, 255, 255, 40)
 
-        Render2D.drawRect(ctx, x, y, scaledW, scaledH, Color(10, 10, 10, 150))
-        Render2D.drawRect(ctx, x, y, scaledW, 1f, borderColor)
-        Render2D.drawRect(ctx, x, y + scaledH - 1f, scaledW, 1f, borderColor)
+        Render2D.drawRect(ctx, x - centeredOffset, y, scaledW, scaledH, Color(10, 10, 10, 150))
+        Render2D.drawRect(ctx, x - centeredOffset, y, scaledW, 1f, borderColor)
+        Render2D.drawRect(ctx, x - centeredOffset, y + scaledH - 1f, scaledW, 1f, borderColor)
     }
 
     open fun isHovered(mx: Int, my: Int): Boolean {
-        return mx >= x && mx <= x + (width * scale) && my >= y && my <= y + (height * scale)
+        val scaledW = width * scale
+        val scaledH = height * scale
+        val centeredOffset = (if (centered) scaledW / 2 else 0).toInt()
+        return mx >= x - centeredOffset && mx <= x - centeredOffset + scaledW && my >= y && my <= y + scaledH
     }
 
     fun startDragging(mx: Int, my: Int) {
