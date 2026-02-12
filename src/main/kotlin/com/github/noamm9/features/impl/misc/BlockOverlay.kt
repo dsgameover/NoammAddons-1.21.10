@@ -26,9 +26,9 @@ object BlockOverlay: Feature() {
 
     override fun init() {
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, blockOutlineContext ->
-            if (! enabled) return@register false
+            if (! enabled) return@register true
             render(context, blockOutlineContext)
-            true
+            false
         }
     }
 
