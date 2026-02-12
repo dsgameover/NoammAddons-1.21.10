@@ -1,5 +1,6 @@
 package com.github.noamm9.utils
 
+import net.minecraft.network.chat.TextColor
 import java.awt.Color
 
 object ColorUtils {
@@ -31,4 +32,6 @@ object ColorUtils {
             else -> if (reversed) "§a" else "§c"
         }
     }
+
+    val Color.mcColor: TextColor get() = TextColor.fromRgb(this.rgb)
 }

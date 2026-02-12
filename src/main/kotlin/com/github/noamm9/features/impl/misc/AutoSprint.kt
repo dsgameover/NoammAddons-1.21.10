@@ -1,8 +1,7 @@
-package com.github.noamm9.features.impl.general
+package com.github.noamm9.features.impl.misc
 
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.features.Feature
-
 
 object AutoSprint: Feature("Automatically sprint for you.") {
     override fun init() {

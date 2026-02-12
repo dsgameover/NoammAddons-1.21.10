@@ -49,6 +49,6 @@ object Camera: Feature() {
     val customFOV by ToggleSetting("Custom FOV").section("Custom FOV")
 
     @JvmStatic
-    val customFOVSlider by SliderSetting("Custom FOV", 70, 30, 200, 5).hideIf { ! customFOV.value }
+    val customFOVSlider by SliderSetting("Custom FOV", 110, 30, 179, 1).hideIf { ! customFOV.value }
 
 }

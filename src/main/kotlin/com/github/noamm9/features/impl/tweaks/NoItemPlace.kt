@@ -10,6 +10,9 @@ import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.world.item.context.BlockPlaceContext
 
+/**
+ * @see com.github.noamm9.mixin.MixinBlockItem
+ */
 object NoItemPlace: Feature("Stops you from placing skull blocks/Items") {
 
     @JvmStatic
