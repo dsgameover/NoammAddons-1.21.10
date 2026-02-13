@@ -11,6 +11,7 @@ import com.github.noamm9.ui.clickgui.componnents.provideDelegate
 import com.github.noamm9.ui.nodification.NotificationManager
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.formattedText
+import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.items.ItemUtils.customData
 import com.github.noamm9.utils.items.ItemUtils.itemUUID
 import com.github.noamm9.utils.items.ItemUtils.lore
@@ -24,7 +25,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 
-object ProtectItem: Feature("Prevents dropping or selling important items.") {
+object ProtectItem: Feature("Prevents dropping or selling important items. /protectitem") {
     private val data = PogObject("item_protection", mutableMapOf<String, List<String>>(
         "uuids" to listOf(),
         "ids" to listOf()
@@ -111,7 +112,8 @@ object ProtectItem: Feature("Prevents dropping or selling important items.") {
         }
 
         val data = stack.customData
-        if (protectStarred.value && data.getInt("upgrade_level").orElse(0) > 0) return ProtectType.Starred
+        val name = stack.hoverName.unformattedText
+        if (protectStarred.value && (data.getInt("upgrade_level").orElse(0) > 0 || name.contains("✪"))) return ProtectType.Starred
         if (protectRarity.value && data.getInt("rarity_upgrades").orElse(0) > 0) return ProtectType.RarityUpgraded
 
         return ProtectType.None
