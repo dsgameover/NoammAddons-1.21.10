@@ -16,9 +16,7 @@ abstract class ContainerEvent(val screen: AbstractContainerScreen<*>): Event(can
             class Post(screen: Screen, ctx: GuiGraphics, slot: McSlot): Slot(screen, ctx, slot)
         }
 
-        class Pre(screen: Screen, ctx: GuiGraphics, val mouseX: Int, val mouseY: Int): Render(screen, ctx)
         class Tooltip(screen: Screen, ctx: GuiGraphics, val stack: ItemStack, val mouseX: Int, val mouseY: Int, val lore: MutableList<Component>): Render(screen, ctx)
-        class Post(screen: Screen, ctx: GuiGraphics, val mouseX: Int, val mouseY: Int): Render(screen, ctx)
     }
 
     class Open(screen: Screen): ContainerEvent(screen as AbstractContainerScreen<*>)

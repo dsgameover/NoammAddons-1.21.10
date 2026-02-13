@@ -12,7 +12,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -56,13 +55,9 @@ public class MixinGameRenderer {
         )
     )
     private void redirectScreenRender(Screen instance, GuiGraphics guiGraphics, int i, int j, float f, Operation<Void> original) {
-        if (instance instanceof AbstractContainerScreen<?>) {
-            if (EventBus.post(new ScreenEvent.PreRender(instance, guiGraphics, i, j))) {
-                return;
-            }
-        }
-
+        if (EventBus.post(new ScreenEvent.PreRender(instance, guiGraphics, i, j))) return;
         original.call(instance, guiGraphics, i, j, f);
+        EventBus.post(new ScreenEvent.PostRender(instance, guiGraphics, i, j));
     }
 
     @WrapOperation(method = "getFov", at = @At(value = "INVOKE", target = "Ljava/lang/Integer;intValue()I"))

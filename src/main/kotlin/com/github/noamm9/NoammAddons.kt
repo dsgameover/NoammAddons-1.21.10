@@ -36,6 +36,8 @@ object NoammAddons: ClientModInitializer {
     var screen: Screen? = null
 
     var electionData = ElectionData.empty
+    var priceData = mutableMapOf<String, Int>()
+
 
     override fun onInitializeClient() {
         DataDownloader.downloadData()
@@ -68,6 +70,14 @@ object NoammAddons: ClientModInitializer {
     private fun initNetworkLoop() = ThreadUtils.loop(600_000) {
         WebUtils.get<ElectionData>("https://api.noammaddons.workers.dev/mayor").onSuccess {
             electionData = it
+        }
+
+        WebUtils.get<Map<String, Int>>("https://api.noammaddons.workers.dev/lowestbin").onSuccess {
+            priceData.putAll(it)
+        }
+
+        WebUtils.get<Map<String, Double>>("https://api.noammaddons.workers.dev/bazaar").onSuccess {
+            it.forEach { (key, value) -> priceData[key] = value.toInt() }
         }
     }
 }

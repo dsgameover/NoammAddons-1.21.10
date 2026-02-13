@@ -16,10 +16,6 @@ import kotlin.math.sqrt
 
 
 object Render2D {
-    fun drawImage(ctx: GuiGraphics, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
-        ctx.blitSprite(RenderPipelines.GUI_TEXTURED, image, x, y, width, height)
-    }
-
     fun Slot.highlight(ctx: GuiGraphics, color: Color) = drawRect(ctx, x, y, 16, 16, color)
 
     fun drawTexture(ctx: GuiGraphics, texture: ResourceLocation, x: Number, y: Number, width: Number, height: Number) {

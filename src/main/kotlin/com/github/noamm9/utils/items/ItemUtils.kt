@@ -1,10 +1,13 @@
 package com.github.noamm9.utils.items
 
+import com.github.noamm9.NoammAddons
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.items.ItemRarity.Companion.PET_PATTERN
 import com.github.noamm9.utils.items.ItemRarity.Companion.RARITY_PATTERN
 import com.github.noamm9.utils.items.ItemRarity.Companion.rarityCache
+import com.github.noamm9.utils.network.WebUtils
+import kotlinx.coroutines.launch
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
@@ -12,6 +15,17 @@ import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemLore
 
 object ItemUtils {
+    val idToNameLookup = mutableMapOf<String, String>()
+
+    init {
+        @Suppress("UNCHECKED_CAST")
+        NoammAddons.scope.launch {
+            WebUtils.get<Map<String, Any>>("https://api.noammaddons.workers.dev/items").onSuccess {
+                idToNameLookup.putAll(it["itemIdToName"] as Map<String, String>)
+            }
+        }
+    }
+
     val ItemStack.customData: CompoundTag get() = getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag()
 
     val ItemStack.skyblockId: String get() = customData.getString("id").orElse("")

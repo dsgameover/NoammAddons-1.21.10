@@ -44,20 +44,6 @@ public abstract class MixinAbstractContainerScreen extends Screen {
         }
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void onRenderPre(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (EventBus.post(new ContainerEvent.Render.Pre(this, context, mouseX, mouseY))) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "render", at = @At("TAIL"), cancellable = true)
-    private void onRenderPost(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (EventBus.post(new ContainerEvent.Render.Post(this, context, mouseX, mouseY))) {
-            ci.cancel();
-        }
-    }
-
     @Inject(method = "onClose", at = @At("HEAD"), cancellable = true)
     protected void onClose(CallbackInfo ci) {
         if (EventBus.post(new ContainerEvent.Close(this))) {
