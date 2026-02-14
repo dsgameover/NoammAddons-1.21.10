@@ -12,6 +12,7 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
     private var center = Pair(arrX, arrY)
 
     var mainRoom = room
+    val centerPos = BlockPos(mainRoom.x, 0, mainRoom.z)
     val tiles = mutableListOf(room)
 
     val data = room.data

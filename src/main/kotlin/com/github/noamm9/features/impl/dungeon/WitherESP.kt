@@ -22,7 +22,7 @@ import java.awt.Color
      Vanquisher: isPowered: false/true, invulnerableTicks: 250
 */
 object WitherESP: Feature("Highlights all Withers in F7") {
-    private val color by ColorSetting("Hightlight Color", Color.WHITE, false)
+    private val color by ColorSetting("Highlight Color", Color.WHITE, false)
 
     var currentWither: WitherBoss? = null
 

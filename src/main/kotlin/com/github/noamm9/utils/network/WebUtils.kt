@@ -53,6 +53,20 @@ object WebUtils {
         }
     }
 
+    suspend fun downloadBytes(url: String): Result<ByteArray> = withContext(Dispatchers.IO) {
+        runCatching {
+            val connection = prepareConnection(url)
+            connection.requestMethod = "GET"
+
+            val code = connection.responseCode
+            val stream = if (code in 200 .. 299) connection.inputStream else connection.errorStream
+
+            if (code !in 200 .. 299) throw IllegalStateException("HTTP $code")
+
+            stream.use { it.readBytes() }
+        }
+    }
+
     private fun handleResponse(connection: HttpURLConnection): String {
         val code = connection.responseCode
         val stream = if (code in 200 .. 299) connection.inputStream
