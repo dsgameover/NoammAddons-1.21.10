@@ -48,7 +48,8 @@ object DungeonWaypointCommand: BaseCommand("ndw") {
                 }
 
                 val lookingAt = (hit as BlockHitResult).blockPos
-                val existing = DungeonWaypoints.currentRoomWaypoints.firstOrNull { it.pos == lookingAt }
+                val existing = (if (LocationUtils.inBoss) DungeonWaypoints.waypoints["B${LocationUtils.dungeonFloorNumber}"]
+                else DungeonWaypoints.currentRoomWaypoints)?.firstOrNull { it.pos == lookingAt }
 
                 if (existing == null) {
                     ChatUtils.modMessage("§cNo waypoint found at that block.")
