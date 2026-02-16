@@ -10,6 +10,7 @@ import com.github.noamm9.ui.clickgui.componnents.withDescription
 import com.github.noamm9.utils.ColorUtils.mcColor
 import com.github.noamm9.utils.DataDownloader
 import com.github.noamm9.utils.NumbersUtils.romanToDecimal
+import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import com.github.noamm9.utils.location.LocationUtils.inSkyblock
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -40,49 +41,42 @@ object EnchantColors: Feature() {
 
                 Enchantment(key, type, goodLevel, loreName, maxLevel, nbtName, nbtNum, stackLevel, statLabel)
             }
-        }
+        }.associateBy { it.key }
     }
 
     override fun init() {
         register<ContainerEvent.Render.Tooltip> {
             if (! inSkyblock) return@register
+            if (event.stack.skyblockId.isEmpty()) return@register
+            val iterator = event.lore.listIterator()
 
-            val toolTipList = event.lore
-            val newTooltip = mutableListOf<Component>()
-            var changed = false
+            while (iterator.hasNext()) {
+                val originalComponent = iterator.next()
+                val plainText = originalComponent.string
 
-            for (lineComponent in toolTipList) {
-                val plainText = lineComponent.string
-
-                if ("◆" in plainText) {
-                    newTooltip.add(lineComponent)
-                    continue
-                }
+                if (plainText.isEmpty() || "◆" in plainText) continue
 
                 val matcher = ENCHANTMENT_PATTERN.matcher(plainText)
+                if (! matcher.find()) continue
 
-                if (! matcher.find()) {
-                    newTooltip.add(lineComponent)
-                    continue
-                }
-
-                matcher.reset()
-                val newLine = Component.empty()
+                val newLine = Component.empty().withStyle(ChatFormatting.GRAY)
                 var lastEnd = 0
 
-                while (matcher.find()) {
+                do {
                     val start = matcher.start()
                     val end = matcher.end()
 
-                    if (start > lastEnd) newLine.append(Component.literal(plainText.substring(lastEnd, start)).withStyle(ChatFormatting.GRAY))
+                    if (start > lastEnd) {
+                        newLine.append(plainText.substring(lastEnd, start))
+                    }
 
-                    val name = matcher.group("enchant")
+                    val nameKey = matcher.group("enchant").lowercase()
                     val levelStr = matcher.group("levelNumeral")
-                    val level = levelStr.romanToDecimal()
 
-                    val enchantData = enchantments.find { it.key == name.lowercase() }
+                    val enchantData = enchantments[nameKey]
 
                     if (enchantData != null) {
+                        val level = levelStr.romanToDecimal()
                         val style = enchantData.getStyle(level)
 
                         newLine.append(Component.literal(enchantData.loreName).withStyle(style))
@@ -94,17 +88,13 @@ object EnchantColors: Feature() {
                     else newLine.append(plainText.substring(start, end))
 
                     lastEnd = end
+                } while (matcher.find())
+
+                if (lastEnd < plainText.length) {
+                    newLine.append(plainText.substring(lastEnd))
                 }
 
-                if (lastEnd < plainText.length) newLine.append(Component.literal(plainText.substring(lastEnd)).withStyle(ChatFormatting.GRAY))
-
-                newTooltip.add(newLine)
-                changed = true
-            }
-
-            if (changed) {
-                event.lore.clear()
-                event.lore.addAll(newTooltip)
+                iterator.set(newLine)
             }
         }
     }
