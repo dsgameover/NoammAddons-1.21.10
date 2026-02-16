@@ -26,10 +26,10 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    
+
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-1.20.2:2023.10.08@zip")
+        parchment("org.parchmentmc.data:parchment-1.21.10:2025.10.12@zip")
     }
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -98,4 +98,8 @@ publishing {
 
 tasks.named('remapJar') {
     archiveFileName = "$mod_name - ${version}.jar"
+}
+
+kotlin {
+    jvmToolchain(21)
 }

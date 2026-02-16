@@ -22,7 +22,7 @@ object FreezeDisplay: Feature("Shows how long the server froze after a chosen th
     private var lastPacketTime = System.currentTimeMillis()
 
     override fun init() {
-        hudElement(this::class.simpleName !!, shouldDraw = shouldDraw) { ctx, example ->
+        hudElement(this::class.simpleName !!, shouldDraw = shouldDraw, centered = true) { ctx, example ->
             val diff = System.currentTimeMillis() - lastPacketTime
             val text = if (example) "567ms" else "${diff}ms"
 

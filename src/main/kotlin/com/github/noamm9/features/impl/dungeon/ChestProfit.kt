@@ -202,10 +202,10 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
         }
     }
 
-    private fun getItemValue(stack: ItemStack): Int {
+    private fun getItemValue(stack: ItemStack): Long {
         val itemName = stack.hoverName.formattedText
         val itemId = stack.skyblockId
-        var value = 0
+        var value = 0L
 
         if (itemId == "ENCHANTED_BOOK") value += getPrice(enchantNameToID(stack.lore.first()))
         value += getEssenceValue(itemName)
@@ -218,20 +218,20 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
         return value
     }
 
-    private fun getChestCost(cleanLore: List<String>): Int {
+    private fun getChestCost(cleanLore: List<String>): Long {
         return cleanLore.firstNotNullOfOrNull { line ->
-            if (line.contains("FREE")) 0
-            else if (line.contains(" Coins")) line.substringBefore(" ").replace(",", "").toIntOrNull()
+            if (line.contains("FREE")) 0L
+            else if (line.contains(" Coins")) line.substringBefore(" ").replace(",", "").toLongOrNull()
             else null
-        } ?: 0
+        } ?: 0L
     }
 
-    private fun getEssenceValue(text: String): Int {
-        if (! includeEssence.value) return 0
-        val match = essenceRegex.find(text) ?: return 0
-        val type = match.groups["type"]?.value?.uppercase() ?: return 0
-        val count = match.groups["count"]?.value?.toIntOrNull() ?: 0
-        return (priceData["ESSENCE_$type"] ?: 0) * count
+    private fun getEssenceValue(text: String): Long {
+        if (! includeEssence.value) return 0L
+        val match = essenceRegex.find(text) ?: return 0L
+        val type = match.groups["type"]?.value?.uppercase() ?: return 0L
+        val count = match.groups["count"]?.value?.toLongOrNull() ?: 0L
+        return (priceData["ESSENCE_$type"] ?: 0L) * count
     }
 
     private fun getIdFromName(name: String): String? {
@@ -254,9 +254,9 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
         return "ENCHANTMENT_${enchantId}_$level"
     }
 
-    private fun getPrice(id: String): Int {
-        if (id in blackList) return 0
-        return priceData[id] ?: 0
+    private fun getPrice(id: String): Long {
+        if (id in blackList) return 0L
+        return priceData[id] ?: 0L
     }
 
 
@@ -304,7 +304,7 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
         BEDROCK("Bedrock Chest", Color.DARK_GRAY);
 
         var slot = 0
-        var profit = 0
+        var profit = 0L
         var openedInSequence: Boolean = false
 
         fun reset() {

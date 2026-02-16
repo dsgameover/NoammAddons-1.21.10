@@ -37,7 +37,7 @@ object NoammAddons: ClientModInitializer {
     var screen: Screen? = null
 
     var electionData = ElectionData.empty
-    var priceData = mutableMapOf<String, Int>()
+    var priceData = mutableMapOf<String, Long>()
 
 
     override fun onInitializeClient() {
@@ -74,12 +74,12 @@ object NoammAddons: ClientModInitializer {
             electionData = it
         }
 
-        WebUtils.get<Map<String, Int>>("https://api.noammaddons.workers.dev/lowestbin").onSuccess {
+        WebUtils.get<Map<String, Long>>("https://api.noammaddons.workers.dev/lowestbin").onSuccess {
             priceData.putAll(it)
         }
 
         WebUtils.get<Map<String, Double>>("https://api.noammaddons.workers.dev/bazaar").onSuccess {
-            it.forEach { (key, value) -> priceData[key] = value.toInt() }
+            it.forEach { (key, value) -> priceData[key] = value.toLong() }
         }
     }
 }

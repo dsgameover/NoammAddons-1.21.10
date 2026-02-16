@@ -12,7 +12,6 @@ import com.github.noamm9.ui.clickgui.componnents.showIf
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import java.awt.Color
 
-
 object PuzzleSolvers: Feature() {
     val blaze by ToggleSetting("Enabled").section("Blaze Solver")
     val blazeCount by SliderSetting("Blazes to Highlight", 3, 1, 10, 1).showIf { blaze.value }
@@ -111,7 +110,7 @@ object PuzzleSolvers: Feature() {
             if (quiz.value) QuizSolver.onRenderWorld(event.ctx)
             if (tpmaze.value) TeleportMazeSolver.onRenderWorld(event.ctx)
             if (weirdos.value) ThreeWeirdosSolver.onRenderWorld(event.ctx)
-            TicTacToeSolver.onRenderWorld(event.ctx)
+            if (ttt.value) TicTacToeSolver.onRenderWorld(event.ctx)
             if (weirdos.value) WaterBoardSolver.onRenderWorld(event.ctx)
         }
 

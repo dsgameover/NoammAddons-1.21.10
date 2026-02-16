@@ -1,5 +1,6 @@
 package com.github.noamm9.utils
 
+import java.text.NumberFormat
 import java.util.*
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -193,5 +194,31 @@ object NumbersUtils {
     private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int): Int {
         return if (lastNumber > decimal) lastDecimal - decimal
         else lastDecimal + decimal
+    }
+
+    fun formatComma(value: Long?): String {
+        return value?.let { NumberFormat.getNumberInstance(Locale.US).format(it) } ?: ""
+    }
+
+    fun parseCompactNumber(value: String): Long? {
+        if (value.isBlank()) return null
+        value.toLongOrNull()?.let { return it }
+
+        val cleanValue = value.lowercase().replace(",", "")
+        val lastChar = cleanValue.lastOrNull() ?: return null
+
+        if (! lastChar.isLetter()) return null
+
+        val multiplier: Long = when (lastChar) {
+            'k' -> 1_000L
+            'm' -> 1_000_000L
+            'b' -> 1_000_000_000L
+            't' -> 1_000_000_000_000L
+            else -> return null
+        }
+
+        val numberPartString = cleanValue.substring(0, cleanValue.length - 1)
+
+        return (numberPartString.toDouble() * multiplier).toLong()
     }
 }
