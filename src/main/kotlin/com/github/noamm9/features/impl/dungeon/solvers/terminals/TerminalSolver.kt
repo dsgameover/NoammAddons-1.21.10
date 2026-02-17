@@ -274,7 +274,6 @@ object TerminalSolver: Feature("Renders solutions for Floor 7 terminals.") {
         sendClickPacket(click.slotId, click.btn)
 
         val initialWindowId = TerminalListener.lastWindowId
-
         Scheduler.schedule(resyncTimeout.value.toInt(), resyncTimeout.value.toInt() / 50) {
             if (! TerminalListener.inTerm || initialWindowId != TerminalListener.lastWindowId) return@schedule
 
@@ -287,6 +286,12 @@ object TerminalSolver: Feature("Renders solutions for Floor 7 terminals.") {
                 queue.clear()
                 solve()
                 isClicked = false
+            }
+
+            if (AutoTerminal.enabled) {
+                TerminalType.clickedStartWithSlots.clear()
+                solve()
+                AutoTerminal.onItemsUpdated()
             }
         }
     }

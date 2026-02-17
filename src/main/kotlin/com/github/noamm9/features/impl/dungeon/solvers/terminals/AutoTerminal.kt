@@ -1,6 +1,5 @@
 package com.github.noamm9.features.impl.dungeon.solvers.terminals
 
-import com.github.noamm9.NoammAddons
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.features.impl.dungeon.solvers.terminals.TerminalListener.FIRST_CLICK_DELAY
@@ -8,7 +7,7 @@ import com.github.noamm9.ui.clickgui.componnents.*
 import com.github.noamm9.ui.clickgui.componnents.impl.DropdownSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.utils.ChatUtils
+import com.github.noamm9.utils.ThreadUtils
 import net.minecraft.world.inventory.ClickType
 import kotlin.random.Random
 
@@ -27,12 +26,17 @@ object AutoTerminal: Feature("Automatically clicks terminals for you.") {
         .withDescription("The maximum possible delay")
         .showIf { randomDelay.value }
 
-    private val clickOrder by DropdownSetting("Click Order", 0, listOf("None", "Random", "Human", "Skizo"))
+    private val clickOrder by DropdownSetting("Click Order", 2, listOf("None", "Random", "Human", "Skizo"))
         .withDescription("Human: Logic pathing. Skizo: Chaotic/Furthest.")
+
+    private val autoMelody by ToggleSetting("Melody", true).section("Melody-AutoTerm")
+    private val melodyFcDelay by ToggleSetting("First Click Delay", true).showIf { autoMelody.value }
+    private val melodySkip by ToggleSetting("Melody Skip").showIf { autoMelody.value }
+    private val melodySkipMode by DropdownSetting("Skip Mode", 0, listOf("Edges", "All")).showIf { autoMelody.value && melodySkip.value }
+    private val melodySkipFirstRow by ToggleSetting("&cSkip First Row").showIf { autoMelody.value && melodySkip.value }
 
     private val autoNumbers by ToggleSetting("Numbers", true).section("Terminals")
     private val autoColors by ToggleSetting("Colors", true)
-    private val autoMelody by ToggleSetting("Melody", true)
     private val autoRubix by ToggleSetting("Rubix", true)
     private val autoRedGreen by ToggleSetting("Red-Green", true)
     private val autoStartWith by ToggleSetting("Start-With", true)
@@ -57,7 +61,7 @@ object AutoTerminal: Feature("Automatically clicks terminals for you.") {
         register<TickEvent.Server> {
             if (! autoMelody.value) return@register
             if (! TerminalListener.inTerm) return@register
-            if (TerminalListener.checkFcDelay()) return@register
+            if (melodyFcDelay.value && TerminalListener.checkFcDelay()) return@register
             if (TerminalListener.currentType != TerminalType.MELODY) return@register
             if (System.currentTimeMillis() - lastClickTime < 250) return@register
 
@@ -69,9 +73,20 @@ object AutoTerminal: Feature("Automatically clicks terminals for you.") {
             val actualSlot = buttonRow * 9 + 16
             if (lastClickedSlot == actualSlot) return@register
 
-            sendClickPacket(actualSlot)
+            ThreadUtils.scheduledTask(0) { sendClickPacket(actualSlot) }
             lastClickTime = System.currentTimeMillis()
             lastClickedSlot = actualSlot
+
+
+            if (buttonRow == 3) return@register
+            if (! melodySkip.value) return@register
+            if (melodySkipFirstRow.value && buttonRow == 0) return@register
+            if (! (melodySkipMode.value == 1 || (melodySkipMode.value == 0 && (current == 0 || current == 4)))) return@register
+
+            val check = { TerminalListener.inTerm && TerminalListener.currentType == TerminalType.MELODY }
+            if (buttonRow < 3) ThreadUtils.scheduledTask(1) { if (check()) sendClickPacket(actualSlot + 9) }
+            if (buttonRow < 2) ThreadUtils.scheduledTask(2) { if (check()) sendClickPacket(actualSlot + 18) }
+            if (buttonRow < 1) ThreadUtils.scheduledTask(3) { if (check()) sendClickPacket(actualSlot + 27) }
         }
     }
 
@@ -146,9 +161,6 @@ object AutoTerminal: Feature("Automatically clicks terminals for you.") {
         mc.gameMode?.handleInventoryMouseClick(
             TerminalListener.lastWindowId, slot, 2, ClickType.CLONE, mc.player
         )
-        if (NoammAddons.debugFlags.contains("terminal")) {
-            ChatUtils.modMessage("Auto-Clicked Melody $slot")
-        }
     }
 
     fun reset() {

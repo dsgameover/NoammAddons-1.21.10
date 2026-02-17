@@ -92,8 +92,9 @@ object TerminalListener {
         when (packet) {
             is ServerboundContainerClickPacket -> {
                 if (! inTerm) return
+                val isMelody = currentType == TerminalType.MELODY
 
-                if (checkFcDelay() || packet.containerId != lastWindowId) {
+                if ((checkFcDelay() && ! isMelody) || packet.containerId != lastWindowId) {
                     event.isCanceled = true
                 }
             }
