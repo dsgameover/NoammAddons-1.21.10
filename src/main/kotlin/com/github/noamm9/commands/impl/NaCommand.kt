@@ -22,7 +22,7 @@ object NaCommand: BaseCommand("na") {
     private val commands = mapOf(
         "/na" to "config gui",
         "/na hud" to "HUD editor",
-        "/na discord" to "opens the link to the disrod server",
+        "/na discord" to "opens the link to the discord server",
         "/na debug" to "debug flags",
         "/na sim" to "simulate chat message",
         "/na leaporder" to "configure custom leap sorting",

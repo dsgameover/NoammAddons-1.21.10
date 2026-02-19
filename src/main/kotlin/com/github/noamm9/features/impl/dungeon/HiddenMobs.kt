@@ -6,10 +6,9 @@ import com.github.noamm9.ui.clickgui.componnents.getValue
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.componnents.provideDelegate
 import com.github.noamm9.utils.DataDownloader
-import com.github.noamm9.utils.dungeons.map.DungeonInfo
-import com.github.noamm9.utils.dungeons.map.utils.ScanUtils
 import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.client.player.AbstractClientPlayer
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.Giant
 
@@ -30,8 +29,7 @@ object HiddenMobs: Feature("Reveals invisible mobs in dungeons") {
             val isFel = event.entity is EnderMan && showFels.value && name == "Dinnerbone"
             val isSA = event.entity is AbstractClientPlayer && showSa.value && name.contains("Shadow Assassin")
             val isWatcherMob = event.entity is AbstractClientPlayer && showStealthy.value && watcherMobs.any { name == it }
-            val isGiant = event.entity is Giant && showStealthy.value
-                && ScanUtils.getRoomFromPos(event.entity.position()) == DungeonInfo.uniqueRooms["Blood"]
+            val isGiant = event.entity is Giant && showStealthy.value && ! event.entity.getItemBySlot(EquipmentSlot.FEET).isEmpty
 
             if (isFel || isSA || isWatcherMob || isGiant) event.entity.isInvisible = false
         }

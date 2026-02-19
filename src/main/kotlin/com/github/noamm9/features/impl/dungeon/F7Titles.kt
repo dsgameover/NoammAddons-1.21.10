@@ -115,7 +115,7 @@ object F7Titles: Feature(name = "F7 Titles", description = "Custom Titles for F7
             val name = event.name.unformattedText
             val entry = DungeonListener.bossEntryTime ?: return@register
 
-            if (name.contains("Maxor") && ! maxorDead && DungeonListener.currentTime - entry > 6000) {
+            if (name.contains("Maxor") && ! maxorDead && DungeonListener.currentTime - entry > 120) {
                 maxorDead = true
                 showTitle("&dMaxor Dead!")
             }

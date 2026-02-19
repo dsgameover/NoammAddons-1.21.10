@@ -1,5 +1,6 @@
 package com.github.noamm9.features.impl.general
 
+import com.github.noamm9.event.EventPriority
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.MouseClickEvent
 import com.github.noamm9.features.Feature
@@ -42,7 +43,7 @@ object Chat: Feature("Useful tweaks for the chat such as Ctrl + Click to copy me
             event.isCanceled = true
         }
 
-        register<MainThreadPacketReceivedEvent.Pre> {
+        register<MainThreadPacketReceivedEvent.Pre>(EventPriority.LOW) {
             if (! removeUselessMessages.value) return@register
             if (event.packet !is ClientboundSystemChatPacket) return@register
             val msg = event.packet.content.unformattedText

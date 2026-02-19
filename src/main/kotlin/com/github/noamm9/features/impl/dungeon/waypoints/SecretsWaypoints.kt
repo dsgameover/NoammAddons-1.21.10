@@ -5,6 +5,7 @@ import com.github.noamm9.event.impl.DungeonEvent
 import com.github.noamm9.utils.dungeons.enums.SecretType
 import com.github.noamm9.utils.dungeons.map.core.UniqueRoom
 import com.github.noamm9.utils.dungeons.map.utils.ScanUtils
+import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render3D
 import com.github.noamm9.utils.render.RenderContext
 import com.github.noamm9.utils.world.WorldUtils
@@ -51,7 +52,9 @@ object SecretsWaypoints {
     }
 
     fun onRenderWorld(ctx: RenderContext) {
-        if (! DungeonWaypoints.secretWaypoints.value || currentSecrets.isEmpty()) return
+        if (! DungeonWaypoints.secretWaypoints.value) return
+        if (LocationUtils.inBoss) return
+        if (currentSecrets.isEmpty()) return
 
         for (wp in currentSecrets) {
             if (wp.type == SecretType.REDSTONE_KEY && WorldUtils.getBlockAt(wp.pos) != Blocks.PLAYER_HEAD) continue

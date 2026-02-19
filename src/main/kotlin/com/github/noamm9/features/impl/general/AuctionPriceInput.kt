@@ -27,6 +27,7 @@ import java.awt.Color
 
 object AuctionPriceInput: Feature("replaces the sign input with a proper textbox and undercut mode") {
     private var stack: ItemStack? = null
+    private var input = ""
     private var undercut = true
 
     override fun init() {
@@ -70,14 +71,18 @@ object AuctionPriceInput: Feature("replaces the sign input with a proper textbox
 
         override fun init() {
             super.init()
+            lowestBin = NoammAddons.priceData[stack.skyblockId] ?: 0L
 
             val centerX = width / 2
             val centerY = height / 2
 
             inputField = EditBox(font, centerX - 100, centerY - 20, 200, 20, Component.literal("Price"))
+            inputField.value = input
+            recalculateValue()
             inputField.setMaxLength(32)
 
             inputField.setResponder {
+                input = inputField.value
                 recalculateValue()
             }
 
@@ -94,7 +99,6 @@ object AuctionPriceInput: Feature("replaces the sign input with a proper textbox
                 recalculateValue()
             })
 
-            lowestBin = NoammAddons.priceData[stack.skyblockId] ?: 0L
         }
 
         override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
