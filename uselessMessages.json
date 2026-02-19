@@ -62,8 +62,6 @@
   "The .+ Trap hit you for .+ damage!",
   "The Mage's Magma burnt you for .+ true damage.",
   ".+ (?:struck|hit|exploded) .+ (?:for |you for ).+",
-  "Your .+ hit .+ for [\\d,.]+ damage\\.",
-  "Your .+ hit .+ (?:enemy|enemies) for .+ damage.",
   "Your Spirit Pet hit .+ enemy for .+ damage.",
   ".+ healed you for .+ health!",
   "You were healed for .+ health by .+!",
@@ -144,5 +142,9 @@
   " +Event rewards are deleted after 10 SkyBlock years!",
   "\\+[0-9]+ Kill Combo.*",
   "Your Kill Combo has expired! You reached a [0-9]+ Kill Combo!",
-  "Your Auto Recombobulator recombobulated .+!"
+  "Your Auto Recombobulator recombobulated .+!",
+  "\\[CROWD] .+: .+",
+  "\\[Healer] .+",
+  "Healing Circle is now available!",
+  "Used Healing Circle!"
 ]
