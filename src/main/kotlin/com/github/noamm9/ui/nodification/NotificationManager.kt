@@ -2,7 +2,6 @@ package com.github.noamm9.ui.nodification
 
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.ui.clickgui.componnents.Style
-import com.github.noamm9.ui.utils.Resolution
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
@@ -24,12 +23,11 @@ object NotificationManager {
         lastFrameTime = now
         if (notifications.isEmpty()) return
 
-        Resolution.refresh()
-        val screenW = Resolution.width
-        val screenH = Resolution.height
+        val screenW = mc.window.guiScaledWidth
+        val screenH = mc.window.guiScaledHeight
 
-        val mX = Resolution.getMouseX(mc.mouseHandler.getScaledXPos(mc.window))
-        val mY = Resolution.getMouseY(mc.mouseHandler.getScaledYPos(mc.window))
+        val mX = mc.mouseHandler.getScaledXPos(mc.window).toInt()
+        val mY = mc.mouseHandler.getScaledYPos(mc.window).toInt()
 
         var currentYOffset = 0f
 
@@ -55,9 +53,7 @@ object NotificationManager {
 
             val isHovered = mX >= x && mX <= x + width && mY >= y && mY <= y + height
 
-            if (! isHovered && isAlive) {
-                notify.elapsedTime += delta
-            }
+            if (! isHovered && isAlive) notify.elapsedTime += delta
 
             Render2D.drawRect(ctx, x, y, width, height, Color(20, 20, 20, 240))
             Render2D.drawRect(ctx, x, y, width, 2f, Style.accentColor)
@@ -72,9 +68,7 @@ object NotificationManager {
 
             val progress = (notify.elapsedTime.toFloat() / notify.duration.toFloat()).coerceIn(0f, 1f)
             val barWidth = width * (1f - progress)
-            if (isAlive) {
-                Render2D.drawRect(ctx, x, y + height - 1.5f, barWidth, 1.5f, Style.accentColor.withAlpha(200))
-            }
+            if (isAlive) Render2D.drawRect(ctx, x, y + height - 1.5f, barWidth, 1.5f, Style.accentColor.withAlpha(200))
 
             currentYOffset += (height + 5f) * notify.anim.value
         }
