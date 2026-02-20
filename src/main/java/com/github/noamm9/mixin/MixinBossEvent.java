@@ -13,14 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BossEvent.class)
 public class MixinBossEvent {
+    @Shadow protected Component name;
     @Shadow protected float progress;
 
-    @Inject(method = "setName", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setName", at = @At("HEAD"))
     private void onSetName(Component name, CallbackInfo ci) {
         if ((Object) this instanceof LerpingBossEvent self) {
-            if (EventBus.post(new BossBarUpdateEvent(name, this.progress))) {
-                ci.cancel();
-            }
+            EventBus.post(new BossBarUpdateEvent(name, ((ILerpingBossEvent) self).getTargetPrecent()));
         }
     }
 }

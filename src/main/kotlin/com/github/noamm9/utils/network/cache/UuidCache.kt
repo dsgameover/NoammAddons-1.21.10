@@ -10,4 +10,8 @@ object UuidCache {
     }
 
     fun getFromCache(name: String): String? = cache[name.lowercase()]
+
+    fun getNameFromCache(uuid: String): String? {
+        return cache.entries.find { it.value == uuid }?.key
+    }
 }

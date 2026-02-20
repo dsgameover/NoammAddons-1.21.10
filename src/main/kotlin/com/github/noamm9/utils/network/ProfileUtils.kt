@@ -12,6 +12,13 @@ object ProfileUtils {
             .onSuccess { UuidCache.addToCache(name, it.uuid) }
     }
 
+    suspend fun getNameByUUID(uuid: String): Result<MojangData> {
+        val cleanUuid = uuid.replace("-", "")
+        UuidCache.getNameFromCache(cleanUuid)?.let { return Result.success(MojangData(it, cleanUuid)) }
+        return WebUtils.get<MojangData>("https://sessionserver.mojang.com/session/minecraft/profile/$cleanUuid")
+            .onSuccess { UuidCache.addToCache(it.name, it.uuid) }
+    }
+
     suspend fun getSecrets(playerName: String): Result<Long> {
         return getUUIDbyName(playerName).mapCatching { mojangData ->
             WebUtils.get<Long>("https://api.noammaddons.workers.dev/secrets?uuid=${mojangData.uuid}").getOrThrow()

@@ -32,6 +32,9 @@ object NoammAddons: ClientModInitializer {
     val mc = Minecraft.getInstance()
     val logger = LoggerFactory.getLogger(MOD_NAME)
 
+    @JvmField
+    var isLoaded = false
+
     val cacheData = PogObject("cacheData", mutableMapOf<String, Any>())
     val debugFlags = mutableSetOf<String>()
     var screen: Screen? = null
@@ -67,6 +70,8 @@ object NoammAddons: ClientModInitializer {
                 screen = null
             }
         }
+
+        isLoaded = true
     }
 
     private fun initNetworkLoop() = ThreadUtils.loop(600_000) {

@@ -18,10 +18,8 @@ public abstract class MixinLerpingBossEvent extends BossEvent {
         super(uuid, component, bossBarColor, bossBarOverlay);
     }
 
-    @Inject(method = "setProgress", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setProgress", at = @At("HEAD"))
     private void onSetProgress(float newProgress, CallbackInfo ci) {
-        if (EventBus.post(new BossBarUpdateEvent(this.getName(), newProgress))) {
-            ci.cancel();
-        }
+        EventBus.post(new BossBarUpdateEvent(name, newProgress));
     }
 }
