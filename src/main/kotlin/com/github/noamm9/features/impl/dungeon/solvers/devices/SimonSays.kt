@@ -182,6 +182,7 @@ object SimonSays: Feature("Simon Says Solver") {
         register<PlayerInteractEvent.LEFT_CLICK.BLOCK> { handleClick(event, event.pos) }
 
         register<ChatMessageEvent> {
+            if (! alertsEnabled.value) return@register
             if (LocationUtils.F7Phase != 3) return@register
             val msg = event.unformattedText
 
