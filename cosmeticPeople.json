@@ -22,5 +22,26 @@
     "sizeX": 1.5,
     "sizeY": 0.5,
     "sizeZ": 1.5
+  },
+  "2298735a-62b8-4ff3-a928-382f56382898": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"L\",\"color\":\"#770A0A\",\"bold\":true},{\"text\":\"a\",\"color\":\"#6D0909\",\"bold\":true},{\"text\":\"c\",\"color\":\"#630808\",\"bold\":true},{\"text\":\"o\",\"color\":\"#5A0707\",\"bold\":true},{\"text\":\"s\",\"color\":\"#500606\",\"bold\":true},{\"text\":\"t\",\"color\":\"#460505\",\"bold\":true},{\"text\":\"e\",\"color\":\"#3C0404\",\"bold\":true},{\"text\":\"2\",\"color\":\"#330303\",\"bold\":true},{\"text\":\"5\",\"color\":\"#290202\",\"bold\":true},{\"text\":\"7\",\"color\":\"#1F0101\",\"bold\":true}]}",
+    "sizeX": 0.5,
+    "sizeY": -0.4,
+    "sizeZ": 0.5
+  },
+  "9806982a-1ecc-42bb-8899-cea654560bc3": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"d\",\"color\":\"#00B7FF\"},{\"text\":\"s\",\"color\":\"#44A6FF\"},{\"text\":\"_\",\"color\":\"#5D95FF\"},{\"text\":\"g\",\"color\":\"#6D83FF\"},{\"text\":\"a\",\"color\":\"#796FFF\"},{\"text\":\"m\",\"color\":\"#8259FF\"},{\"text\":\"e\",\"color\":\"#893DFF\"},{\"text\":\"_\",\"color\":\"#8E00FF\"},{\"text\":\"o\",\"color\":\"#9804FF\"},{\"text\":\"v\",\"color\":\"#A205FF\"},{\"text\":\"e\",\"color\":\"#AD04FF\"},{\"text\":\"r\",\"color\":\"#B700FF\"}]}",
+    "sizeX": 0.8,
+    "sizeY": 0.6,
+    "sizeZ": 0.8
+  },
+  "9aade936-a83f-47d8-b542-25e3f5d75480": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"S\",\"color\":\"#CCCCFF\",\"bold\":true},{\"text\":\"a\",\"color\":\"#BFC7F8\",\"bold\":true},{\"text\":\"s\",\"color\":\"#B3C1F2\",\"bold\":true},{\"text\":\"u\",\"color\":\"#A6BCEC\",\"bold\":true},{\"text\":\"k\",\"color\":\"#99B6E5\",\"bold\":true},{\"text\":\"e\",\"color\":\"#8CB1DF\",\"bold\":true},{\"text\":\"y\",\"color\":\"#7FABD8\",\"bold\":true},{\"text\":\"y\",\"color\":\"#71A6D2\",\"bold\":true}]}",
+    "sizeX": 0.6,
+    "sizeY": 0.6,
+    "sizeZ": 0.6
+  },
+  "0f013113-dc74-4255-bf6b-8d933e0cf8d3": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"S\",\"color\":\"#B2FFFF\"},{\"text\":\"o\",\"color\":\"#A7F0F8\"},{\"text\":\"u\",\"color\":\"#9CE1F0\"},{\"text\":\"l\",\"color\":\"#91D2E9\"},{\"text\":\"F\",\"color\":\"#86C3E1\"},{\"text\":\"1\",\"color\":\"#7BB5DA\"},{\"text\":\"k\",\"color\":\"#71A6D2\"}]}"
   }
 }
