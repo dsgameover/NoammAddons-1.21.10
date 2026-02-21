@@ -54,5 +54,8 @@
   },
   "40d8d869-051c-4811-97b8-98772570c879": {
     "name": "{\"text\":\"\",\"extra\":[{\"text\":\"M\",\"color\":\"#E83FAF\",\"bold\":true},{\"text\":\"a\",\"color\":\"#ED53BD\",\"bold\":true},{\"text\":\"g\",\"color\":\"#F165CC\",\"bold\":true},{\"text\":\"e\",\"color\":\"#F575DA\",\"bold\":true},{\"text\":\"6\",\"color\":\"#F985E9\",\"bold\":true},{\"text\":\"7\",\"color\":\"#F471E9\",\"bold\":true},{\"text\":\"7\",\"color\":\"#EF5BE8\",\"bold\":true},{\"text\":\"7\",\"color\":\"#EA40E7\",\"bold\":true}]}"
+  },
+  "0f888ec4-cb04-4c2a-95f7-8edc75ffcc55": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"F\",\"color\":\"#54DAF4\",\"bold\":true,\"shadow_color\":[0,0,0,1]},{\"text\":\"r\",\"color\":\"#51A7E3\",\"bold\":true,\"shadow_color\":[0,0,0,1]},{\"text\":\"m\",\"color\":\"#517CCE\",\"bold\":true,\"shadow_color\":[0,0,0,1]},{\"text\":\"c\",\"color\":\"#545EB6\",\"bold\":true,\"shadow_color\":[0,0,0,1]}]}"
   }
 }
