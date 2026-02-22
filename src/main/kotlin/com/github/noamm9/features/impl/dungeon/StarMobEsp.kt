@@ -84,7 +84,7 @@ object StarMobEsp: Feature("Hightlights all starred mobs in a dungeon.") {
     }
 
     private fun getColor(entity: Entity): Color? {
-        if (entity is Bat) return if (espBats.value && ! entity.isInvisible && ! entity.isPassenger && entity.maxHealth.equalsOneOf(100, 200, 400, 800)) batColor.value else null
+        if (entity is Bat) return if (espBats.value && ! entity.isInvisible && ! entity.isPassenger) batColor.value else null
         if (entity is EnderMan) return if (espFels.value && entity.name.unformattedText == "Dinnerbone") felColor.value else null
         if (entity is Player) {
             val name = entity.name.unformattedText.takeUnless { it.isBlank() } ?: return null

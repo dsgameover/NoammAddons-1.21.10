@@ -7,19 +7,16 @@ import com.github.noamm9.event.EventBus.register
 import com.github.noamm9.event.EventPriority
 import com.github.noamm9.event.impl.TickEvent
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.*
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 
 object ThreadUtils {
     data class TickTask(var ticks: Int, val action: () -> Unit)
 
-    private fun createDaemonFactory(name: String): ThreadFactory {
-        return ThreadFactory { r ->
-            Thread(r, name).apply { isDaemon = true }
-        }
-    }
 
-    private val asyncExecutor = Executors.newCachedThreadPool(createDaemonFactory("$MOD_NAME-Async"))
-    private val scheduler = Executors.newScheduledThreadPool(1, createDaemonFactory("$MOD_NAME-Scheduler"))
+    private val scheduler = Executors.newScheduledThreadPool(1) { Thread(it, "$MOD_NAME-Scheduler").apply { isDaemon = true } }
     private val serverTickTasks = ConcurrentLinkedQueue<TickTask>()
     private val clientTickTasks = ConcurrentLinkedQueue<TickTask>()
 
@@ -29,9 +26,6 @@ object ThreadUtils {
         else mc.execute { safeRun(block) }
     }
 
-    fun runAsync(block: () -> Unit) {
-        asyncExecutor.submit { safeRun(block) }
-    }
 
     fun setTimeout(delay: Long, block: () -> Unit): ScheduledFuture<*> {
         return scheduler.schedule({ safeRun(block) }, delay, TimeUnit.MILLISECONDS)

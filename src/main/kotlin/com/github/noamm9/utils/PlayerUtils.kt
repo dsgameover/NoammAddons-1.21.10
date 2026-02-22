@@ -166,7 +166,7 @@ object PlayerUtils {
     fun swapToSlot(slot: Int) {
         if (! Inventory.isHotbarSlot(slot)) return
         if (mc.player?.inventory?.selectedSlot == slot) return
-        modMessage("Swapeed to hotbar Slot $slot")
+        modMessage("swapped to hotbar Slot $slot")
         mc.player?.inventory?.selectedSlot = slot
     }
 

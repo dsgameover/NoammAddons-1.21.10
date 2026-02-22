@@ -43,7 +43,8 @@ object ClearInfoUpdater {
     fun initStartSecrets() = NoammAddons.scope.launch(Dispatchers.IO) {
         if (! DungeonMap.enabled) return@launch
         if (! MapConfig.printPlayersClearInfo.value) return@launch
-        DungeonListener.runPlayersNames.keys.toList().forEach { name ->
+        DungeonListener.dungeonTeammates.toList().forEach { teammate ->
+            val name = teammate.name
             val ci = DungeonPlayer.get(name) ?: return@forEach
             ProfileUtils.getSecrets(name).onSuccess { secrets ->
                 ci.secretsBeforeRun = secrets

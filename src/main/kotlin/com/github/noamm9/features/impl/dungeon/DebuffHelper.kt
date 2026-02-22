@@ -30,7 +30,7 @@ object DebuffHelper: Feature(description = "Automatically pulls and fires bows b
     private val p1Ticks by SliderSetting("P1 Ticks", 8, 0, 20, 1)
     private val p2Ticks by SliderSetting("P2 Ticks", 8, 0, 20, 1)
     private val p3Ticks by SliderSetting("P3 Ticks", 8, 0, 20, 1)
-    private val p4Ticks by SliderSetting("P3 Ticks", 8, 0, 20, 1)
+    private val p4Ticks by SliderSetting("P4 Ticks", 8, 0, 20, 1)
     private val purpleTicks by SliderSetting("Purple Dragon", 8, 0, 20, 1)
     private val greenTicks by SliderSetting("Green Dragon", 8, 0, 20, 1)
     private val redTicks by SliderSetting("Red Dragon", 8, 0, 20, 1)
@@ -74,7 +74,8 @@ object DebuffHelper: Feature(description = "Automatically pulls and fires bows b
 
             ticksHeld ++
 
-            if (ticksHeld >= (getTicks() ?: return@register)) {
+            val ticks = getTicks()?.takeIf { it > 0 } ?: return@register
+            if (ticksHeld >= ticks) {
                 fire()
             }
         }
@@ -105,8 +106,8 @@ object DebuffHelper: Feature(description = "Automatically pulls and fires bows b
         lastSequence = - 1
     }
 
-    private fun getTicks(): Int? {
-        val player = mc.player?.position() ?: return null
+    private fun getTicks(): Int {
+        val player = mc.player?.position() ?: return defaultTicks.value
         val phase = LocationUtils.F7Phase ?: return defaultTicks.value
 
         return when (phase) {

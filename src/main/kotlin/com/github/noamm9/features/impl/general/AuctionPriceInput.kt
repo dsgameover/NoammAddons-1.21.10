@@ -93,7 +93,7 @@ object AuctionPriceInput: Feature("replaces the sign input with a proper textbox
                 finish()
             })
 
-            buttons.add(UIButton(centerX - 100, centerY + 30, 200, 20, "Mode: Normal") { button ->
+            buttons.add(UIButton(centerX - 100, centerY + 30, 200, 20, "Mode: ${if (undercut) "UnderCut" else "Normal"}") { button ->
                 undercut = ! undercut
                 button.text = "Mode: ${if (undercut) "UnderCut" else "Normal"}"
                 recalculateValue()

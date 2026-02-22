@@ -18,7 +18,9 @@ import kotlin.math.absoluteValue
 
 
 @AlwaysActive
-object Cosmetics: Feature() {
+object Cosmetics: Feature(toggled = true) {
+    override fun toggle() {}
+    
     val cosmeticPeople by lazy {
         DataDownloader.loadJson<Map<UUID, CosmeticData>>("cosmeticPeople.json").also { data ->
             scope.launch {

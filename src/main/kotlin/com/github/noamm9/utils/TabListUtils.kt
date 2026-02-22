@@ -15,7 +15,7 @@ object TabListUtils {
     private var listDirty = true
 
     init {
-        EventBus.register<PacketEvent.Received>(EventPriority.HIGH) {
+        EventBus.register<PacketEvent.Received>(EventPriority.HIGHEST) {
             if (event.packet is ClientboundPlayerInfoUpdatePacket) {
                 listDirty = true
             }

@@ -1,15 +1,18 @@
 package com.github.noamm9.utils
 
-import com.github.noamm9.NoammAddons.mc
-import com.google.gson.*
-import com.google.gson.stream.*
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.Json.Default.parseToJsonElement
-import kotlinx.serialization.json.JsonObject
 import net.minecraft.core.BlockPos
 import java.awt.Color
-import java.io.*
-import kotlin.jvm.java
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
+import java.io.UnsupportedEncodingException
 
 
 object JsonUtils {
@@ -74,9 +77,9 @@ object JsonUtils {
     fun JsonObject.getBoolean(key: String) = this[key]?.jsonPrimitive?.boolean
 
 
-    fun stringToJson(s: String): JsonObject {
+    fun stringToJson(s: String): JsonElement {
         return try {
-            parseToJsonElement(s).jsonObject
+            parseToJsonElement(s)
         }
         catch (e: Exception) {
             e.printStackTrace()

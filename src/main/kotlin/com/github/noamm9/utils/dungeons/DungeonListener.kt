@@ -11,6 +11,7 @@ import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.NumbersUtils.romanToDecimal
 import com.github.noamm9.utils.PlayerUtils
+import com.github.noamm9.utils.TabListUtils
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.enums.Blessing
 import com.github.noamm9.utils.dungeons.enums.DungeonClass
@@ -21,10 +22,10 @@ import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import com.github.noamm9.utils.location.LocationUtils.inDungeon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.network.protocol.game.*
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 
 
@@ -38,14 +39,13 @@ object DungeonListener {
     private val watcherMessageRegex = Regex("^\\[BOSS] The Watcher: .+$")
     private val runEndRegex = Regex("^\\s*(Master Mode)? ?(?:The)? Catacombs - (Floor (.{1,3})|Entrance)$") // https://regex101.com/r/W4UjWQ/3
 
-    val runPlayersNames = mutableMapOf<String, ResourceLocation>()
     var dungeonTeammates = mutableListOf<DungeonPlayer>()
     var dungeonTeammatesNoSelf = listOf<DungeonPlayer>()
     var thePlayer: DungeonPlayer? = null
 
     var maxPuzzleCount = 0
     var puzzles = mutableListOf<Puzzle>()
-    val dungeonStarted get() = dungeonTeammates.isNotEmpty()
+    val dungeonStarted get() = dungeonTeammates.none { it.clazz == DungeonClass.Empty }
     var dungeonStartTime: Long? = null
     var dungeonEnded = false
 
@@ -66,15 +66,11 @@ object DungeonListener {
 
             when (val packet = event.packet) {
                 is ClientboundPlayerInfoUpdatePacket -> {
-                    val actions = packet.actions()
-                    if (actions.contains(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME) || actions.contains(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER)) {
-                        for (entry in packet.entries()) {
-                            val text = entry.displayName()?.formattedText ?: continue
-
-                            updateDungeonTeammates(text)
-                            updatePuzzleCount(text)
-                            updatePuzzles(text)
-                        }
+                    for (entry in TabListUtils.getTabList()) {
+                        val text = entry.first.formattedText
+                        updateDungeonTeammates(text, entry.second)
+                        updatePuzzleCount(text)
+                        updatePuzzles(text)
                     }
                 }
 
@@ -92,7 +88,8 @@ object DungeonListener {
 
                 is ClientboundRemoveEntitiesPacket -> dungeonTeammates.forEach {
                     val id = it.entity?.id ?: return@forEach
-                    if (id in packet.entityIds) it.entity = null
+                    if (id !in packet.entityIds) return@forEach
+                    it.entity = null
                 }
 
                 is ClientboundAddEntityPacket -> {
@@ -153,7 +150,7 @@ object DungeonListener {
 
                 unformatted == "[NPC] Mort: Here, I found this map when I first entered the dungeon." -> scope.launch {
                     dungeonStartTime = currentTime
-                    while (thePlayer == null) delay(1)
+                    while (thePlayer?.clazz == DungeonClass.Empty) delay(50)
                     EventBus.post(DungeonEvent.RunStatedEvent)
                 }
 
@@ -178,7 +175,6 @@ object DungeonListener {
         }
 
         register<WorldChangeEvent>(EventPriority.HIGHEST) {
-            runPlayersNames.clear()
             dungeonTeammates = mutableListOf()
             dungeonTeammatesNoSelf = mutableListOf()
             thePlayer = null
@@ -205,7 +201,7 @@ object DungeonListener {
         }
     }
 
-    private fun updateDungeonTeammates(tabName: String) {
+    private fun updateDungeonTeammates(tabName: String, second: PlayerInfo) {
         if (NoammAddons.debugFlags.contains("dev")) listOf(
             DungeonPlayer("Noamm", DungeonClass.Mage, 50, isDead = false),
             DungeonPlayer("Noamm9", DungeonClass.Archer, 50, isDead = false),
@@ -225,35 +221,30 @@ object DungeonListener {
             return
         }
 
-        var (_, name, clazz, clazzLevel) = tablistRegex.find(tabName.removeFormatting())?.destructured ?: return
-        val isNicked = runPlayersNames.isEmpty() && name != mc.user.name
-        name = if (isNicked) mc.user.name else name
-        val skin = if (isNicked) mc.player !!.skin.body.texturePath() else mc.connection?.getPlayerInfo(name)?.skin?.body?.texturePath() ?: DefaultPlayerSkin.getDefaultTexture()
-        runPlayersNames[name] = skin
-        if (clazz == "EMPTY") return
+        val (_, name, clazz, clazzLevel) = tablistRegex.find(tabName.removeFormatting())?.destructured ?: return
+        val skin = second.skin?.body?.texturePath() ?: DefaultPlayerSkin.getDefaultTexture()
 
         dungeonTeammates.find { it.name == name }?.let { currentTeammate ->
             currentTeammate.clazz = if (clazz != "DEAD") DungeonClass.fromName(clazz) else currentTeammate.clazz
             currentTeammate.clazzLvl = clazzLevel.romanToDecimal()
             currentTeammate.skin = skin
             currentTeammate.isDead = clazz == "DEAD"
-        } ?: run {
-            dungeonTeammates.add(
-                DungeonPlayer(
-                    name,
-                    DungeonClass.fromName(clazz),
-                    clazzLevel.romanToDecimal(),
-                    skin,
-                    clazz == "DEAD",
-                )
+        } ?: dungeonTeammates.add(
+            DungeonPlayer(
+                name,
+                DungeonClass.fromName(clazz),
+                clazzLevel.romanToDecimal(),
+                skin,
+                clazz == "DEAD",
             )
-        }
+        )
 
         thePlayer = dungeonTeammates.find { it.name == mc.user.name }
         dungeonTeammatesNoSelf = dungeonTeammates.filter { it != thePlayer }
 
         dungeonTeammates.onEach { teammate ->
-            teammate.entity = mc.level?.players()?.find { it.name.string == teammate.name } ?: teammate.entity
+            if (teammate.entity != null) return@onEach
+            teammate.entity = mc.level?.players()?.find { it.name.string == teammate.name }
         }
     }
 
@@ -294,4 +285,3 @@ object DungeonListener {
         }
     }
 }
-

@@ -2,12 +2,13 @@ package com.github.noamm9.utils
 
 import com.github.noamm9.NoammAddons.MOD_ID
 import com.github.noamm9.NoammAddons.MOD_NAME
+import com.github.noamm9.utils.network.WebUtils
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.runBlocking
 import net.fabricmc.loader.api.FabricLoader
 import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
@@ -31,7 +32,7 @@ object DataDownloader {
 
             try {
                 LOGGER.info("Checking for remote data updates...")
-                val remoteHash = getRemoteCommitHash() ?: return@thread LOGGER.error("Could not fetch remote version hash.")
+                val remoteHash = runBlocking { WebUtils.getString(HASH_URL).getOrNull() } ?: return@thread LOGGER.error("Could not fetch remote version hash.")
                 val localHash = if (versionFile.exists()) versionFile.readText().trim() else null
 
                 if (remoteHash != localHash || ! modDataPath.exists()) {
@@ -67,23 +68,6 @@ object DataDownloader {
         }
         catch (e: IOException) {
             LOGGER.error("Failed to update data files", e)
-        }
-    }
-
-    private fun getRemoteCommitHash(): String? {
-        return try {
-            val connection = URL(HASH_URL).openConnection() as HttpURLConnection
-            connection.setRequestProperty("User-Agent", "Minecraft-Mod-$MOD_ID")
-            connection.requestMethod = "GET"
-
-            if (connection.responseCode == 200) {
-                connection.inputStream.bufferedReader().use { it.readText() }
-            }
-            else null
-        }
-        catch (e: IOException) {
-            LOGGER.error("Failed to fetch remote version hash", e)
-            null
         }
     }
 

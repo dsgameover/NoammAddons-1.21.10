@@ -48,9 +48,7 @@ object Scoreboard: Feature("draws a custom scoreboard instead of the vanilla one
             }
 
             var maxWidth = titleStr.width()
-            lines.forEach { line ->
-                maxWidth = maxOf(maxWidth, line.width())
-            }
+            lines.forEach { maxWidth = maxOf(maxWidth, it.width()) }
 
             val padding = 8
             val boxWidth = maxWidth + (padding * 2)

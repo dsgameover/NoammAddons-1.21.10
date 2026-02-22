@@ -47,7 +47,7 @@ object CreeperBeamSolver {
     fun onRoomEnter(event: DungeonEvent.RoomEvent.onEnter) {
         if (event.room.name != "Creeper Beams") return
         inCreeperBeams = true
-        rotation = (360 - event.room.rotation !! + 180) % 360
+        rotation = 360 - event.room.rotation !! + 180
         roomCenter = event.room.centerPos
         solve()
     }

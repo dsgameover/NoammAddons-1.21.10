@@ -91,7 +91,7 @@ object PuzzleSolvers: Feature() {
             if (quiz.value) QuizSolver.onRoomEnter(event)
             if (tpmaze.value) TeleportMazeSolver.onRoomEnter(event)
             if (ttt.value) TicTacToeSolver.onRoomEnter(event)
-            if (weirdos.value) WaterBoardSolver.onRoomEnter(event)
+            if (water.value) WaterBoardSolver.onRoomEnter(event)
             if (icefill.value) IceFillSolver.onRoomEnter(event)
         }
 
@@ -117,7 +117,7 @@ object PuzzleSolvers: Feature() {
             if (tpmaze.value) TeleportMazeSolver.onRenderWorld(event.ctx)
             if (weirdos.value) ThreeWeirdosSolver.onRenderWorld(event.ctx)
             if (ttt.value) TicTacToeSolver.onRenderWorld(event.ctx)
-            if (weirdos.value) WaterBoardSolver.onRenderWorld(event.ctx)
+            if (water.value) WaterBoardSolver.onRenderWorld(event.ctx)
             if (icefill.value) IceFillSolver.onRenderWorld(event.ctx)
         }
 
@@ -129,7 +129,7 @@ object PuzzleSolvers: Feature() {
             if (boulder.value) BoulderSolver.onInteract(event)
             if (weirdos.value) ThreeWeirdosSolver.onInteract(event)
             if (ttt.value) TicTacToeSolver.onInteract(event)
-            if (weirdos.value) WaterBoardSolver.onInteract(event)
+            if (water.value) WaterBoardSolver.onInteract(event)
         }
     }
 }

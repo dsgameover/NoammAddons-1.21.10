@@ -10,12 +10,13 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.resources.RegistryOps
 import net.minecraft.util.FormattedCharSequence
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object TextReplacer {
-    val replaceMap = mutableMapOf(
-        "NoammAddons" to "{\"text\":\"\",\"extra\":[{\"text\":\"N\",\"color\":\"#ED2AE6\",\"bold\":true},{\"text\":\"o\",\"color\":\"#DF40E5\",\"bold\":true},{\"text\":\"a\",\"color\":\"#D14FE4\",\"bold\":true},{\"text\":\"m\",\"color\":\"#C25AE3\",\"bold\":true},{\"text\":\"m\",\"color\":\"#B263E2\",\"bold\":true},{\"text\":\"A\",\"color\":\"#A26AE1\",\"bold\":true},{\"text\":\"d\",\"color\":\"#9171DF\",\"bold\":true},{\"text\":\"d\",\"color\":\"#7E76DE\",\"bold\":true},{\"text\":\"o\",\"color\":\"#687BDD\",\"bold\":true},{\"text\":\"n\",\"color\":\"#4E7FDC\",\"bold\":true},{\"text\":\"s\",\"color\":\"#2283DB\",\"bold\":true}]}"
-    )
+    val replaceMap = ConcurrentHashMap<String, String>().apply {
+        put("NoammAddons", "{\"text\":\"\",\"extra\":[{\"text\":\"N\",\"color\":\"#ED2AE6\",\"bold\":true},{\"text\":\"o\",\"color\":\"#DF40E5\",\"bold\":true},{\"text\":\"a\",\"color\":\"#D14FE4\",\"bold\":true},{\"text\":\"m\",\"color\":\"#C25AE3\",\"bold\":true},{\"text\":\"m\",\"color\":\"#B263E2\",\"bold\":true},{\"text\":\"A\",\"color\":\"#A26AE1\",\"bold\":true},{\"text\":\"d\",\"color\":\"#9171DF\",\"bold\":true},{\"text\":\"d\",\"color\":\"#7E76DE\",\"bold\":true},{\"text\":\"o\",\"color\":\"#687BDD\",\"bold\":true},{\"text\":\"n\",\"color\":\"#4E7FDC\",\"bold\":true},{\"text\":\"s\",\"color\":\"#2283DB\",\"bold\":true}]}")
+    }
 
     private val HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})")
 

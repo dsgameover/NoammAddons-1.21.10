@@ -7,6 +7,7 @@ import com.github.noamm9.utils.ColorUtils.colorCodeByPresent
 import com.github.noamm9.utils.ColorUtils.colorizeScore
 import com.github.noamm9.utils.MathUtils
 import com.github.noamm9.utils.dungeons.DungeonListener
+import com.github.noamm9.utils.dungeons.DungeonPlayer
 import com.github.noamm9.utils.dungeons.enums.DungeonClass
 import com.github.noamm9.utils.dungeons.map.DungeonInfo
 import com.github.noamm9.utils.dungeons.map.core.*
@@ -275,58 +276,12 @@ object MapRenderer: HudElement() {
     private fun renderPlayerHeads(ctx: GuiGraphics) {
         if (LocationUtils.inBoss) return
 
-        if (DungeonListener.dungeonStarted) {
-            DungeonListener.dungeonTeammatesNoSelf.forEach { player ->
-                if (player.isDead) return@forEach
-                val entity = player.entity
-
-                val (x, z, yaw) = if (entity == null || ! entity.isAlive) {
-                    Triple(player.mapX, player.mapZ, player.yaw)
-                }
-                else {
-                    val (mx, mz) = MapUtils.coordsToMap(entity.renderVec)
-                    Triple(mx, mz, entity.yRot)
-                }
-
-                val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) player.clazz.color
-                else MapConfig.mapPlayerHeadColor.value
-
-                val nameColor = if (MapConfig.mapPlayerNameClassColorBased.value && player.clazz != DungeonClass.Empty) player.clazz.color
-                else Color.WHITE
-
-                drawPlayerHead(ctx, player.name, x, z, yaw, entity?.skin?.body?.id() ?: player.skin, borderColor, nameColor)
-            }
-
-            val thePlayer = DungeonListener.thePlayer ?: return
-            val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) thePlayer.clazz.color
-            else MapConfig.mapPlayerHeadColor.value
-
-            val nameColor = if (MapConfig.mapPlayerNameClassColorBased.value && thePlayer.clazz != DungeonClass.Empty) thePlayer.clazz.color
-            else Color.WHITE
-
-            val (x, z) = MapUtils.coordsToMap(thePlayer.entity !!.renderVec)
-            drawPlayerHead(ctx, thePlayer.name, x, z, thePlayer.entity !!.yRot, thePlayer.skin, borderColor, nameColor)
+        DungeonListener.dungeonTeammatesNoSelf.forEach { player ->
+            if (player.isDead) return@forEach
+            drawPlayerHead(ctx, player)
         }
-        else {
-            val levelPlayers = mc.level?.players() ?: return
-            DungeonListener.runPlayersNames.keys.forEach { name ->
-                if (name == mc.user.name) return@forEach
-                levelPlayers.find { it.name.string == name }?.let { entity ->
-                    val (x, z) = MapUtils.coordsToMap(entity.renderVec)
 
-                    val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) DungeonClass.Empty.color
-                    else MapConfig.mapPlayerHeadColor.value
-
-                    drawPlayerHead(ctx, name, x, z, entity.yRot, entity.skin.body.id(), borderColor, Color.WHITE)
-                }
-            }
-
-            val (x, z) = MapUtils.coordsToMap(mc.player !!.renderVec)
-            val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) DungeonClass.Empty.color
-            else MapConfig.mapPlayerHeadColor.value
-
-            drawPlayerHead(ctx, mc.user.name, x, z, mc.player !!.yRot, mc.player !!.skin.body.id(), borderColor, Color.WHITE)
-        }
+        drawPlayerHead(ctx, DungeonListener.thePlayer ?: return)
     }
 
 
@@ -344,16 +299,25 @@ object MapRenderer: HudElement() {
 
     private fun drawPlayerHead(
         ctx: GuiGraphics,
-        name: String,
-        x: Float,
-        z: Float,
-        yaw: Float,
-        skin: ResourceLocation,
-        borderColor: Color,
-        nameColor: Color
+        teammate: DungeonPlayer
     ) {
-        ctx.pose().pushMatrix()
+        val entity = teammate.entity
 
+        val (x, z, yaw) = if (entity == null || ! entity.isAlive) {
+            Triple(teammate.mapX, teammate.mapZ, teammate.yaw)
+        }
+        else {
+            val (mx, mz) = MapUtils.coordsToMap(entity.renderVec)
+            Triple(mx, mz, entity.yRot)
+        }
+
+        val borderColor = if (MapConfig.mapPlayerHeadColorClassBased.value) teammate.clazz.color
+        else MapConfig.mapPlayerHeadColor.value
+
+        val nameColor = if (MapConfig.mapPlayerNameClassColorBased.value && teammate.clazz != DungeonClass.Empty) teammate.clazz.color
+        else Color.WHITE
+
+        ctx.pose().pushMatrix()
         ctx.pose().translate(x, z)
         val currentYaw = MathUtils.normalizeYaw(yaw)
         val headYaw = Math.toRadians((currentYaw + 180).toDouble()).toFloat()
@@ -366,7 +330,7 @@ object MapRenderer: HudElement() {
         }
         else {
             Render2D.drawBorder(ctx, - 7, - 7, 14, 14, borderColor)
-            Render2D.drawPlayerHead(ctx, - 6, - 6, 12, skin)
+            Render2D.drawPlayerHead(ctx, - 6, - 6, 12, teammate.skin)
         }
 
         val heldItem = mc.player?.mainHandItem
@@ -378,7 +342,7 @@ object MapRenderer: HudElement() {
             ctx.pose().rotate(- headYaw)
             ctx.pose().translate(0f, 8f)
             ctx.pose().scale(MapConfig.playerNameScale.value)
-            Render2D.drawCenteredString(ctx, name, 0, 0, nameColor)
+            Render2D.drawCenteredString(ctx, teammate.name, 0, 0, nameColor)
         }
 
         ctx.pose().popMatrix()

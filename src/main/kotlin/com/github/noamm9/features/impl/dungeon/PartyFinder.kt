@@ -23,6 +23,7 @@ import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import kotlinx.coroutines.launch
 import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import java.util.*
 
@@ -95,6 +96,7 @@ object PartyFinder: Feature() {
 
         register<ContainerEvent.Render.Tooltip> {
             if (event.screen.title.string != "Party Finder") return@register
+            if (! event.stack.`is`(Items.PLAYER_HEAD)) return@register
             if (event.screen.menu.slots.find { it.item == event.stack }?.index !in headSlots) return@register
 
             var floor = 0

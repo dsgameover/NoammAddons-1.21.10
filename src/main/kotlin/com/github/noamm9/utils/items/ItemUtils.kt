@@ -52,7 +52,7 @@ object ItemUtils {
             if (customData.contains("id")) sbItemID = customData.getString("id").getOrNull()?.replace(":", "-")
             if (sbItemID == "PET") {
                 val petInfo = customData.getString("petInfo").getOrNull()?.takeIf { it.isNotEmpty() } ?: return sbItemID
-                val petInfoObject = JsonUtils.stringToJson(petInfo)
+                val petInfoObject = JsonUtils.stringToJson(petInfo).jsonObject
                 val type = petInfoObject["type"]?.jsonPrimitive?.content
                 val tier = petInfoObject["tier"]?.jsonPrimitive?.content
                 if (type != null && tier != null) sbItemID += "-$type-$tier"

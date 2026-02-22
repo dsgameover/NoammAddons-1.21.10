@@ -7,13 +7,12 @@ import com.github.noamm9.utils.items.ItemUtils.customData
 import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import net.minecraft.core.BlockPos
 import net.minecraft.core.SectionPos
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.*
 import net.minecraft.world.level.block.piston.PistonHeadBlock
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.phys.Vec3
-import java.util.*
+import net.minecraft.world.phys.shapes.CollisionContext
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
@@ -63,13 +62,13 @@ object EtherwarpHelper {
         val stepY = sign(dirY).toInt()
         val stepZ = sign(dirZ).toInt()
 
-        val tDeltaX = if (dirX == 0.0) Double.POSITIVE_INFINITY else abs(1.0 / dirX)
-        val tDeltaY = if (dirY == 0.0) Double.POSITIVE_INFINITY else abs(1.0 / dirY)
-        val tDeltaZ = if (dirZ == 0.0) Double.POSITIVE_INFINITY else abs(1.0 / dirZ)
+        val tDeltaX = abs(1.0 / dirX)
+        val tDeltaY = abs(1.0 / dirY)
+        val tDeltaZ = abs(1.0 / dirZ)
 
-        var tMaxX = if (dirX == 0.0) Double.POSITIVE_INFINITY else abs((floor(start.x) + max(0.0, stepX.toDouble()) - start.x) / dirX)
-        var tMaxY = if (dirY == 0.0) Double.POSITIVE_INFINITY else abs((floor(start.y) + max(0.0, stepY.toDouble()) - start.y) / dirY)
-        var tMaxZ = if (dirZ == 0.0) Double.POSITIVE_INFINITY else abs((floor(start.z) + max(0.0, stepZ.toDouble()) - start.z) / dirZ)
+        var tMaxX = abs((floor(start.x) + max(0.0, stepX.toDouble()) - start.x) / dirX)
+        var tMaxY = abs((floor(start.y) + max(0.0, stepY.toDouble()) - start.y) / dirY)
+        var tMaxZ = abs((floor(start.z) + max(0.0, stepZ.toDouble()) - start.z) / dirZ)
 
         val currentPos = BlockPos.MutableBlockPos()
 
@@ -82,10 +81,9 @@ object EtherwarpHelper {
             ) ?: return EtherPos.NONE
 
             val state = chunk.getBlockState(currentPos)
-            val id = Block.getId(state)
 
-            if (isValidEtherwarpBlock(currentPos, id, chunk)) return EtherPos(true, currentPos)
-            if (! validEtherwarpFeetIds[id]) return if (state.isAir) EtherPos.NONE else EtherPos(false, currentPos)
+            if (isValidEtherwarpBlock(currentPos, chunk)) return EtherPos(true, currentPos)
+            if (! isPassable(currentPos, chunk)) return EtherPos(false, currentPos)
             if (x == endX && y == endY && z == endZ) return if (state.isAir) EtherPos.NONE else EtherPos(false, currentPos)
 
             if (tMaxX < tMaxY) {
@@ -113,32 +111,23 @@ object EtherwarpHelper {
         return EtherPos.NONE
     }
 
-    private fun isValidEtherwarpBlock(currentPos: BlockPos, currendId: Int, chunk: LevelChunk): Boolean {
-        if (currendId == 0 || validEtherwarpFeetIds[currendId]) return false
-        if (! validEtherwarpFeetIds[Block.getId(chunk.getBlockState(currentPos.above()))]) return false
-        return validEtherwarpFeetIds[Block.getId(chunk.getBlockState(currentPos.above(2)))]
+    private fun isValidEtherwarpBlock(pos: BlockPos, chunk: LevelChunk): Boolean {
+        if (isPassable(pos, chunk)) return false
+        if (! isPassable(pos.above(1), chunk)) return false
+        return isPassable(pos.above(2), chunk)
     }
 
-    private val validTypes = setOf(
-        ButtonBlock::class, CarpetBlock::class, SkullBlock::class,
-        WallSkullBlock::class, LadderBlock::class, SaplingBlock::class,
-        FlowerBlock::class, StemBlock::class, CropBlock::class,
-        RailBlock::class, SnowLayerBlock::class, BubbleColumnBlock::class,
-        TripWireBlock::class, TripWireHookBlock::class, FireBlock::class,
-        AirBlock::class, TorchBlock::class, FlowerPotBlock::class,
-        TallFlowerBlock::class, TallGrassBlock::class, BushBlock::class,
-        SeagrassBlock::class, TallSeagrassBlock::class, SugarCaneBlock::class,
-        LiquidBlock::class, VineBlock::class, MushroomBlock::class,
-        PistonHeadBlock::class, WebBlock::class,
-        NetherWartBlock::class, NetherPortalBlock::class, RedStoneWireBlock::class,
+    private fun isPassable(pos: BlockPos, chunk: LevelChunk): Boolean {
+        val level = mc.level ?: return true
+        val state = chunk.getBlockState(pos)
+        if (extraPassable.any { it.isInstance(state.block) }) return true
+        return state.getCollisionShape(level, pos, CollisionContext.empty()).isEmpty
+    }
+
+    private val extraPassable = setOf(
+        CarpetBlock::class, SkullBlock::class, WallSkullBlock::class,
+        LadderBlock::class, SnowLayerBlock::class, BubbleColumnBlock::class,
+        FlowerPotBlock::class, LiquidBlock::class, PistonHeadBlock::class,
         ComparatorBlock::class, RedstoneTorchBlock::class, RepeaterBlock::class
     )
-
-    private val validEtherwarpFeetIds = BitSet().apply {
-        BuiltInRegistries.BLOCK.forEach { block ->
-            if (validTypes.any { it.isInstance(block) }) {
-                set(Block.getId(block.defaultBlockState()))
-            }
-        }
-    }
 }

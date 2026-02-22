@@ -1,13 +1,17 @@
 package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.features.Feature
+import com.github.noamm9.mixin.ILerpingBossEvent
 import com.github.noamm9.ui.clickgui.componnents.getValue
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.componnents.provideDelegate
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.location.LocationUtils
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation
+import net.minecraft.client.gui.components.LerpingBossEvent
 import net.minecraft.network.chat.Component
 import java.util.*
+import kotlin.math.roundToInt
 
 object BossBarHealth: Feature(name = "BossBar Health", description = "Shows the health number of the bossbar boss") {
     private val theWatcher by ToggleSetting("The Watcher", true)
@@ -15,7 +19,22 @@ object BossBarHealth: Feature(name = "BossBar Health", description = "Shows the 
     private val f7Withers by ToggleSetting("F7 Withers", true)
 
     @JvmStatic
-    fun getMaxHealth(nameComponent: Component): Float {
+    fun onRender(instance: LerpingBossEvent, original: Operation<Component>): Component? {
+        val originalName = original.call(instance)
+        if (! enabled) return originalName
+        if (! LocationUtils.inDungeon) return originalName
+        val maxHealth = getMaxHealth(originalName) ?: return originalName
+
+        val percent = (instance as ILerpingBossEvent).getTargetPrecent()
+        val currentHealth = (percent * maxHealth).roundToInt().toFloat()
+
+        return originalName.copy().append(
+            Component.literal(" §r§8- §a" + formatHealth(currentHealth) + "§7/§a" + formatHealth(maxHealth) + "§c❤")
+        )
+    }
+
+    @JvmStatic
+    fun getMaxHealth(nameComponent: Component): Float? {
         val name = nameComponent.unformattedText
         val isMaster = LocationUtils.isMasterMode
 
@@ -26,7 +45,7 @@ object BossBarHealth: Feature(name = "BossBar Health", description = "Shows the 
             "Storm" if f7Withers.value -> if (isMaster) 1_000_000_000F else 400_000_000F
             "Goldor" if f7Withers.value -> if (isMaster) 1_200_000_000F else 750_000_000F
             "Necron" if f7Withers.value -> if (isMaster) 1_400_000_000F else 1_000_000_000F
-            else -> - 1f
+            else -> null
         }
     }
 
