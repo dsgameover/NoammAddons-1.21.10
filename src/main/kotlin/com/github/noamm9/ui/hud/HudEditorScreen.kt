@@ -3,6 +3,7 @@ package com.github.noamm9.ui.hud
 import com.github.noamm9.config.Config
 import com.github.noamm9.features.FeatureManager
 import com.github.noamm9.ui.utils.Resolution
+import com.github.noamm9.ui.utils.componnents.UIButton
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
@@ -11,25 +12,49 @@ import net.minecraft.network.chat.Component
 import java.awt.Color
 
 object HudEditorScreen: Screen(Component.literal("HudEditor")) {
+
+    override fun init() {
+        super.init()
+
+        val btnWidth = 100
+        val btnHeight = 20
+
+        addRenderableWidget(UIButton(
+            width / 2 - btnWidth / 2,
+            height - 100,
+            btnWidth,
+            btnHeight,
+            "§cReset HUD"
+        ) {
+            FeatureManager.hudElements.forEach { element ->
+                element.x = 20f
+                element.y = 20f
+                element.scale = 1f
+            }
+        })
+    }
+
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         Resolution.refresh()
         Resolution.push(context)
 
         val mX = Resolution.getMouseX(mouseX)
         val mY = Resolution.getMouseY(mouseY)
-
         val midX = Resolution.width / 2
 
         FeatureManager.hudElements.forEach { it.drawEditor(context, mX, mY) }
 
-        Render2D.drawCenteredString(context, "Dragging HUD Elements...", midX, 10f, Color.WHITE, 1.2f)
+        val element = FeatureManager.hudElements.find { it.isDragging }
+        Render2D.drawCenteredString(context, element?.name.orEmpty(), midX, 10f, Color.WHITE, 1.2f)
         Render2D.drawCenteredString(context, "ESC to Save and Exit", midX, Resolution.height - 20f, Color.GRAY, shadow = false)
 
         Resolution.pop(context)
+
+        super.render(context, mouseX, mouseY, delta)
     }
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontal: Double, vertical: Double): Boolean {
-        FeatureManager.hudElements.asReversed().forEach { element ->
+        FeatureManager.hudElements.forEach { element ->
             if (element.isDragging) {
                 val increment = (vertical * 0.1).toFloat()
                 element.scale = (element.scale + increment).coerceIn(0.5f, 5.0f)
@@ -40,16 +65,19 @@ object HudEditorScreen: Screen(Component.literal("HudEditor")) {
     }
 
     override fun mouseClicked(mouseButtonEvent: MouseButtonEvent, bl: Boolean): Boolean {
+        if (super.mouseClicked(mouseButtonEvent, bl)) return true
+
         val mX = Resolution.getMouseX(mouseButtonEvent.x)
         val mY = Resolution.getMouseY(mouseButtonEvent.y)
 
         if (mouseButtonEvent.button() == 0) {
-            FeatureManager.hudElements.asReversed().forEach {
+            FeatureManager.hudElements.forEach {
                 it.startDragging(mX, mY)
                 if (it.isDragging) return true
             }
         }
-        return super.mouseClicked(mouseButtonEvent, bl)
+
+        return false
     }
 
     override fun mouseReleased(mouseButtonEvent: MouseButtonEvent): Boolean {
@@ -61,6 +89,4 @@ object HudEditorScreen: Screen(Component.literal("HudEditor")) {
         Config.save()
         super.onClose()
     }
-
-    override fun isPauseScreen(): Boolean = false
 }

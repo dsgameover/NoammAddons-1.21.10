@@ -22,7 +22,7 @@ object SpringBoots: Feature("Shows the spring boots charge progress on screen") 
     )
 
     override fun init() {
-        hudElement("Spring Boots", shouldDraw = { LocationUtils.inSkyblock }) { context, example ->
+        hudElement("Spring Boots Display", shouldDraw = { LocationUtils.inSkyblock }) { context, example ->
             if (progress <= 0 && ! example) return@hudElement 0f to 0f
             val text = (if (example) 33 else ((progress / 42.0) * 100.0).roundToInt()).toString() + "%"
             val color = getColorForProgress(if (example) 14 else progress)

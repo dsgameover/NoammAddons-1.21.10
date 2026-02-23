@@ -25,6 +25,7 @@ import java.awt.Color
 import kotlin.math.max
 
 object MapRenderer: HudElement() {
+    override val name get() = "Dungeon Map"
     override val toggle get() = DungeonMap.enabled && MapConfig.mapEnabled.value
     override val shouldDraw get() = LocationUtils.inDungeon && ! LocationUtils.inBoss
 
@@ -33,7 +34,7 @@ object MapRenderer: HudElement() {
     private val checkmarkUnknown = ResourceLocation.fromNamespaceAndPath(MOD_ID, "dungeonmap/checkmarks/question")
     private val checkmarkFail = ResourceLocation.fromNamespaceAndPath(MOD_ID, "dungeonmap/checkmarks/cross")
     private val ownPlayerMarker = ResourceLocation.fromNamespaceAndPath(MOD_ID, "dungeonmap/marker_self")
-    private val otherPlayerMarker = ResourceLocation.fromNamespaceAndPath(MOD_ID, "dungeonmap/marker_other")
+    // private val otherPlayerMarker = ResourceLocation.fromNamespaceAndPath(MOD_ID, "dungeonmap/marker_other")
 
     override fun draw(ctx: GuiGraphics, example: Boolean): Pair<Float, Float> {
 

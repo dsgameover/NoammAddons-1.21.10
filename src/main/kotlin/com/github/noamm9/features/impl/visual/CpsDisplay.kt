@@ -11,7 +11,7 @@ object CpsDisplay: Feature("Displays your left and right clicks per second.") {
     private val leftClicks = mutableListOf<Long>()
     private val rightClicks = mutableListOf<Long>()
 
-    val combinedCps by hudElement("CPS") { ctx, _ ->
+    val combinedCps by hudElement("CPS Display") { ctx, _ ->
         val l = getCps(leftClicks)
         val r = getCps(rightClicks)
         val text = "§f$l §7| §f$r §bCPS"

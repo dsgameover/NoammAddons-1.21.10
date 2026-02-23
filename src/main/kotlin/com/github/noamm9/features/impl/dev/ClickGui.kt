@@ -20,14 +20,14 @@ object ClickGui: Feature("A feature used to change the ClickGui configiration.",
         .withDescription("The Accent Color used by the whole ClickGui.")
 
     val editGuiButton by ButtonSetting("Open HUD Editor") {
-        NoammAddons.screen = HudEditorScreen
         ClickGuiScreen.onClose()
+        NoammAddons.screen = HudEditorScreen
     }.withDescription("Opens the HUD Editor Screen where u can change you HUD elements size and position")
 
-    val resetButton by ButtonSetting("Reset All Settings") {
+    val resetButton by ButtonSetting("Reset Settings") {
         playClickSound.value = true
         accsentColor.value = Color.CYAN
-    }.withDescription("Reverts all settings back to their original values.")
+    }.withDescription("Reverts Settings back to their original values.")
 
     override fun toggle() {}
 }
