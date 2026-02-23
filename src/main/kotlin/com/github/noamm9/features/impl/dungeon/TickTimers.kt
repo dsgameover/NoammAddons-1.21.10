@@ -11,8 +11,8 @@ import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
+import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
-import java.awt.Color
 
 object TickTimers: Feature("Shows various types of server tick timers for F7 boss fight") {
     private val showPrefix by ToggleSetting("Prefix", true).section("Settings")
@@ -40,6 +40,21 @@ object TickTimers: Feature("Shows various types of server tick timers for F7 bos
     private var dungeonStartTime = 0L
 
     override fun init() {
+        hudElement("Tick Timers", shouldDraw = { LocationUtils.inDungeon }, centered = true) { ctx, example ->
+            val textToRender = if (example) "§aStart: 150"
+            else when {
+                startTickTime != - 1 -> formatTimer(startTickTime, 150, "§aStart:")
+                goldorTickTime != - 1 -> formatTimer(goldorTickTime, 60, "§7Goldor:")
+                padTickTime != - 1 -> formatTimer(padTickTime, 20, "§bPad:")
+                deathTickTime != - 1 -> formatTimer(deathTickTime, 40, "§cDeath:")
+                secretTickTime != - 1 -> formatTimer(secretTickTime, 20, "§dSecret:")
+                else -> return@hudElement 0f to 0f
+            }
+
+            Render2D.drawCenteredString(ctx, textToRender, 0f, 0f)
+            return@hudElement textToRender.width().toFloat() to 9F
+        }
+
         register<WorldChangeEvent> { reset() }
         register<DungeonEvent.RunStatedEvent> { dungeonStartTime = System.currentTimeMillis() }
 
@@ -116,29 +131,6 @@ object TickTimers: Feature("Shows various types of server tick timers for F7 bos
                 secretTickTime --
                 if (secretTickTime == 0 && ! LocationUtils.inBoss) secretTickTime = 20
             }
-        }
-
-        register<RenderOverlayEvent> {
-            val textToRender = when {
-                startTickTime != - 1 -> formatTimer(startTickTime, 150, "§aStart:")
-                goldorTickTime != - 1 -> formatTimer(goldorTickTime, 60, "§7Goldor:")
-                padTickTime != - 1 -> formatTimer(padTickTime, 20, "§bPad:")
-                deathTickTime != - 1 -> formatTimer(deathTickTime, 40, "§cDeath:")
-                secretTickTime != - 1 -> formatTimer(secretTickTime, 20, "§dSecret:")
-                else -> return@register
-            }
-
-            val width = mc.window.guiScaledWidth
-            val height = mc.window.guiScaledHeight
-
-            Render2D.drawCenteredString(
-                event.context,
-                textToRender,
-                width / 2f,
-                height / 2f + height / 15,
-                scale = 1.5f,
-                color = Color.WHITE
-            )
         }
     }
 
