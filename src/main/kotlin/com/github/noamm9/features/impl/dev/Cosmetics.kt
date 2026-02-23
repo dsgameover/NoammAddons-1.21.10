@@ -7,6 +7,7 @@ import com.github.noamm9.utils.DataDownloader
 import com.github.noamm9.utils.network.ProfileUtils
 import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.vertex.PoseStack
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey
 import net.minecraft.client.player.AbstractClientPlayer
@@ -20,15 +21,15 @@ import kotlin.math.absoluteValue
 @AlwaysActive
 object Cosmetics: Feature(toggled = true) {
     override fun toggle() {}
-    
+
     val cosmeticPeople by lazy {
         DataDownloader.loadJson<Map<UUID, CosmeticData>>("cosmeticPeople.json").also { data ->
             scope.launch {
-                TextReplacer.replaceMap.putAll(
-                    data.filter { it.value.hasCustomName }.map {
-                        ProfileUtils.getNameByUUID(it.key.toString()).getOrThrow().name to it.value.name
-                    }
-                )
+                for ((uuid, cosmetic) in data.filter { it.value.hasCustomName }) {
+                    val profile = ProfileUtils.getNameByUUID(uuid.toString()).getOrThrow()
+                    TextReplacer.replaceMap[profile.name] = cosmetic.name
+                    delay(200)
+                }
             }
         }
     }

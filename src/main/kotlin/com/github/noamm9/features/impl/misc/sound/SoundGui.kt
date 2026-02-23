@@ -1,4 +1,4 @@
-package com.github.noamm9.features.impl.tweaks.sound
+package com.github.noamm9.features.impl.misc.sound
 
 import com.github.noamm9.NoammAddons
 import com.github.noamm9.ui.clickgui.ClickGuiScreen

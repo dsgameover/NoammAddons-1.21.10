@@ -45,7 +45,7 @@ object DungeonListener {
 
     var maxPuzzleCount = 0
     var puzzles = mutableListOf<Puzzle>()
-    val dungeonStarted get() = dungeonTeammates.none { it.clazz == DungeonClass.Empty }
+    var dungeonStarted = false
     var dungeonStartTime: Long? = null
     var dungeonEnded = false
 
@@ -151,6 +151,7 @@ object DungeonListener {
                 unformatted == "[NPC] Mort: Here, I found this map when I first entered the dungeon." -> scope.launch {
                     dungeonStartTime = currentTime
                     while (thePlayer?.clazz == DungeonClass.Empty) delay(50)
+                    dungeonStarted = true
                     EventBus.post(DungeonEvent.RunStatedEvent)
                 }
 
@@ -175,6 +176,7 @@ object DungeonListener {
         }
 
         register<WorldChangeEvent>(EventPriority.HIGHEST) {
+            dungeonStarted = false
             dungeonTeammates = mutableListOf()
             dungeonTeammatesNoSelf = mutableListOf()
             thePlayer = null

@@ -2,23 +2,26 @@ package com.github.noamm9.ui.utils.componnents
 
 import com.github.noamm9.ui.clickgui.componnents.Style
 import com.github.noamm9.utils.render.Render2D
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.components.Button
+import net.minecraft.client.sounds.SoundManager
+import net.minecraft.network.chat.Component
 import java.awt.Color
 
 class UIButton(
-    var x: Int,
-    var y: Int,
-    var width: Int,
-    var height: Int,
-    var text: String,
+    x: Int,
+    y: Int,
+    width: Int,
+    height: Int,
+    text: String,
     private val colorProvider: (() -> Color)? = null,
     private val action: (UIButton) -> Unit
-) {
+): Button(x, y, width, height, Component.literal(text), { btn -> action(btn as UIButton) }, DEFAULT_NARRATION) {
+
     var overrideColor: Color? = null
 
-    fun render(context: GuiGraphics, mouseX: Int, mouseY: Int) {
-        val isHovered = isMouseOver(mouseX.toDouble(), mouseY.toDouble())
-
+    override fun renderWidget(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
         val bgColor = if (isHovered) Color(45, 45, 45, 220) else Color(30, 30, 30, 200)
         Render2D.drawRect(context, x, y, width, height, bgColor)
 
@@ -31,25 +34,17 @@ class UIButton(
         Render2D.drawRect(context, x, y, 1, height, borderColor)
         Render2D.drawRect(context, x + width - 1, y, 1, height, borderColor)
 
-        Render2D.drawCenteredString(
-            context,
-            text,
+        context.drawCenteredString(
+            Minecraft.getInstance().font,
+            message,
             x + width / 2,
             y + (height - 8) / 2,
-            textColor
+            textColor.rgb
         )
     }
 
-    fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (button == 0 && isMouseOver(mouseX, mouseY)) {
-            Style.playClickSound(1f)
-            action(this)
-            return true
-        }
-        return false
-    }
-
-    private fun isMouseOver(mx: Double, my: Double): Boolean {
-        return mx >= x && mx <= x + width && my >= y && my <= y + height
+    override fun playDownSound(soundManager: SoundManager) {
+        Style.playClickSound(1f)
     }
 }
+

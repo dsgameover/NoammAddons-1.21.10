@@ -66,7 +66,7 @@ object DungeonWaypointCommand: BaseCommand("ndw") {
                 val (roomName, roomCorner, rotation) = getRoomData() ?: return@runs
                 val playerPos = NoammAddons.mc.player?.position() ?: return@runs
 
-                val closest = DungeonWaypoints.currentRoomWaypoints.minByOrNull {
+                val closest = (if (LocationUtils.inBoss) DungeonWaypoints.waypoints[roomName] else DungeonWaypoints.currentRoomWaypoints)?.minByOrNull {
                     val dx = it.pos.x + 0.5 - playerPos.x
                     val dy = it.pos.y + 0.5 - playerPos.y
                     val dz = it.pos.z + 0.5 - playerPos.z
@@ -135,7 +135,12 @@ object DungeonWaypointCommand: BaseCommand("ndw") {
             return null
         }
 
-        if (! LocationUtils.inBoss) {
+        if (LocationUtils.inBoss) return RoomInfo(
+            name = "B$floor",
+            corner = BlockPos.ZERO,
+            rotation = 0
+        )
+        else {
             val currentRoom = ScanUtils.currentRoom
             if (currentRoom == null) {
                 ChatUtils.modMessage("§cYou must be in a dungeon room to edit waypoints!")
@@ -144,14 +149,9 @@ object DungeonWaypointCommand: BaseCommand("ndw") {
 
             return RoomInfo(
                 name = currentRoom.data.name,
-                corner = currentRoom.corner !!,
-                rotation = 360 - currentRoom.rotation !!
+                corner = currentRoom.corner ?: BlockPos.ZERO,
+                rotation = 360 - (currentRoom.rotation ?: 0)
             )
         }
-        else return RoomInfo(
-            name = "B$floor",
-            corner = BlockPos.ZERO,
-            rotation = 0
-        )
     }
 }

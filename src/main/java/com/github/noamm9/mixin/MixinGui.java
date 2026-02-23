@@ -4,7 +4,7 @@ import com.github.noamm9.event.EventBus;
 import com.github.noamm9.event.impl.ActionBarMessageEvent;
 import com.github.noamm9.event.impl.RenderOverlayEvent;
 import com.github.noamm9.features.impl.general.FEAT_ItemRarity;
-import com.github.noamm9.features.impl.tweaks.Camera;
+import com.github.noamm9.features.impl.misc.Camera;
 import com.github.noamm9.features.impl.visual.DarkMode;
 import com.github.noamm9.features.impl.visual.PlayerHud;
 import com.github.noamm9.features.impl.visual.Scoreboard;

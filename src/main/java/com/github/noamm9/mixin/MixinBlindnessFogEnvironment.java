@@ -1,6 +1,6 @@
 package com.github.noamm9.mixin;
 
-import com.github.noamm9.features.impl.tweaks.Camera;
+import com.github.noamm9.features.impl.misc.Camera;
 import net.minecraft.client.renderer.fog.environment.BlindnessFogEnvironment;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;

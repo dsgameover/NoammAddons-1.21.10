@@ -5,17 +5,16 @@ import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.mixin.IAbstractSignEditScreen
 import com.github.noamm9.ui.utils.componnents.UIButton
+import com.github.noamm9.ui.utils.componnents.UISearchBox
 import com.github.noamm9.utils.NumbersUtils
 import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import com.github.noamm9.utils.network.PacketUtils.send
 import com.github.noamm9.utils.render.Render2D
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.client.input.KeyEvent
-import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket
@@ -64,8 +63,7 @@ object AuctionPriceInput: Feature("replaces the sign input with a proper textbox
         private val stack: ItemStack
     ): Screen(Component.literal("Auction Price Input")) {
 
-        private val buttons = mutableSetOf<UIButton>()
-        private lateinit var inputField: EditBox
+        private lateinit var inputField: UISearchBox
         private var parsedValue: Long? = null
         private var lowestBin = 0L
 
@@ -76,50 +74,51 @@ object AuctionPriceInput: Feature("replaces the sign input with a proper textbox
             val centerX = width / 2
             val centerY = height / 2
 
-            inputField = EditBox(font, centerX - 100, centerY - 20, 200, 20, Component.literal("Price"))
+            inputField = UISearchBox(centerX - 100, centerY - 20, 200, 22, Component.literal("Price"))
             inputField.value = input
-            recalculateValue()
             inputField.setMaxLength(32)
+            recalculateValue()
 
             inputField.setResponder {
-                input = inputField.value
+                input = it
                 recalculateValue()
             }
 
             addRenderableWidget(inputField)
             setInitialFocus(inputField)
 
-            buttons.add(UIButton(centerX - 100, centerY + 5, 200, 20, "Done") {
+            addRenderableWidget(UIButton(centerX - 100, centerY + 10, 200, 20, "Done") {
                 finish()
             })
 
-            buttons.add(UIButton(centerX - 100, centerY + 30, 200, 20, "Mode: ${if (undercut) "UnderCut" else "Normal"}") { button ->
+            addRenderableWidget(UIButton(centerX - 100, centerY + 35, 200, 20, getModeText()) { button ->
                 undercut = ! undercut
-                button.text = "Mode: ${if (undercut) "UnderCut" else "Normal"}"
+                button.message = Component.literal(getModeText())
                 recalculateValue()
             })
-
         }
 
-        override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-            super.render(guiGraphics, mouseX, mouseY, partialTick)
+        private fun getModeText() = "Mode: ${if (undercut) "UnderCut" else "Normal"}"
 
+        override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
             val centerX = width / 2
             val centerY = height / 2
 
             val itemX = centerX - 8
             val itemY = centerY - 75
-
             guiGraphics.renderItem(stack, itemX, itemY)
             guiGraphics.renderItemDecorations(font, stack, itemX, itemY)
-            val lore = stack.getOrDefault(DataComponents.LORE, ItemLore.EMPTY).styledLines().drop(1)
-            guiGraphics.setTooltipForNextFrame(
-                mc.font,
-                lore,
-                stack.tooltipImage,
-                mouseX, mouseY,
-                stack.get(DataComponents.TOOLTIP_STYLE)
-            )
+
+            if (mouseX >= itemX && mouseX <= itemX + 16 && mouseY >= itemY && mouseY <= itemY + 16) {
+                val lore = stack.getOrDefault(DataComponents.LORE, ItemLore.EMPTY).styledLines().drop(1)
+                guiGraphics.setTooltipForNextFrame(
+                    mc.font,
+                    lore,
+                    stack.tooltipImage,
+                    mouseX, mouseY,
+                    stack.get(DataComponents.TOOLTIP_STYLE)
+                )
+            }
 
             guiGraphics.drawCenteredString(font,
                 if (undercut) "Lowest BIN: ${NumbersUtils.format(lowestBin)}" else "Set Auction Price",
@@ -134,18 +133,7 @@ object AuctionPriceInput: Feature("replaces the sign input with a proper textbox
 
             Render2D.drawCenteredString(guiGraphics, displayText, centerX, centerY - 35)
 
-            buttons.forEach { it.render(guiGraphics, mouseX, mouseY) }
-        }
-
-        override fun mouseClicked(event: MouseButtonEvent, bl: Boolean): Boolean {
-            val x = event.x
-            val y = event.y
-            val button = event.button()
-
-            for (btn in buttons) {
-                if (btn.mouseClicked(x, y, button)) return true
-            }
-            return super.mouseClicked(event, bl)
+            super.render(guiGraphics, mouseX, mouseY, partialTick)
         }
 
         override fun keyPressed(event: KeyEvent): Boolean {

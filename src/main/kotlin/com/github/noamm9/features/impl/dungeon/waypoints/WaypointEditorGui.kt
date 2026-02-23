@@ -6,7 +6,6 @@ import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import java.awt.Color
@@ -36,8 +35,6 @@ class WaypointEditorGui(
     private val bodyBg = Color(15, 15, 15, 200)
     private val headerBg = Color(20, 20, 20, 255)
 
-    private val buttons = mutableListOf<UIButton>()
-
     override fun init() {
         if (initialState != null) {
             filled = initialState.filled
@@ -55,36 +52,38 @@ class WaypointEditorGui(
         val startY = centerY - 40
         val spacing = 24
 
-        buttons.add(UIButton(centerX - 100, startY, btnWidth, btnHeight, "Filled: ${colorBoolean(filled)}") { btn ->
+        addRenderableWidget(UIButton(centerX - 100, startY, btnWidth, btnHeight, "Filled: ${colorBoolean(filled)}") { btn ->
             filled = ! filled
-            btn.text = "Filled: ${colorBoolean(filled)}"
+            btn.message = Component.literal("Filled: ${colorBoolean(filled)}")
         })
 
-        buttons.add(UIButton(centerX - 100, startY + spacing, btnWidth, btnHeight, "Outline: ${colorBoolean(outline)}") { btn ->
+        addRenderableWidget(UIButton(centerX - 100, startY + spacing, btnWidth, btnHeight, "Outline: ${colorBoolean(outline)}") { btn ->
             outline = ! outline
-            btn.text = "Outline: ${colorBoolean(outline)}"
+            btn.message = Component.literal("Outline: ${colorBoolean(outline)}")
         })
 
-        buttons.add(UIButton(centerX - 100, startY + spacing * 2, btnWidth, btnHeight, "Phase (See-Thru): ${colorBoolean(phase)}") { btn ->
+        addRenderableWidget(UIButton(centerX - 100, startY + spacing * 2, btnWidth, btnHeight, "Phase (See-Thru): ${colorBoolean(phase)}") { btn ->
             phase = ! phase
-            btn.text = "Phase (See-Thru): ${colorBoolean(phase)}"
+            btn.message = Component.literal("Phase (See-Thru): ${colorBoolean(phase)}")
         })
 
-        buttons.add(UIButton(
+        addRenderableWidget(UIButton(
             centerX - 100,
             startY + 75,
-            200,
-            20,
-            "&fColor: ${colorNames[colorIndex]}",
+            btnWidth,
+            btnHeight,
+            "Color: ${colorNames[colorIndex]}",
             colorProvider = { colors[colorIndex] }
         ) { btn ->
-            colorIndex ++
-            if (colorIndex >= colors.size) colorIndex = 0
-            btn.text = "Color: ${colorNames[colorIndex]}"
+            colorIndex = (colorIndex + 1) % colors.size
+            btn.message = Component.literal("Color: ${colorNames[colorIndex]}")
         })
 
-        buttons.add(UIButton(centerX - 100, startY + spacing * 5, 98, btnHeight, "§aSave") {
-            if (! filled && ! outline) return@UIButton ChatUtils.modMessage("§cBoth Filled and Outline cannot be false")
+        addRenderableWidget(UIButton(centerX - 100, startY + spacing * 5, 98, btnHeight, "§aSave") {
+            if (! filled && ! outline) {
+                ChatUtils.modMessage("§cBoth Filled and Outline cannot be false")
+                return@UIButton
+            }
 
             val baseColor = colors[colorIndex]
             val finalColor = if (filled) Color(baseColor.red, baseColor.green, baseColor.blue, 60) else baseColor
@@ -99,7 +98,7 @@ class WaypointEditorGui(
             overrideColor = Color.GREEN
         })
 
-        buttons.add(UIButton(centerX + 2, startY + spacing * 5, 98, btnHeight, "§cCancel") {
+        addRenderableWidget(UIButton(centerX + 2, startY + spacing * 5, 98, btnHeight, "§cCancel") {
             onClose()
         }.apply {
             overrideColor = Color.RED
@@ -125,20 +124,8 @@ class WaypointEditorGui(
         Render2D.drawCenteredString(context, "§b$roomName", centerX, panelY + 30)
         Render2D.drawCenteredString(context, "§7[${absolutePos.x}, ${absolutePos.y}, ${absolutePos.z}]", centerX, panelY + 43)
 
-        buttons.forEach { it.render(context, mouseX, mouseY) }
+        super.render(context, mouseX, mouseY, partialTicks)
     }
 
-
-    override fun mouseClicked(event: MouseButtonEvent, bl: Boolean): Boolean {
-        val x = event.x
-        val y = event.y
-        val button = event.button()
-
-        for (btn in buttons) {
-            if (btn.mouseClicked(x, y, button)) return true
-        }
-        return super.mouseClicked(event, bl)
-    }
-
-    private fun colorBoolean(bl: Boolean) = if (bl) "&atrue" else "&cfalse"
+    private fun colorBoolean(bl: Boolean) = if (bl) "§atrue" else "§cfalse"
 }

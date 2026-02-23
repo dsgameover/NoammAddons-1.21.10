@@ -1,4 +1,4 @@
-package com.github.noamm9.features.impl.tweaks
+package com.github.noamm9.features.impl.misc
 
 /*
 object NoCursorReset: Feature("Prevents the mouse cursor from resetting when you open a new gui.") {

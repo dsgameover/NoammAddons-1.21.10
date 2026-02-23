@@ -18,6 +18,13 @@ object TestCommand: BaseCommand("test") {
             }
         }
 
+        literal("gui") {
+            runs {
+                mc.screen?.onClose()
+                //    NoammAddons.screen = KitchenSinkScreen()
+            }
+        }
+
         runs {
             ChatUtils.chat("${mc.player?.mainHandItem.skyblockId}: ${priceData[mc.player?.mainHandItem.skyblockId]}")
         }

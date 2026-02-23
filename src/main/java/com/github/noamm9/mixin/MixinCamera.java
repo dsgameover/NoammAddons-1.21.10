@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static com.github.noamm9.features.impl.tweaks.Camera.*;
+import static com.github.noamm9.features.impl.misc.Camera.*;
 
 
 @Mixin(Camera.class)

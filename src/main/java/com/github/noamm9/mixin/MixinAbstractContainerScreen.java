@@ -3,7 +3,7 @@ package com.github.noamm9.mixin;
 import com.github.noamm9.NoammAddons;
 import com.github.noamm9.event.EventBus;
 import com.github.noamm9.event.impl.ContainerEvent;
-import com.github.noamm9.features.impl.tweaks.ScrollableTooltip;
+import com.github.noamm9.features.impl.misc.ScrollableTooltip;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;

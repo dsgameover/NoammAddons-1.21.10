@@ -1,7 +1,7 @@
 package com.github.noamm9.mixin;
 
 import com.github.noamm9.NoammAddons;
-import com.github.noamm9.features.impl.tweaks.ArrowFix;
+import com.github.noamm9.features.impl.misc.ArrowFix;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

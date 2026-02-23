@@ -2,6 +2,7 @@ package com.github.noamm9.ui.clickgui
 
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.utils.ChatUtils.addColor
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
@@ -35,7 +36,7 @@ object TooltipManager {
         val text = hoveredText ?: return
         if (System.currentTimeMillis() - displayStartTime < displayDelay) return
 
-        val lines = mc.font.split(Component.literal(text), 150)
+        val lines = mc.font.split(Component.literal(text.addColor()), 150)
         val padding = 6
         val textWidth = lines.maxOfOrNull { mc.font.width(it) } ?: return
         val textHeight = lines.size * (mc.font.lineHeight + 2)
@@ -43,12 +44,8 @@ object TooltipManager {
         var tx = lastMouseX + 12f
         var ty = lastMouseY + 12f
 
-        if (tx + textWidth + (padding * 2) > logicalWidth) {
-            tx = lastMouseX - textWidth - (padding * 2) - 4f
-        }
-        if (ty + textHeight + (padding * 2) > logicalHeight) {
-            ty = logicalHeight - textHeight - (padding * 2) - 4f
-        }
+        if (tx + textWidth + (padding * 2) > logicalWidth) tx = lastMouseX - textWidth - (padding * 2) - 4f
+        if (ty + textHeight + (padding * 2) > logicalHeight) ty = logicalHeight - textHeight - (padding * 2) - 4f
 
         Render2D.drawRect(context, tx, ty, textWidth + (padding * 2f), textHeight + (padding * 2f), Color(10, 10, 10, 240))
         Render2D.drawRect(context, tx, ty, textWidth + (padding * 2f), 1.5f, Style.accentColor)

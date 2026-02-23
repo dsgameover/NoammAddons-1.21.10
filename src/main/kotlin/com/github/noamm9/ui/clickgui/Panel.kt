@@ -1,7 +1,7 @@
 package com.github.noamm9.ui.clickgui
 
 import com.github.noamm9.features.FeatureManager
-import com.github.noamm9.features.impl.tweaks.sound.SoundManager
+import com.github.noamm9.features.impl.misc.sound.SoundManager
 import com.github.noamm9.ui.clickgui.componnents.Style
 import com.github.noamm9.ui.utils.Animation
 import com.github.noamm9.utils.ColorUtils.withAlpha

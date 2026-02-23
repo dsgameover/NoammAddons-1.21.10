@@ -1,4 +1,4 @@
-package com.github.noamm9.features.impl.tweaks
+package com.github.noamm9.features.impl.misc
 
 import com.github.noamm9.features.Feature
 import com.github.noamm9.utils.ChatUtils.unformattedText
