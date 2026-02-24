@@ -42,7 +42,7 @@ object PartyHelper: Feature("Party commands and reformatting.") {
         .section("Party Addons")
 
     private val party = mutableListOf<PartyMember>()
-    private val downtimeList = mutableMapOf<String, String>()
+    val downtimeList = mutableMapOf<String, String>()
     private var awaitingDelimiter = 0
 
     private val partyStartPattern = Regex("^Party Members \\((\\d+)\\)$")
