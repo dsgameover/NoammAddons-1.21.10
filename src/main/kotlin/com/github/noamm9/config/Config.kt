@@ -34,10 +34,7 @@ object Config {
                 featureObj.getAsJsonArray("configSettings")?.forEach { settingElement ->
                     val settingEntry = settingElement.asJsonObject.entrySet().firstOrNull() ?: return@forEach
                     val setting = feature.getSettingByName(settingEntry.key)
-                    if (setting is Savable) {
-                        logger.info("loading settings for feature: ${feature.name}")
-                        setting.read(settingEntry.value)
-                    }
+                    if (setting is Savable) setting.read(settingEntry.value)
                 }
             }
 
