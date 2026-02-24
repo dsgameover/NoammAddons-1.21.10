@@ -1,7 +1,7 @@
 package com.github.noamm9.mixin;
 
 import com.github.noamm9.event.EventBus;
-import com.github.noamm9.event.impl.EntityCheckRenderEvent;
+import com.github.noamm9.event.impl.CheckEntityRenderEvent;
 import com.github.noamm9.features.impl.visual.RenderOptimizer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinEntityRenderDispatcher {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private <T extends Entity> void onShouldRender(T entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
-        if (EventBus.post(new EntityCheckRenderEvent(entity))) {
+        if (EventBus.post(new CheckEntityRenderEvent(entity))) {
             cir.setReturnValue(false);
         }
     }

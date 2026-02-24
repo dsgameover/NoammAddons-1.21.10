@@ -1,6 +1,6 @@
 package com.github.noamm9.features.impl.visual
 
-import com.github.noamm9.event.impl.EntityCheckRenderEvent
+import com.github.noamm9.event.impl.CheckEntityRenderEvent
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.componnents.getValue
@@ -101,7 +101,7 @@ object RenderOptimizer: Feature("Optimize Rendering by hiding useless shit.") {
             }
         }
 
-        register<EntityCheckRenderEvent> {
+        register<CheckEntityRenderEvent> {
             if (hideDeadMobs.value) {
                 if (! event.entity.isAlive || ((event.entity as? LivingEntity)?.health ?: 1f) <= 0) {
                     event.isCanceled = true

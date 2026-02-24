@@ -1,6 +1,6 @@
 package com.github.noamm9.features.impl.dungeon
 
-import com.github.noamm9.event.impl.EntityCheckRenderEvent
+import com.github.noamm9.event.impl.CheckEntityRenderEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.componnents.getValue
 import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
@@ -20,7 +20,7 @@ object HiddenMobs: Feature("Reveals invisible mobs in dungeons") {
     private val showStealthy by ToggleSetting("Show Stealthy")
 
     override fun init() {
-        register<EntityCheckRenderEvent> {
+        register<CheckEntityRenderEvent> {
             if (! showFels.value && ! showSa.value && ! showStealthy.value) return@register
             if (! LocationUtils.inDungeon) return@register
             if (! event.entity.isInvisible) return@register

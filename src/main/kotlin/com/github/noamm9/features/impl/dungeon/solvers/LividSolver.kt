@@ -57,7 +57,7 @@ object LividSolver: Feature() {
             }
         }
 
-        register<EntityCheckRenderEvent> {
+        register<CheckEntityRenderEvent> {
             if (! hideWrong.value) return@register
             if (LocationUtils.dungeonFloorNumber != 5) return@register
             if (! LocationUtils.inBoss) return@register

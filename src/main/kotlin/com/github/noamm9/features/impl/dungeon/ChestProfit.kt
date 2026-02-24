@@ -58,13 +58,13 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
         register<ContainerFullyOpenedEvent> {
             if (! LocationUtils.world.equalsOneOf(WorldType.DungeonHub, WorldType.Catacombs)) return@register
             val chestName = event.title.unformattedText
+            val currentChest = DungeonChest.getFromName(chestName)
 
             chestsToHighlight.clear()
             sortedChestsCache = emptyList()
 
             when {
-                chestName.endsWith(" Chest") -> {
-                    val chestType = DungeonChest.getFromName(chestName) ?: return@register
+                currentChest != null -> {
                     val rewardItem = event.items[31] ?: return@register
 
                     val lore = rewardItem.lore.map { it.removeFormatting() }
@@ -77,8 +77,8 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
                         profit += getItemValue(stack)
                     }
 
-                    chestType.profit = profit
-                    chestType.openedInSequence = true
+                    currentChest.profit = profit
+                    currentChest.openedInSequence = true
                 }
 
                 chestName.matches(croesusChestRegex) && croesusChestsProfit.value -> {
@@ -102,10 +102,10 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
                         chestType.profit = profit
                         chestType.openedInSequence = true
 
-                        if (chestsToHighlight.none { it.displayText == chestType.displayText }) {
+                        if (chestsToHighlight.none { it == chestType }) {
                             chestsToHighlight.add(chestType)
                         }
-                        else chestsToHighlight.find { it.displayText == chestType.displayText }?.profit = profit
+                        else chestsToHighlight.find { it == chestType }?.profit = profit
                     }
 
                     sortedChestsCache = chestsToHighlight.sortedByDescending { it.profit }
@@ -122,23 +122,24 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
                 val width = 176f
                 val height = 166f
 
-                if (titleName.endsWith(" Chest")) DungeonChest.getFromName(titleName)?.let {
+                DungeonChest.getFromName(titleName)?.let {
                     val color = if (it.profit < 0) "§4" else "§a"
                     val text = "Profit: $color${NumbersUtils.format(it.profit)}  "
                     Render2D.drawString(event.context, text, width - text.width(), 6f)
-                }
-                else if (croesusChestRegex.matches(titleName) && croesusChestsProfit.value) {
-                    sortedChestsCache.forEachIndexed { index, chest ->
-                        val color = if (chest.profit < 0) "§4" else "§a"
-                        val text = "${chest.displayText}: $color${NumbersUtils.format(chest.profit)}§r"
+                } ?: run {
+                    if (croesusChestRegex.matches(titleName) && croesusChestsProfit.value) {
+                        sortedChestsCache.forEachIndexed { index, chest ->
+                            val color = if (chest.profit < 0) "§4" else "§a"
+                            val text = "${chest.displayText}: $color${NumbersUtils.format(chest.profit)}§r"
 
-                        Render2D.drawString(
-                            event.context,
-                            text,
-                            width * 1.15f,
-                            index * 9f + height / 6f,
-                            chest.color
-                        )
+                            Render2D.drawString(
+                                event.context,
+                                text,
+                                width * 1.15f,
+                                index * 9f + height / 6f,
+                                chest.color
+                            )
+                        }
                     }
                 }
             }
@@ -152,53 +153,49 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
                 }
             }
             else if (titleName == "Croesus") {
-                handleCroesusMenu(event)
-            }
-        }
-    }
+                val stack = event.slot.item ?: return@register
+                if (stack.item != Items.PLAYER_HEAD) return@register
 
-    private fun handleCroesusMenu(event: ContainerEvent.Render.Slot.Pre) {
-        val stack = event.slot.item ?: return
-        if (stack.item != Items.PLAYER_HEAD) return
+                val name = stack.hoverName.formattedText
+                if (! name.equalsOneOf("§aThe Catacombs", "§aMaster Mode The Catacombs")) return@register
+                val lore = stack.lore
 
-        val name = stack.hoverName.formattedText
-        if (! name.equalsOneOf("§aThe Catacombs", "§aMaster Mode The Catacombs")) return
-        val lore = stack.lore
+                if (croesusChestHighlight.value) {
+                    var highlightColor: Color? = null
 
-        if (croesusChestHighlight.value) {
-            var highlightColor: Color? = null
+                    for (line in lore) when {
+                        line == "§aNo more chests to open!" -> {
+                            if (hideRedChests.value) {
+                                event.isCanceled = true
+                                return@register
+                            }
+                            highlightColor = Color.RED
+                            break
+                        }
 
-            for (line in lore) when {
-                line == "§aNo more chests to open!" -> {
-                    if (hideRedChests.value) {
-                        event.isCanceled = true
-                        return
+                        line == "§cNo chests opened yet!" -> {
+                            highlightColor = Color.GREEN
+                            break
+                        }
+
+                        line.startsWith("§7Opened Chest: ") -> {
+                            highlightColor = Color.YELLOW
+                            break
+                        }
                     }
-                    highlightColor = Color.RED
-                    break
+
+                    highlightColor?.let { event.slot.highlight(event.context, it.withAlpha(100)) }
                 }
 
-                line == "§cNo chests opened yet!" -> {
-                    highlightColor = Color.GREEN
-                    break
-                }
-
-                line.startsWith("§7Opened Chest: ") -> {
-                    highlightColor = Color.YELLOW
-                    break
+                if (croesusKismetDisplay.value && lore[lore.size - 4] != "§5 §9Kismet Feather") {
+                    val pose = event.context.pose()
+                    pose.pushMatrix()
+                    pose.scale(0.7f)
+                    pose.translate((event.slot.x + 7) / 0.7f, (event.slot.y + 7) / 0.7f)
+                    event.context.renderFakeItem(ItemStack(Items.FEATHER), 0, 0)
+                    pose.popMatrix()
                 }
             }
-
-            highlightColor?.let { event.slot.highlight(event.context, it.withAlpha(100)) }
-        }
-
-        if (croesusKismetDisplay.value && lore[lore.size - 4] != "§5 §9Kismet Feather") {
-            val pose = event.context.pose()
-            pose.pushMatrix()
-            pose.scale(0.7f)
-            pose.translate((event.slot.x + 7) / 0.7f, (event.slot.y + 7) / 0.7f)
-            event.context.renderFakeItem(ItemStack(Items.FEATHER), 0, 0)
-            pose.popMatrix()
         }
     }
 
@@ -259,7 +256,6 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
         return priceData[id] ?: 0L
     }
 
-
     init {
         hudElement(
             name = "Chest Profit",
@@ -316,8 +312,9 @@ object ChestProfit: Feature("Dungeon Chest Profit Calculator") {
         companion object {
             fun getFromName(name: String?): DungeonChest? {
                 if (name.isNullOrBlank()) return null
-                val clean = name.replace(" Chest", "").removeFormatting()
-                return entries.find { it.displayText.replace(" Chest", "") == clean }
+                return entries.find {
+                    it.displayText.remove(" Chest") == name.remove(" Chest")
+                }
             }
         }
     }

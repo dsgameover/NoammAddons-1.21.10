@@ -2,7 +2,7 @@ package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.event.impl.ChatMessageEvent
 import com.github.noamm9.event.impl.ContainerEvent
-import com.github.noamm9.event.impl.EntityCheckRenderEvent
+import com.github.noamm9.event.impl.CheckEntityRenderEvent
 import com.github.noamm9.event.impl.ScreenEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.ui.clickgui.componnents.*
@@ -75,7 +75,7 @@ object LeapMenu: Feature("Custom Leap Menu and leap message") {
             }
         }
 
-        register<EntityCheckRenderEvent> {
+        register<CheckEntityRenderEvent> {
             if (System.currentTimeMillis() > shouldHide) return@register
             if (event.entity !is Player) return@register
             if (event.entity == mc.player) return@register
