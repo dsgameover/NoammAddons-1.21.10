@@ -62,4 +62,3 @@ object Ragnarock: Feature("Ragnarock alerts") {
         }
     }
 }
-
