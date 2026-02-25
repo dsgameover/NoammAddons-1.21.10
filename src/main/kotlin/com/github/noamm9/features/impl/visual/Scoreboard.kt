@@ -15,10 +15,7 @@ import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
-import net.minecraft.network.protocol.game.ClientboundResetScorePacket
-import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket
-import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
-import net.minecraft.network.protocol.game.ClientboundSetScorePacket
+import net.minecraft.network.protocol.game.*
 import net.minecraft.world.scores.DisplaySlot
 import net.minecraft.world.scores.Objective
 import net.minecraft.world.scores.PlayerTeam
@@ -99,7 +96,8 @@ object Scoreboard: Feature("draws a custom scoreboard instead of the vanilla one
         register<MainThreadPacketReceivedEvent.Post> {
             if (
                 event.packet is ClientboundSetScorePacket || event.packet is ClientboundSetObjectivePacket ||
-                event.packet is ClientboundSetDisplayObjectivePacket || event.packet is ClientboundResetScorePacket
+                event.packet is ClientboundSetDisplayObjectivePacket || event.packet is ClientboundResetScorePacket ||
+                event.packet is ClientboundSetPlayerTeamPacket
             ) {
                 needsUpdate = true
             }
