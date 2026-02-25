@@ -11,7 +11,6 @@ import com.github.noamm9.ui.clickgui.componnents.showIf
 import com.github.noamm9.ui.clickgui.componnents.withDescription
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.unformattedText
-import com.github.noamm9.utils.MathUtils.add
 import com.github.noamm9.utils.MathUtils.center
 import com.github.noamm9.utils.MathUtils.toPos
 import com.github.noamm9.utils.NumbersUtils.toFixed
@@ -171,14 +170,13 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
             if (! relicAura.value) return@register
             if (LocationUtils.F7Phase != 5) return@register
             if (System.currentTimeMillis() - lastClick < 200) return@register
+            if (mc.player !!.inventory.getItem(8).displayName.string.contains("Relic")) return@register
 
-            val armorStand = mc.level?.entitiesForRendering()?.filterIsInstance<ArmorStand>()?.firstOrNull {
-                val hasRelic = mc.player !!.inventory.getItem(8).displayName.string.contains("Relic")
+            val armorStand = mc.level?.entitiesForRendering()?.filterIsInstance<ArmorStand>()?.find {
                 val isRelic = it.getItemBySlot(EquipmentSlot.HEAD).displayName.string.contains("Relic")
-                val pos = mc.player !!.position().add(y = mc.player !!.eyeHeight)
-                val entitypos = it.position().add(y = it.eyeHeight)
-                val atCauldron = WitherRelic.entries.any { relic -> isEntityAtCauldron(entitypos, relic) }
-                ! hasRelic && isRelic && pos.distanceTo(entitypos) < 3 && ! atCauldron
+                val atCauldron = WitherRelic.entries.any { relic -> isEntityAtCauldron(it.position(), relic) }
+                val distance = it.position().distanceTo(mc.player !!.position())
+                isRelic && ! atCauldron && distance < 3
             } ?: return@register
 
             PlayerUtils.interactEntity(armorStand, InteractionHand.MAIN_HAND)

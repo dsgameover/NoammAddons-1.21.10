@@ -212,7 +212,6 @@ object PlayerUtils {
     }
 
     fun interactEntity(entity: Entity, hand: InteractionHand) {
-        if (entity.distanceTo(mc.player) > 3) return ChatUtils.sendMessage("&cEntity is too far away!")
         val hitVec = Vec3(0.0, entity.bbHeight / 2.0, 0.0)
         val shift = mc.player !!.isShiftKeyDown
 
