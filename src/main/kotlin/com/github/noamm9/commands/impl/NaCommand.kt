@@ -12,6 +12,8 @@ import com.github.noamm9.ui.clickgui.ClickGuiScreen
 import com.github.noamm9.ui.hud.HudEditorScreen
 import com.github.noamm9.utils.*
 import com.github.noamm9.utils.ChatUtils.addColor
+import com.github.noamm9.utils.dungeons.DungeonListener
+import com.github.noamm9.utils.dungeons.enums.DungeonClass
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import kotlinx.coroutines.launch
@@ -27,7 +29,8 @@ object NaCommand: BaseCommand("na") {
         "/na sim" to "simulate chat message",
         "/na leaporder" to "configure custom leap sorting",
         "/na swapmask" to "equips either bonzo mask or spirit mask",
-        "/na ping" to "Shows ur ping in chat"
+        "/na ping" to "Shows ur ping in chat",
+        "/na leap <class>" to "Automatically leaps to the selected class"
     )
 
     override fun CommandNodeBuilder.build() {
@@ -114,6 +117,17 @@ object NaCommand: BaseCommand("na") {
             runs {
                 scope.launch {
                     PlayerUtils.changeMaskAction()
+                }
+            }
+        }
+
+        literal("leap") {
+            argument("class", StringArgumentType.word()) {
+                suggests { DungeonClass.entries.map { it.name } }
+                runs { ctx ->
+                    val clazz = StringArgumentType.getString(ctx, "class")
+                    val player = DungeonListener.dungeonTeammatesNoSelf.find { it.clazz.name == clazz } ?: return@runs ChatUtils.modMessage("leap target not found")
+                    scope.launch { PlayerUtils.leapAction(player) }
                 }
             }
         }

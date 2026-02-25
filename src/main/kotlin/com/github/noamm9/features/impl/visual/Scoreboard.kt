@@ -56,13 +56,13 @@ object Scoreboard: Feature("draws a custom scoreboard instead of the vanilla one
             Render2D.drawRect(ctx, xOffset, yOffset, boxWidth, 2.0, Style.accentColor)
             Render2D.drawRect(ctx, xOffset - 1, yOffset - 1, boxWidth + 2.0, boxHeight + 2.0, Color(255, 255, 255, 20))
 
-            Render2D.drawCenteredString(ctx, cachedTitle, (xOffset + boxWidth / 2).toFloat(), (yOffset + padding).toFloat(), Color.WHITE, shadow = false)
+            Render2D.drawCenteredString(ctx, cachedTitle, (xOffset + boxWidth / 2).toFloat(), (yOffset + padding).toFloat(), shadow = false)
 
             val startY = yOffset + padding + mc.font.lineHeight + 4
             val lineHeights = mc.font.lineHeight + 2
 
             cachedLines.forEachIndexed { index, text ->
-                Render2D.drawString(ctx, text, (xOffset + padding).toFloat(), (startY + (index * lineHeights)).toFloat(), Color.WHITE)
+                Render2D.drawString(ctx, text, (xOffset + padding).toFloat(), (startY + (index * lineHeights)).toFloat())
             }
 
             return cachedW to cachedH

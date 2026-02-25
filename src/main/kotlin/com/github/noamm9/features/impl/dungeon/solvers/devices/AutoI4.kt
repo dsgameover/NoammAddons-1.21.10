@@ -37,11 +37,7 @@ import kotlin.math.min
 
 
 object AutoI4: Feature("Fully Automated I4") {
-    private val rotationTime by SliderSetting<Long>("Rotation Time",
-        170,
-        0,
-        250,
-        1).withDescription("Time (ms) to interpolate rotations when aiming at dev block targets. &eSet to 0 to disable the auto rotation.")
+    private val rotationTime by SliderSetting<Long>("Rotation Time", 170, 0, 250, 1).withDescription("Time (ms) to interpolate rotations when aiming at dev block targets. &eSet to 0 to disable the auto rotation.")
     private val predictSetting by ToggleSetting("Predictions", true).withDescription("Enables prediction logic to aim at the next target block.")
 
     private val rodSetting by ToggleSetting("Auto Rod", true)

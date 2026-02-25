@@ -109,3 +109,4 @@ object I4Helper: Feature(name = "I4 Helper") {
         return abs(playerPos.y - 127.0) < 0.5 && playerPos.x in 62.0 .. 65.0 && playerPos.z in 34.0 .. 37.0
     }
 }
+

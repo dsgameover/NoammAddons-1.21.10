@@ -2,7 +2,7 @@ package com.github.noamm9.utils
 
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.event.EventBus.register
-import com.github.noamm9.event.impl.ContainerEvent
+import com.github.noamm9.event.impl.ContainerFullyOpenedEvent
 import com.github.noamm9.features.impl.dungeon.LeapMenu
 import com.github.noamm9.mixin.IKeyMapping
 import com.github.noamm9.ui.utils.Animation.Companion.easeInOutCubic
@@ -210,13 +210,13 @@ object PlayerUtils {
     }
 
     init {
-        register<ContainerEvent.Open> {
-            val title = event.screen.title.unformattedText
+        register<ContainerFullyOpenedEvent> {
+            val title = event.title.unformattedText
 
             when {
                 title.equals("your equipment and stats", true) -> {
                     if (awaiting4EQ.isBlank()) return@register
-                    if (! event.screen.title.unformattedText.equals("your equipment and stats", true)) return@register
+                    if (! event.title.unformattedText.equals("your equipment and stats", true)) return@register
 
                     ThreadUtils.scheduledTask(7) {
                         val con = mc.player?.containerMenu?.slots ?: return@scheduledTask
@@ -245,7 +245,6 @@ object PlayerUtils {
                     }
                 }
             }
-
         }
     }
 }

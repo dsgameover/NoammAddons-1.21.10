@@ -87,60 +87,58 @@ object MapRenderer: HudElement() {
     private fun renderRooms(ctx: GuiGraphics) {
         val connectorSize = (HotbarMapColorParser.quarterRoom.takeUnless { it == - 1 } ?: 4)
 
-        for (y in 0 .. 10) {
-            for (x in 0 .. 10) {
-                val tile = DungeonInfo.dungeonList[y * 11 + x]
-                if (tile is Unknown) continue
-                if (tile.state == RoomState.UNDISCOVERED && ! MapConfig.dungeonMapCheater.value) continue
-                if (tile is Door && getDoorState(y, x) == RoomState.UNDISCOVERED && ! MapConfig.dungeonMapCheater.value) continue
+        for (y in 0 .. 10) for (x in 0 .. 10) {
+            val tile = DungeonInfo.dungeonList[y * 11 + x]
+            if (tile is Unknown) continue
+            if (tile.state == RoomState.UNDISCOVERED && ! MapConfig.dungeonMapCheater.value) continue
+            if (tile is Door && getDoorState(y, x) == RoomState.UNDISCOVERED && ! MapConfig.dungeonMapCheater.value) continue
 
-                var color = tile.color
+            var color = tile.color
 
-                if (tile is Room && tile.uniqueRoom?.hasMimic == true && MapConfig.highlightMimicRoom.value) {
-                    color = MathUtils.lerpColor(color, MapConfig.colorMimic.value, 0.2)
-                }
+            if (tile is Room && tile.uniqueRoom?.hasMimic == true && MapConfig.highlightMimicRoom.value) {
+                color = MathUtils.lerpColor(color, MapConfig.colorMimic.value, 0.2)
+            }
 
-                val xOffset = (x shr 1) * (MapUtils.mapRoomSize + connectorSize)
-                val yOffset = (y shr 1) * (MapUtils.mapRoomSize + connectorSize)
+            val xOffset = (x shr 1) * (MapUtils.mapRoomSize + connectorSize)
+            val yOffset = (y shr 1) * (MapUtils.mapRoomSize + connectorSize)
 
-                val xEven = x and 1 == 0
-                val yEven = y and 1 == 0
+            val xEven = x and 1 == 0
+            val yEven = y and 1 == 0
 
-                when {
-                    xEven && yEven -> if (tile is Room) {
-                        Render2D.drawRect(
-                            ctx,
-                            xOffset, yOffset,
-                            MapUtils.mapRoomSize,
-                            MapUtils.mapRoomSize,
-                            color
-                        )
-                    }
-
-                    ! xEven && ! yEven -> {
-                        Render2D.drawRect(
-                            ctx,
-                            xOffset, yOffset,
-                            MapUtils.mapRoomSize + connectorSize,
-                            MapUtils.mapRoomSize + connectorSize,
-                            color
-                        )
-                    }
-
-                    else -> drawRoomConnector(
-                        ctx, xOffset, yOffset, connectorSize, tile is Door, ! xEven, color
+            when {
+                xEven && yEven -> if (tile is Room) {
+                    Render2D.drawRect(
+                        ctx,
+                        xOffset, yOffset,
+                        MapUtils.mapRoomSize,
+                        MapUtils.mapRoomSize,
+                        color
                     )
                 }
 
-                if (tile is Room && tile.core == 0) {
-                    val checkmarkSize = MapConfig.checkmarkSize.value * 10
-                    drawCheckmark(
-                        ctx, tile,
-                        xOffset + MapUtils.mapRoomSize / 2 - checkmarkSize / 2,
-                        yOffset + MapUtils.mapRoomSize / 2 - checkmarkSize / 2,
-                        checkmarkSize,
+                ! xEven && ! yEven -> {
+                    Render2D.drawRect(
+                        ctx,
+                        xOffset, yOffset,
+                        MapUtils.mapRoomSize + connectorSize,
+                        MapUtils.mapRoomSize + connectorSize,
+                        color
                     )
                 }
+
+                else -> drawRoomConnector(
+                    ctx, xOffset, yOffset, connectorSize, tile is Door, ! xEven, color
+                )
+            }
+
+            if (tile is Room && tile.core == 0) {
+                val checkmarkSize = MapConfig.checkmarkSize.value * 10
+                drawCheckmark(
+                    ctx, tile,
+                    xOffset + MapUtils.mapRoomSize / 2 - checkmarkSize / 2,
+                    yOffset + MapUtils.mapRoomSize / 2 - checkmarkSize / 2,
+                    checkmarkSize,
+                )
             }
         }
     }
