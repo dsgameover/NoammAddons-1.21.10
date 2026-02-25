@@ -1,8 +1,8 @@
-package com.github.noamm9.ui.clickgui.componnents
+package com.github.noamm9.ui.clickgui.components
 
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.impl.CategorySetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SeparatorSetting
+import com.github.noamm9.ui.clickgui.components.impl.CategorySetting
+import com.github.noamm9.ui.clickgui.components.impl.SeparatorSetting
 import net.minecraft.client.gui.GuiGraphics
 import kotlin.reflect.KProperty
 

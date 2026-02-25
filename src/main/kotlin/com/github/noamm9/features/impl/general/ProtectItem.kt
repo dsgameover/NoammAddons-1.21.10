@@ -5,10 +5,10 @@ import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.event.impl.KeyboardEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.mixin.IKeyMapping
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.nodification.NotificationManager
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.notification.NotificationManager
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.unformattedText

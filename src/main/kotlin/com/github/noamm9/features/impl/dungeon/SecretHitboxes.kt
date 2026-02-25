@@ -1,10 +1,10 @@
 package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction

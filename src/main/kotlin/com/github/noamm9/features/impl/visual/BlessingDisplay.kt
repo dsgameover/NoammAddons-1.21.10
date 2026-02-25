@@ -1,12 +1,12 @@
 package com.github.noamm9.features.impl.visual
 
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.section
-import com.github.noamm9.ui.clickgui.componnents.showIf
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.section
+import com.github.noamm9.ui.clickgui.components.showIf
 import com.github.noamm9.ui.hud.getValue
 import com.github.noamm9.ui.hud.provideDelegate
 import com.github.noamm9.utils.dungeons.enums.Blessing
@@ -15,7 +15,7 @@ import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.ChatFormatting
 import java.awt.Color
 
-object BlessingDisplay: Feature("Displays the current active blessings of the dungeon") {
+object BlessingDisplay: Feature("Displays the current active blessings in the dungeon.") {
     private val power by ToggleSetting("Power Blessing", true).section("Blessings")
     private val time by ToggleSetting("Time Blessing", true)
     private val wisdom by ToggleSetting("Wisdom Blessing", false)

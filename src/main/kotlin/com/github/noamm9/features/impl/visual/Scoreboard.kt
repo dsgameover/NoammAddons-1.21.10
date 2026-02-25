@@ -4,28 +4,25 @@ import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.features.impl.dev.ClickGui
 import com.github.noamm9.mixin.IPlayerTabOverlay
-import com.github.noamm9.ui.clickgui.componnents.Style
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.Style
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.ui.hud.HudElement
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
-import net.minecraft.network.protocol.game.ClientboundResetScorePacket
-import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket
-import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
-import net.minecraft.network.protocol.game.ClientboundSetScorePacket
+import net.minecraft.network.protocol.game.*
 import net.minecraft.world.scores.DisplaySlot
 import net.minecraft.world.scores.Objective
 import net.minecraft.world.scores.PlayerTeam
 import java.awt.Color
 import net.minecraft.world.scores.Scoreboard as MCScoreboard
 
-object Scoreboard: Feature("draws a custom scoreboard instead of the vanilla one.") {
+object Scoreboard: Feature("Draws a custom scoreboard instead of the vanilla one.") {
     private val hideServerId by ToggleSetting("Hide Server ID").withDescription("Hides the 'm151AM' text from the scoreboard")
 
     private var needsUpdate = true
@@ -99,7 +96,8 @@ object Scoreboard: Feature("draws a custom scoreboard instead of the vanilla one
         register<MainThreadPacketReceivedEvent.Post> {
             if (
                 event.packet is ClientboundSetScorePacket || event.packet is ClientboundSetObjectivePacket ||
-                event.packet is ClientboundSetDisplayObjectivePacket || event.packet is ClientboundResetScorePacket
+                event.packet is ClientboundSetDisplayObjectivePacket || event.packet is ClientboundResetScorePacket ||
+                event.packet is ClientboundSetPlayerTeamPacket
             ) {
                 needsUpdate = true
             }

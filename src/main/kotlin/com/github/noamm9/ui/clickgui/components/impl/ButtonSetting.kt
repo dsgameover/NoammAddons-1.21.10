@@ -1,7 +1,7 @@
-package com.github.noamm9.ui.clickgui.componnents.impl
+package com.github.noamm9.ui.clickgui.components.impl
 
-import com.github.noamm9.ui.clickgui.componnents.Setting
-import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.clickgui.components.Setting
+import com.github.noamm9.ui.clickgui.components.Style
 import com.github.noamm9.ui.utils.Animation
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.render.Render2D

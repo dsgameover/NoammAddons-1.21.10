@@ -1,7 +1,7 @@
-package com.github.noamm9.ui.nodification
+package com.github.noamm9.ui.notification
 
 import com.github.noamm9.NoammAddons.mc
-import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.clickgui.components.Style
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics

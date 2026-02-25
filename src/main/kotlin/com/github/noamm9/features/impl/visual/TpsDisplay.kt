@@ -1,9 +1,9 @@
 package com.github.noamm9.features.impl.visual
 
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.ServerUtils
 import com.github.noamm9.utils.render.Render2D
@@ -12,7 +12,7 @@ import com.github.noamm9.utils.render.Render2D.width
 import java.awt.Color
 
 
-object TpsDisplay: Feature("Displays the Server's Ticks Per Second on screen.") {
+object TpsDisplay: Feature("Displays the Server's Ticks Per Second (TPS) on screen.") {
     private val color by ColorSetting("Color", Color(0, 114, 255), false)
 
     private val tpsDisplayHud = hudElement("TpsDisplay") { ctx, example ->

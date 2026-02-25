@@ -5,8 +5,8 @@ import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.event.impl.CheckEntityRenderEvent
 import com.github.noamm9.event.impl.ScreenEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.*
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.*
 import com.github.noamm9.ui.utils.Resolution
 import com.github.noamm9.utils.ButtonType
 import com.github.noamm9.utils.ChatUtils

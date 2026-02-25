@@ -12,7 +12,7 @@ import net.minecraft.world.entity.EquipmentSlot
 import java.awt.Color
 import kotlin.math.roundToInt
 
-object SpringBoots: Feature("Shows the spring boots charge progress on screen") {
+object SpringBoots: Feature("Shows the spring boots charge progress on screen.") {
     private var progress = 0
 
     private val pitchList = listOf(

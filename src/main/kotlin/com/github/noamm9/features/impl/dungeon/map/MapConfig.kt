@@ -1,12 +1,12 @@
 package com.github.noamm9.features.impl.dungeon.map
 
-import com.github.noamm9.ui.clickgui.componnents.Setting
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.DropdownSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.section
-import com.github.noamm9.ui.clickgui.componnents.showIf
+import com.github.noamm9.ui.clickgui.components.Setting
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.DropdownSetting
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.section
+import com.github.noamm9.ui.clickgui.components.showIf
 import java.awt.Color
 
 object MapConfig {
@@ -31,7 +31,7 @@ object MapConfig {
     val centerStyle = ToggleSetting("Center Checkmark", true)
     val hideQuestionCheckmarks = ToggleSetting("Hide Unknown Room Checkmark", false).showIf { dungeonMapCheckmarkStyle.value == 0 }
     val limitRoomNameSize = ToggleSetting("Limit Room Name Size", true).showIf { dungeonMapCheckmarkStyle.value == 2 || dungeonMapCheckmarkStyle.value == 3 }
-    val highlightMimicRoom = ToggleSetting("Hightlight Mimic Room", true)
+    val highlightMimicRoom = ToggleSetting("Highlight Mimic Room", true)
 
     val mapPlayerHeadColor = ColorSetting("Head Border", Color(0, 0, 0), true).section("Colors")
     val mapPlayerHeadColorClassBased = ToggleSetting("Head Border Class Base", false)

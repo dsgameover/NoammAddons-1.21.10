@@ -2,9 +2,9 @@ package com.github.noamm9.features.impl.visual
 
 import com.github.noamm9.event.impl.ActionBarMessageEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.MultiCheckboxSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.MultiCheckboxSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.ui.hud.getValue
 import com.github.noamm9.ui.hud.provideDelegate
 import com.github.noamm9.utils.ActionBarParser
@@ -25,9 +25,9 @@ object PlayerHud: Feature(name = "Player HUD", description = "Displays your stat
         "Dungeon Room Secrets" to false
     ))
 
-    val hideFoodbar by ToggleSetting("Hide Food bar").withDescription("Hides the foodbar.").section("Extras")
-    val hideHealthbar by ToggleSetting("Hide Health bar").withDescription("Hides the healthbar.")
-    val hideArmorbar by ToggleSetting("Hide Armor bar").withDescription("Hides the defensebar.").hideIf { hideHealthbar.value }
+    val hideFoodbar by ToggleSetting("Hide Food bar").withDescription("Hides the food bar.").section("Extras")
+    val hideHealthbar by ToggleSetting("Hide Health bar").withDescription("Hides the health bar.")
+    val hideArmorbar by ToggleSetting("Hide Armor bar").withDescription("Hides the defense bar.").hideIf { hideHealthbar.value }
 
     val healthDisplay by hudElement(
         this.name + " Health",

@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.entity.SignBlockEntity
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
 
-object AuctionPriceInput: Feature("replaces the sign input with a proper textbox and undercut mode") {
+object AuctionPriceInput: Feature("Replaces the sign input with a proper textbox and undercut mode.") {
     private var stack: ItemStack? = null
     private var input = ""
     private var undercut = true

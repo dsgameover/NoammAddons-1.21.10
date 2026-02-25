@@ -2,11 +2,11 @@ package com.github.noamm9.features.impl.general
 
 import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.ColorUtils.mcColor
 import com.github.noamm9.utils.DataDownloader
 import com.github.noamm9.utils.NumbersUtils.romanToDecimal
@@ -19,12 +19,13 @@ import net.minecraft.network.chat.TextColor
 import java.awt.Color
 import java.util.regex.Pattern
 
-object EnchantColors: Feature() {
+object EnchantColors: Feature("Changes the color of enchantments in items lore.") {
     private val showNumbers by ToggleSetting("Levels as Numbers").withDescription("Show levels as numbers instead of roman numerals")
     private val maxLevelColor by ColorSetting("Max Level Color", Color(255, 170, 0), false)
     private val highLevelColor by ColorSetting("High Level Color", Color(255, 170, 0), false)
     private val normalLevelColor by ColorSetting("Normal Level Color", Color(0, 170, 170), false)
     private val badLevelColor by ColorSetting("Bad Level Color", Color(170, 170, 170), false)
+    private val boldMaxLevel by ToggleSetting("Bold Max Level", true).withDescription("Make max level bold")
 
     private val ENCHANTMENT_PATTERN = Pattern.compile("(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?=, |$| [\\d,]+$)")
 
@@ -120,7 +121,7 @@ object EnchantColors: Feature() {
                     else -> badLevelColor.value.mcColor
                 }
 
-                Style.EMPTY.withColor(color).withBold(level >= maxLevel)
+                Style.EMPTY.withColor(color).withBold(level >= maxLevel && boldMaxLevel.value)
             }
         }
     }

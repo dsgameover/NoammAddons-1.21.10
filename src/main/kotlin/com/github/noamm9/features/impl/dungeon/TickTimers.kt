@@ -2,11 +2,11 @@ package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.event.impl.*
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.DropdownSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.section
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.DropdownSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.section
 import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.location.LocationUtils
@@ -14,12 +14,12 @@ import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 
-object TickTimers: Feature("Shows various types of server tick timers for F7 boss fight") {
+object TickTimers: Feature("Shows various types of server tick timers for F7 boss fight.") {
     private val showPrefix by ToggleSetting("Prefix", true).section("Settings")
     private val showSuffix by ToggleSetting("Suffix", true)
     private val format by DropdownSetting("Format", 0, listOf("Seconds", "Ticks"))
 
-    private val deathTickTimer by ToggleSetting("0s DeathTick").section("clear")
+    private val deathTickTimer by ToggleSetting("0s Death Tick").section("clear")
     private val secretTickTimer by ToggleSetting("SecretTick")
 
     private val p1 by ToggleSetting("Maxor Start").section("F7")

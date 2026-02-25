@@ -3,8 +3,8 @@ package com.github.noamm9.features.impl.dungeon.map
 import com.github.noamm9.event.impl.*
 import com.github.noamm9.features.Feature
 import com.github.noamm9.features.annotations.AlwaysActive
-import com.github.noamm9.ui.clickgui.componnents.impl.CategorySetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SeparatorSetting
+import com.github.noamm9.ui.clickgui.components.impl.CategorySetting
+import com.github.noamm9.ui.clickgui.components.impl.SeparatorSetting
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.PlayerUtils
 import com.github.noamm9.utils.dungeons.DungeonListener

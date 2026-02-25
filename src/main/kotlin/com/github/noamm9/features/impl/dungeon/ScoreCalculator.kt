@@ -2,9 +2,9 @@ package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.event.impl.DungeonEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.TextInputSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.TextInputSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.ui.hud.getValue
 import com.github.noamm9.ui.hud.provideDelegate
 import com.github.noamm9.utils.ChatUtils
@@ -16,7 +16,7 @@ import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.sounds.SoundEvents
 
-object ScoreCalculator: Feature("Shows the score of the dungeon run") {
+object ScoreCalculator: Feature("Shows the score of the dungeon run.") {
     val forcePaul by ToggleSetting("Force Paul")
     private val hudElement by ToggleSetting("HUD Element")
     val sendMimic by ToggleSetting("Send Mimic Message")

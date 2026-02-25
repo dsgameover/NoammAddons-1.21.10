@@ -3,9 +3,9 @@ package com.github.noamm9.features.impl.visual
 import com.github.noamm9.event.impl.CheckEntityRenderEvent
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.items.ItemUtils
@@ -30,7 +30,7 @@ object RenderOptimizer: Feature("Optimize Rendering by hiding useless shit.") {
     private val hideSoulWeaver by ToggleSetting("Hide Soul Weaver")
     private val hide0HealthNames by ToggleSetting("Hide 0 Health")
     private val hideDeadMobs by ToggleSetting("Hide Dead Mobs")
-    private val hideXpOrbs by ToggleSetting("Hide Xp Orbs")
+    private val hideXpOrbs by ToggleSetting("Hide XP Orbs")
     private val removeTentacles by ToggleSetting("Hide P5 Tentacles")
     private val hideP5p by ToggleSetting("Hide P5 Particles")
     val hideFireOnEntities by ToggleSetting("Hide Fire On Entities")

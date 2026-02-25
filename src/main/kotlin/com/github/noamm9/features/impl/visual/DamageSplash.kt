@@ -2,10 +2,10 @@ package com.github.noamm9.features.impl.visual
 
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.NumbersUtils
@@ -20,8 +20,8 @@ import kotlin.jvm.optionals.getOrNull
 
 object DamageSplash: Feature("Reformat Skyblock's Damage Indicators.") {
     private val uppercase by ToggleSetting("Uppercase Formatting").withDescription("Changes the damage number to uppercase.")
-    private val disableinClear by ToggleSetting("Hide in Clear").withDescription("Hides all damage indicators in dungeon clear")
-    private val disableinBoss by ToggleSetting("Hide in Boss").withDescription("Hides all damage indicators in dungeon boss room")
+    private val disableinClear by ToggleSetting("Hide in Clear").withDescription("Hides all damage indicators in dungeon clear.")
+    private val disableinBoss by ToggleSetting("Hide in Boss").withDescription("Hides all damage indicators in dungeon boss room.")
 
     private val damageRegex = Regex("[✧✯]?(\\d{1,3}(?:,\\d{3})*[⚔+✧❤♞☄✷ﬗ✯]*)")
 

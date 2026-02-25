@@ -6,7 +6,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
-object ArrowFix: Feature("Disables Bow Pullback on ShortBows.") {
+object ArrowFix: Feature("Disables Bow Pullback on Shortbows.") {
     private val bowCache = mutableSetOf<String>()
 
     @JvmStatic

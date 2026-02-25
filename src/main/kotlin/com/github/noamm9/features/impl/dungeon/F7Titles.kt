@@ -3,9 +3,9 @@ package com.github.noamm9.features.impl.dungeon
 import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.impl.*
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.NumbersUtils.toFixed
@@ -18,7 +18,7 @@ import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket
 import net.minecraft.sounds.SoundEvents
 
-object F7Titles: Feature(name = "F7 Titles", description = "Custom Titles for F7 boss fight") {
+object F7Titles: Feature(name = "F7 Titles", description = "Custom Titles for F7 boss fight.") {
     private val crystalTitles by ToggleSetting("Crystal Titles")
     private val witherTitles by ToggleSetting("Wither Titles")
     private val lightningTimer by ToggleSetting("Lightning Timer")
