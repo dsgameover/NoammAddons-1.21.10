@@ -71,10 +71,10 @@ object FeatureManager {
 
     fun createFeatureList(): String {
         val featureList = StringBuilder()
-        for ((category, features) in features.groupBy { it.category }.entries) {
+        for ((category, features) in features.groupBy { it.category }.entries.sortedBy { it.key.ordinal }) {
             featureList.appendLine("Category: ${category.name}")
             for (feature in features.sortedByDescending { it.name.width() }) {
-                featureList.appendLine("- ${feature.name}: ${feature.description}")
+                featureList.appendLine("- ${feature.name}: ${feature.description ?: ""}")
             }
             featureList.appendLine()
         }
