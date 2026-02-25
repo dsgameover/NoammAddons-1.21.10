@@ -94,7 +94,7 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
 
         register<MainThreadPacketReceivedEvent.Post> {
             if (! relicLook.value || LocationUtils.F7Phase != 5) return@register
-            if (event.packet is ClientboundContainerSetSlotPacket) return@register
+            if (event.packet !is ClientboundContainerSetSlotPacket) return@register
             val item = PlayerUtils.getHotbarSlot(8)?.hoverName ?: return@register
             val relic = WitherRelic.fromName(item.unformattedText) ?: return@register
             if (relic == WitherRelic.RED || relic == WitherRelic.ORANGE) scope.launch {
