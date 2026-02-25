@@ -3,7 +3,7 @@ package com.github.noamm9.ui.hud
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.features.Feature
 import com.github.noamm9.features.FeatureManager
-import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.clickgui.components.Style
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color

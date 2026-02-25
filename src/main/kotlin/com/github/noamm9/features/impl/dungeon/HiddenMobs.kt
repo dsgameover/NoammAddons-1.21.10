@@ -2,9 +2,9 @@ package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.event.impl.CheckEntityRenderEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.DataDownloader
 import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.client.player.AbstractClientPlayer
@@ -12,7 +12,7 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.Giant
 
-object HiddenMobs: Feature("Reveals invisible mobs in dungeons") {
+object HiddenMobs: Feature("Reveals invisible mobs in dungeons.") {
     private val watcherMobs by lazy { DataDownloader.loadJson<List<String>>("watcherMobsNames.json") }
 
     private val showFels by ToggleSetting("Show Fels")

@@ -5,11 +5,11 @@ import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.MouseClickEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.interfaces.IChatComponent
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
-import com.github.noamm9.ui.nodification.NotificationManager
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
+import com.github.noamm9.ui.notification.NotificationManager
 import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.DataDownloader

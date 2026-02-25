@@ -1,15 +1,15 @@
 package com.github.noamm9.features.impl.visual
 
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.height
 import com.github.noamm9.utils.render.Render2D.width
 import java.awt.Color
 
-object FpsDisplay: Feature("Displays the game's fps on screen.") {
+object FpsDisplay: Feature("Displays the game's FPS on screen.") {
     private val color by ColorSetting("Color", Color(230, 114, 230), false)
 
     private val fpsDisplayHud = hudElement("FpsDisplay") { ctx, _ ->

@@ -13,7 +13,7 @@ import net.minecraft.world.item.context.BlockPlaceContext
 /**
  * @see com.github.noamm9.mixin.MixinBlockItem
  */
-object NoItemPlace: Feature("Stops you from placing skull blocks/Items") {
+object NoItemPlace: Feature("Stops you from placing skull blocks/items.") {
 
     @JvmStatic
     fun placeHook(context: BlockPlaceContext): Boolean {

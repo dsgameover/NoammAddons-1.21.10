@@ -3,14 +3,14 @@ package com.github.noamm9.features.impl.misc
 import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.mixin.IAbstractContainerScreen
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import org.lwjgl.glfw.GLFW
 
 
-object ScrollableTooltip: Feature("allows you to scroll through long tooltips") {
+object ScrollableTooltip: Feature("Allows you to scroll through long tooltips.") {
     val scale by SliderSetting("Tooltip Scale", 100, 30, 150, 0.1).withDescription("how fast the tooltip scrolls")
     private val scrollSpeed by SliderSetting("Scroll Speed", 3, 1, 10, 1).withDescription("how fast the tooltip scrolls")
     private val scaleSpeed by SliderSetting("Scale Speed", 3, 1, 10, 1).withDescription("how fast the tooltip scales")

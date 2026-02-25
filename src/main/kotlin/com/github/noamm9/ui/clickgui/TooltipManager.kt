@@ -1,7 +1,7 @@
 package com.github.noamm9.ui.clickgui
 
 import com.github.noamm9.NoammAddons.mc
-import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.clickgui.components.Style
 import com.github.noamm9.utils.ChatUtils.addColor
 import com.github.noamm9.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics

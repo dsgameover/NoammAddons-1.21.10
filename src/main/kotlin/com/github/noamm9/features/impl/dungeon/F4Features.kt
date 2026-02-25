@@ -5,12 +5,12 @@ import com.github.noamm9.event.impl.CheckEntityGlowEvent
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.section
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.section
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.dungeons.DungeonListener
@@ -26,11 +26,11 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
 
-object F4Features: Feature(name = "F4 Features", description = "Spirit bear spawn timer, highlights, and more") {
+object F4Features: Feature(name = "F4 Features", description = "Spirit bear spawn timer, highlights, and more.") {
     private val espThorn by ToggleSetting("ESP Thorn", true).section("Toggles")
     private val espSpiritBow by ToggleSetting("ESP Spirit Bow", true).withDescription("Highlights the Spirit Bow")
     private val espSpiritBear by ToggleSetting("ESP Spirit Bear", true).withDescription("Highlights the Spirit Bear")
-    private val spiritBearHud by ToggleSetting("Spirit Bear Hud", true).withDescription("Shows the required mobs to spawn the Spirit Bear and a spawn timer for when he's about to spawn")
+    private val spiritBearHud by ToggleSetting("Spirit Bear HUD", true).withDescription("Shows the required mobs to spawn the Spirit Bear and a spawn timer for when he's about to spawn.")
 
     private val espThornColor by ColorSetting("Thorn Color", Color(255, 0, 0, 50)).section("Colors")
     private val espSpiritBearColor by ColorSetting("Bear Color", Color(255, 0, 255, 50))

@@ -5,9 +5,9 @@ import com.github.noamm9.event.impl.EntityDeathEvent
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.removeFormatting
 import com.github.noamm9.utils.ChatUtils.unformattedText
@@ -25,7 +25,7 @@ import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.player.Player
 import java.awt.Color
 
-object StarMobEsp: Feature("Hightlights all starred mobs in a dungeon.") {
+object StarMobESP: Feature("Highlights all starred mobs in a dungeon.") {
     private val dungeonMobRegex = Regex("^.+❤$")
 
     private val starMobs = HashSet<Int>()

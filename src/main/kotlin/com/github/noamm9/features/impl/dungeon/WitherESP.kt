@@ -4,9 +4,9 @@ import com.github.noamm9.event.impl.CheckEntityGlowEvent
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.location.LocationUtils
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
@@ -21,7 +21,7 @@ import java.awt.Color
      Necron: isPowered: true, invulnerableTicks: 1
      Vanquisher: isPowered: false/true, invulnerableTicks: 250
 */
-object WitherESP: Feature("Highlights all Withers in F7") {
+object WitherESP: Feature("Highlights all Withers in F7.") {
     private val color by ColorSetting("Highlight Color", Color.WHITE, false)
 
     var currentWither: WitherBoss? = null

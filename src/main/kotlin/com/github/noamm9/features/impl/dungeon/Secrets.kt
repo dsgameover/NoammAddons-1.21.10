@@ -4,8 +4,8 @@ import com.github.noamm9.event.impl.DungeonEvent
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.RenderWorldEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.*
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.*
 import com.github.noamm9.ui.hud.getValue
 import com.github.noamm9.ui.hud.provideDelegate
 import com.github.noamm9.utils.ActionBarParser
@@ -29,11 +29,11 @@ import java.util.concurrent.CopyOnWriteArraySet
 
 object Secrets: Feature() {
     private val hudDisplay by ToggleSetting("Secret HUD", true)
-        .withDescription("Dispalys the current room's secrets on screen.")
+        .withDescription("Displays the current room's secrets on screen.")
         .section("HUD")
 
     private val closeChest by ToggleSetting("Close Chest").section("Auto")
-        .withDescription("Automatically closes the secret chest for you")
+        .withDescription("Automatically closes the secret chest for you.")
 
     private val secretClicked by ToggleSetting("Highlight Clicked Secret")
         .withDescription("Highlights the block of a secret when you interact with it.")

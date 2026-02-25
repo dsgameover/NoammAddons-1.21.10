@@ -1,4 +1,4 @@
-package com.github.noamm9.ui.clickgui.componnents
+package com.github.noamm9.ui.clickgui.components
 
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.features.impl.dev.ClickGui

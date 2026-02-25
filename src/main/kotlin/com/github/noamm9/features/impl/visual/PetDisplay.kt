@@ -5,9 +5,9 @@ import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.event.impl.ContainerFullyOpenedEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.features.annotations.AlwaysActive
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.removeFormatting
@@ -22,18 +22,18 @@ import java.awt.Color
 
 @AlwaysActive
 object PetDisplay: Feature("Pet Features") {
-    private val petDisplay by ToggleSetting("Pet Display").withDescription("Draws the current active pet on screen").section("HUD")
-    private val autoPetTitles by ToggleSetting("Auto Pet Title").withDescription("Shows a title on screen when you swap pets via autopet rules")
+    private val petDisplay by ToggleSetting("Pet Display").withDescription("Draws the current active pet on screen.").section("HUD")
+    private val autoPetTitles by ToggleSetting("Auto Pet Title").withDescription("Shows a title on screen when you swap pets via autopet rules.")
 
     private val activePetHighlight by ToggleSetting("Highlight Active pet").withDescription("highlights the active pet inside the pet menu").section("Pets Menu")
-    private val petHighlightColor by ColorSetting("Hightlight color", Color.CYAN).showIf { activePetHighlight.value }
+    private val petHighlightColor by ColorSetting("Highlight color", Color.CYAN).showIf { activePetHighlight.value }
 
     private val chatPetRuleRegex = Regex("§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)§e! §a§lVIEW RULE")
     private val chatSpawnRegex = Regex("§aYou summoned your (?<pet>.*)§a!")
     private val chatDespawnRegex = Regex("§aYou despawned your .*§a!")
 
     private val petLevelRegex = Regex(".+\\[Lvl .*]")
-    private var selectedPetSlot = - 1
+    private var selectedPetSlot = -1
 
     override fun init() {
         hudElement("PetDisplay",

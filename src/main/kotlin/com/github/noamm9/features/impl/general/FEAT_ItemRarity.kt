@@ -2,11 +2,11 @@ package com.github.noamm9.features.impl.general
 
 import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.DropdownSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.DropdownSetting
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.items.ItemRarity
 import com.github.noamm9.utils.items.ItemUtils
@@ -16,7 +16,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
 
 
-object FEAT_ItemRarity: Feature(name = "Item Rarity", description = "Draws the rarity of item behind the slot") {
+object FEAT_ItemRarity: Feature(name = "Item Rarity", description = "Draws the rarity of item behind the slot.") {
     val drawOnHotbar by ToggleSetting("Draw on Hotbar", true)
     private val rarityOpacity by SliderSetting("Rarity Opacity", 30f, 10f, 100f, 1f)
     private val style by DropdownSetting("Rarity Style", 0, listOf("Filled", "Outline", "Filled Outline"))

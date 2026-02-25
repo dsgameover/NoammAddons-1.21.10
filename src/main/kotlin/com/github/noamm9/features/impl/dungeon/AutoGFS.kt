@@ -1,18 +1,18 @@
 package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ThreadUtils
 import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.items.ItemUtils.skyblockId
 import com.github.noamm9.utils.location.LocationUtils
 
-object AutoGFS: Feature("Automatically refills dungeon items from your sacks using /gfs.") {
+object AutoGFS: Feature("Automatically refills dungeon items from your sacks using /gfs while in dungeons.") {
     private val delay by SliderSetting("Delay (seconds)", 20.0, 1.0, 60.0, 1.0)
         .withDescription("How often to check for refills.")
 

@@ -3,10 +3,10 @@ package com.github.noamm9.features.impl.general
 import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.mixin.IAbstractContainerScreen
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.KeybindSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.KeybindSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.utils.ChatUtils.modMessage
 import com.github.noamm9.utils.GuiUtils
 import com.github.noamm9.utils.render.Render2D

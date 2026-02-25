@@ -2,7 +2,7 @@ package com.github.noamm9.ui.clickgui
 
 import com.github.noamm9.config.Config
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.clickgui.components.Style
 import com.github.noamm9.ui.utils.Animation
 import com.github.noamm9.ui.utils.Resolution
 import com.github.noamm9.ui.utils.TextInputHandler

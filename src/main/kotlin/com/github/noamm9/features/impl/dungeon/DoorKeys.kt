@@ -4,12 +4,12 @@ import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.RenderWorldEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.section
-import com.github.noamm9.ui.clickgui.componnents.showIf
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.section
+import com.github.noamm9.ui.clickgui.components.showIf
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.MathUtils.add
@@ -21,7 +21,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.awt.Color
 
-object DoorKeys: Feature("ESP box & Tracer for wither doors and blood door") {
+object DoorKeys: Feature("ESP box & Tracer for wither doors and blood door.") {
     private val highlightWither by ToggleSetting("Wither Key").section("Keys")
     private val highlightBlood by ToggleSetting("Blood Key")
     private val witherColor by ColorSetting("Wither Key Color", Color.BLACK.withAlpha(60)).showIf { highlightWither.value }.section("Colors")
