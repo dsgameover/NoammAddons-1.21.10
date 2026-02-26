@@ -105,5 +105,14 @@
   },
   "eaca29a3-ec52-4971-b00d-a6d0aedc9190": {
     "name": "{\"text\":\"\",\"extra\":[{\"text\":\"n\",\"color\":\"#E43A96\"},{\"text\":\"t\",\"color\":\"#E66BAE\"},{\"text\":\"b\",\"color\":\"#EB9AC6\"},{\"text\":\"t\",\"color\":\"#F2C6DE\"}]}"
+  },
+  "4ef4f5a5-e5ad-4d9c-9bfe-435075c4d83b": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"L\",\"color\":\"#FF73F4\"},{\"text\":\"u\",\"color\":\"#E074F7\"},{\"text\":\"n\",\"color\":\"#BB76ED\"},{\"text\":\"a\",\"color\":\"#9C79E3\"},{\"text\":\"c\",\"color\":\"#847DD9\"},{\"text\":\"i\",\"color\":\"#818ECD\"},{\"text\":\"i\",\"color\":\"#7AA4D4\"},{\"text\":\"a\",\"color\":\"#72C3DB\"}]}"
+  },
+  "7976b041-1120-4e57-a5f1-ce9a339240bc": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"S\",\"color\":\"#FF0000\"},{\"text\":\"k\",\"color\":\"#FF1F00\"},{\"text\":\"i\",\"color\":\"#FF3D00\"},{\"text\":\"l\",\"color\":\"#FF5C00\"},{\"text\":\"l\",\"color\":\"#FF7B00\"},{\"text\":\"W\",\"color\":\"#FF9900\"},{\"text\":\"i\",\"color\":\"#FFB800\"},{\"text\":\"p\",\"color\":\"#FFD600\"},{\"text\":\"e\",\"color\":\"#FFF500\"}]}"
+  },
+  "ba510aae-4381-43ad-a277-f4e18c1f9390": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"TvTokyo\",\"color\":\"#5555FF\"}]}"
   }
 }
