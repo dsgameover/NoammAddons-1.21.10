@@ -10,7 +10,6 @@ import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.util.StringUtil
 import org.lwjgl.glfw.GLFW
-import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
 
@@ -18,6 +17,7 @@ import kotlin.math.min
 /**
  * @author Odin
  * @see <a href="https://github.com/odtheking/OdinFabric/blob/c55825af8b8b1080421cf90f61d5a3bdd5e42f14/src/main/kotlin/com/odtheking/odin/utils/ui/TextInputHandler.kt">TextInputHandler</a>
+ * Modified
  */
 class TextInputHandler(
     private val textProvider: () -> String,
@@ -58,7 +58,7 @@ class TextInputHandler(
 
     private var previousMousePos = 0f to 0f
 
-    fun draw(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+    fun draw(context: GuiGraphics, mouseX: Float, mouseY: Float, suffix: String? = null) {
         if (previousMousePos != mouseX to mouseY) mouseDragged(mouseX)
         previousMousePos = mouseX to mouseY
 
@@ -74,20 +74,16 @@ class TextInputHandler(
 
         if (listening) {
             val time = System.currentTimeMillis()
-            if (time - caretBlinkTime < 500)
-                Render2D.drawRect(
-                    context,
-                    x + caretX + 4f - textOffset,
-                    y + 5f,
-                    1,
-                    9,
-                    Color.WHITE
-                )
-            else if (time - caretBlinkTime > 1000)
-                caretBlinkTime = System.currentTimeMillis()
+            if (time - caretBlinkTime < 500) Render2D.drawRect(
+                context,
+                x + caretX + 4f - textOffset,
+                y + height / 3.4,
+                1, 9,
+            )
+            else if (time - caretBlinkTime > 1000) caretBlinkTime = time
         }
 
-        Render2D.drawString(context, text, x + 4f - textOffset, y + height / 2f - 5)
+        Render2D.drawString(context, text + suffix.orEmpty(), x + 4f - textOffset, y + height / 2f - 5)
 
         context.disableScissor()
     }
