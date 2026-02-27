@@ -2,9 +2,9 @@ package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.features.Feature
 import com.github.noamm9.mixin.ILerpingBossEvent
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.location.LocationUtils
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component
 import java.util.*
 import kotlin.math.roundToInt
 
-object BossBarHealth: Feature(name = "BossBar Health", description = "Shows the health number of the bossbar boss") {
+object BossBarHealth: Feature(name = "Bossbar Health", description = "Shows the health number of the bossbar boss.") {
     private val theWatcher by ToggleSetting("The Watcher", true)
     private val f4Thorn by ToggleSetting("Thorn", true)
     private val f7Withers by ToggleSetting("F7 Withers", true)

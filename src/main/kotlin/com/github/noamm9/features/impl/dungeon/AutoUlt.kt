@@ -8,7 +8,7 @@ import com.github.noamm9.utils.dungeons.DungeonListener
 import com.github.noamm9.utils.dungeons.enums.DungeonClass
 import com.github.noamm9.utils.location.LocationUtils
 
-object AutoUlt: Feature("Automatically uses your dungeon class ultimate when needed") {
+object AutoUlt: Feature("Automatically uses your dungeon class ultimate when needed.") {
     private class UltMessage(val msg: String, val classes: List<DungeonClass>, val floor: Int)
 
     private val UltMessages = listOf(

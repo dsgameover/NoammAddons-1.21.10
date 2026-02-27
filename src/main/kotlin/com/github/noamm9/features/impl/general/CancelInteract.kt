@@ -5,7 +5,7 @@ import com.github.noamm9.features.Feature
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
 import net.minecraft.world.item.Items
 
-object CancelInteract: Feature("Disables Hypixel's stupid Ender Pearls throw block when you are looking at a wall/floor/ceiling.") {
+object CancelInteract: Feature("Disables Hypixel's stupid Ender Pearl throw block when you are looking at a wall/floor/ceiling.") {
     override fun init() {
         register<PacketEvent.Sent> {
             if (event.packet !is ServerboundUseItemOnPacket) return@register

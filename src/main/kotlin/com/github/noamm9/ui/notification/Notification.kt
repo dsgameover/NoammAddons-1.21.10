@@ -1,4 +1,4 @@
-package com.github.noamm9.ui.nodification
+package com.github.noamm9.ui.notification
 
 import com.github.noamm9.NoammAddons.mc
 import com.github.noamm9.ui.utils.Animation

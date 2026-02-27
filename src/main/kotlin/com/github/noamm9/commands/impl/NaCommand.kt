@@ -22,14 +22,14 @@ import net.minecraft.network.chat.Component
 
 object NaCommand: BaseCommand("na") {
     private val commands = mapOf(
-        "/na" to "config gui",
+        "/na" to "Config GUI",
         "/na hud" to "HUD editor",
-        "/na discord" to "opens the link to the discord server",
-        "/na debug" to "debug flags",
-        "/na sim" to "simulate chat message",
-        "/na leaporder" to "configure custom leap sorting",
-        "/na swapmask" to "equips either bonzo mask or spirit mask",
-        "/na ping" to "Shows ur ping in chat",
+        "/na discord" to "Opens the link to the Discord server",
+        "/na debug" to "Debug flags",
+        "/na sim" to "Simulate chat message",
+        "/na leaporder" to "Configure custom leap sorting",
+        "/na swapmask" to "Equips either Bonzo Mask or Spirit Mask",
+        "/na ping" to "Shows your ping in chat",
         "/na leap <class>" to "Automatically leaps to the selected class"
     )
 

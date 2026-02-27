@@ -3,8 +3,8 @@ package com.github.noamm9.features.impl.dungeon
 import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.event.impl.ContainerFullyOpenedEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.utils.ChatUtils.addColor
 import com.github.noamm9.utils.ChatUtils.formattedText
 import com.github.noamm9.utils.ChatUtils.removeFormatting
@@ -17,7 +17,6 @@ import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.Utils.remove
 import com.github.noamm9.utils.items.ItemUtils.lore
 import com.github.noamm9.utils.network.ApiUtils
-import com.github.noamm9.utils.network.ProfileUtils
 import com.github.noamm9.utils.network.cache.ProfileCache
 import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
@@ -167,7 +166,7 @@ object PartyFinder: Feature() {
 
                 scope.launch {
                     try {
-                        ProfileUtils.getProfile(key).getOrNull()
+                        //ProfileUtils.getProfile(key).getOrNull() todo api
                     }
                     catch (e: Exception) {
                         e.printStackTrace()

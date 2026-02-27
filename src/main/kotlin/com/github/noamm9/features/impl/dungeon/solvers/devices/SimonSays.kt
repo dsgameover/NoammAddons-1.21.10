@@ -4,10 +4,10 @@ import com.github.noamm9.NoammAddons
 import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.impl.*
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.*
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.*
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.PlayerUtils
 import com.github.noamm9.utils.ThreadUtils
@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.Blocks
 import java.awt.Color
 
 object SimonSays: Feature("Simon Says Solver") {
-    private val ssSkip by ToggleSetting("SS skip Compatibility").withDescription("Always assume at the start that u perfectly ss skip").section("Options")
+    private val ssSkip by ToggleSetting("SS skip Compatibility").withDescription("Always assume at the start that you perfectly SS skip").section("Options")
     private val blockWrongClicks by ToggleSetting("Block Wrong Clicks").withDescription("Blocks clicks if you aren't looking at the correct button. &eSneak to override.")
 
     private val color1 by ColorSetting("First Color", Color.GREEN).withDescription("Color of the first button.").section("Colors")
@@ -41,9 +41,9 @@ object SimonSays: Feature("Simon Says Solver") {
 
     private val alertsEnabled by ToggleSetting("Alerts Enabled", true).section("Alerts")
     private val sendChat by ToggleSetting("SS Break Alert", true).showIf { alertsEnabled.value }.withDescription("Sends in party chat when the device got reset")
-    private val sendRestartChat by ToggleSetting("Send Restart Chat", true).showIf { alertsEnabled.value }.withDescription("Sends a message in party chat when u restarted the device")
+    private val sendRestartChat by ToggleSetting("Send Restart Chat", true).showIf { alertsEnabled.value }.withDescription("Sends a message in party chat when you restart the device")
     private val alertSound by ToggleSetting("Alert Sound", true).showIf { alertsEnabled.value }.withDescription("Plays a sound when the device fails")
-    private val showTitle by ToggleSetting("Show Title", true).showIf { alertsEnabled.value }.withDescription("Shows a Title when the device fails")
+    private val showTitle by ToggleSetting("Show Title", true).showIf { alertsEnabled.value }.withDescription("Shows a title when the device fails")
 
     private val solution = ArrayList<BlockPos>()
     private var lastExisted = false

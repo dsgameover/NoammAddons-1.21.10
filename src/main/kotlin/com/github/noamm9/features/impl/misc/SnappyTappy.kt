@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.minecraft.client.KeyMapping
 import org.lwjgl.glfw.GLFW
 
-object SnappyTappy: Feature("Prevents standing still when pressing opposing direction keys") {
+object SnappyTappy: Feature("Prevents standing still when pressing opposing direction keys.") {
     private val pressTicks = mutableMapOf<KeyMapping, Long>()
     private val movementKeys by lazy {
         listOf(mc.options.keyLeft, mc.options.keyRight, mc.options.keyUp, mc.options.keyDown)

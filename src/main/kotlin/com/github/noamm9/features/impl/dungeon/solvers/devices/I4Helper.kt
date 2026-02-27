@@ -2,11 +2,11 @@ package com.github.noamm9.features.impl.dungeon.solvers.devices
 
 import com.github.noamm9.event.impl.*
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ColorUtils.withAlpha
 import com.github.noamm9.utils.location.LocationUtils
@@ -20,10 +20,10 @@ import kotlin.math.abs
 
 object I4Helper: Feature(name = "I4 Helper") {
     private val targetColor by ColorSetting("Target Color", Color.GREEN.withAlpha(127)).withDescription("Color of the target position.")
-    private val doneColor by ColorSetting("Complate Color", Color.RED).withDescription("Color of a complate position.")
+    private val doneColor by ColorSetting("Complete Color", Color.RED).withDescription("Color of a complete position.")
 
-    private val showPrediction by ToggleSetting("Show Prediction", true).withDescription("Highlights the next block to shoot at")
-    private val predictionColor by ColorSetting("Prediction Color", Color.YELLOW).withDescription("Color of the prediction")
+    private val showPrediction by ToggleSetting("Show Prediction", true).withDescription("Highlights the next block to shoot at.")
+    private val predictionColor by ColorSetting("Prediction Color", Color.YELLOW).withDescription("Color of the prediction.")
 
     val DEVICE_DONE_REGEX = Regex("^(\\w{3,16}) completed a device! \\(\\d/\\d\\)$")
 

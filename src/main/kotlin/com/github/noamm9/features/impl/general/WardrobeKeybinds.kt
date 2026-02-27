@@ -5,11 +5,11 @@ import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.PacketEvent
 import com.github.noamm9.features.Feature
 import com.github.noamm9.mixin.IKeyMapping
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.hideIf
-import com.github.noamm9.ui.clickgui.componnents.impl.KeybindSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.hideIf
+import com.github.noamm9.ui.clickgui.components.impl.KeybindSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.ButtonType
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.GuiUtils
@@ -23,7 +23,7 @@ import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 
 
-object WardrobeKeybinds: Feature("Make it possible to bind armor slots to your keyboard") {
+object WardrobeKeybinds: Feature("Make it possible to bind armor slots to your keyboard.") {
     private val wardrobeMenuRegex = Regex("^Wardrobe \\(\\d/\\d\\)$")
     private var lastClick = System.currentTimeMillis()
     private var inWardrobeMenu = false

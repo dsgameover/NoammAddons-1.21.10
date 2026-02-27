@@ -4,12 +4,12 @@ import com.github.noamm9.event.EventBus
 import com.github.noamm9.event.impl.ChatMessageEvent
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.TextInputSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.TextInputSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.ui.hud.getValue
 import com.github.noamm9.ui.hud.provideDelegate
 import com.github.noamm9.utils.Utils.containsOneOf
@@ -19,11 +19,11 @@ import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.sounds.SoundEvents
 
-object MelodyDisplay: Feature("Displays the current progress someone for melody on screen") {
+object MelodyDisplay: Feature("Displays the current progress someone for melody on screen.") {
     private val melodyFormat by TextInputSetting("Format", "{name} has {progress} melody")
         .withDescription("replaces {name} with the player name and {progress} to the melody progress. &bSupports code codes (&a &e etc..)")
     private val alertDuration by SliderSetting("Alert Duration", 2.5f, 0f, 5f, 0.1f)
-    private val soundEnabled by ToggleSetting("Play sound", true).withDescription("should it play a sound when someone gets melody?")
+    private val soundEnabled by ToggleSetting("Play sound", true).withDescription("Should it play a sound when someone gets melody?")
     private val sound = createSoundSettings("Sound", SoundEvents.EXPERIENCE_ORB_PICKUP) { soundEnabled.value }
 
     private data class MelodyState(val name: String, val progress: Int, val timestamp: Long)

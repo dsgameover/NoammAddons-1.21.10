@@ -3,21 +3,21 @@ package com.github.noamm9.features.impl.visual
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ColorSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ColorSetting
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.location.LocationUtils
 import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.height
 import com.github.noamm9.utils.render.Render2D.width
 import java.awt.Color
 
-object FreezeDisplay: Feature("Shows how long the server froze after a chosen threshold") {
+object FreezeDisplay: Feature("Shows how long the server froze after a chosen threshold.") {
     private val color by ColorSetting("Color", Color(245, 73, 39), false)
     private val threshold by SliderSetting("Threshold", 500, 100, 2000, 100)
-    private val dungeonsOnly by ToggleSetting("Only In Dungeons", true)
+    private val dungeonsOnly by ToggleSetting("Only in Dungeons", true)
 
     private var lastPacketTime = System.currentTimeMillis()
 

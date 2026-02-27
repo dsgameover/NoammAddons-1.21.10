@@ -3,12 +3,12 @@ package com.github.noamm9.features.impl.dungeon
 import com.github.noamm9.config.PersonalBest
 import com.github.noamm9.event.impl.*
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.showIf
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.showIf
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.ChatUtils.unformattedText
 import com.github.noamm9.utils.MathUtils.center
@@ -30,14 +30,14 @@ import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics features") {
-    private val relicBox by ToggleSetting("Box Relics").withDescription("Draws a box on where the relics are spawning and the cauldron u need to place")
-    private val relicSpawnTimer by ToggleSetting("Spawn Timer").withDescription("Shows on screen when the relic will spawn")
-    private val relicTimer by ToggleSetting("Place Timer").withDescription("Sends in chat the time it took to place the relic after u picked it up")
-    private val relicLook by ToggleSetting("Relic Look").withDescription("Automatically rotate to the relic cauldron after u pick it up")
+    private val relicBox by ToggleSetting("Box Relics").withDescription("Draws a box on where the relics are spawning and the cauldron you need to place.")
+    private val relicSpawnTimer by ToggleSetting("Spawn Timer").withDescription("Shows on screen when the relic will spawn.")
+    private val relicTimer by ToggleSetting("Place Timer").withDescription("Sends in chat the time it took to place the relic after you picked it up.")
+    private val relicLook by ToggleSetting("Relic Look").withDescription("Automatically rotate to the relic cauldron after yoo pick it up.")
     private val relicLookTime by SliderSetting("Relic Look Time", 150L, 10, 300, 1).showIf { relicLook.value }.withDescription("How fast should the auto rotate (in milliseconds)")
-    private val blockWrongRelic by ToggleSetting("Block Wrong Relic").withDescription("Prevents you from placing your relic at the wrong cauldron")
+    private val blockWrongRelic by ToggleSetting("Block Wrong Relic").withDescription("Prevents you from placing your relic at the wrong cauldron.")
 
-    private val relicAura by ToggleSetting("Relic Aura").withDescription("Automatically pick up the relic when it spawns")
+    private val relicAura by ToggleSetting("Relic Aura").withDescription("Automatically pick up the relic when it spawns.")
     private var lastClick = System.currentTimeMillis()
 
     private val relicPickUpRegex = Regex("^(\\w{3,16}) picked the Corrupted (\\w{3,6}) Relic!$")
@@ -94,7 +94,7 @@ object M7Relics: Feature(name = "M7 Relics", description = "A bunch of M7 Relics
 
         register<MainThreadPacketReceivedEvent.Post> {
             if (! relicLook.value || LocationUtils.F7Phase != 5) return@register
-            if (event.packet is ClientboundContainerSetSlotPacket) return@register
+            if (event.packet !is ClientboundContainerSetSlotPacket) return@register
             val item = PlayerUtils.getHotbarSlot(8)?.hoverName ?: return@register
             val relic = WitherRelic.fromName(item.unformattedText) ?: return@register
             if (relic == WitherRelic.RED || relic == WitherRelic.ORANGE) scope.launch {

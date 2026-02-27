@@ -13,7 +13,7 @@ import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import java.util.concurrent.ConcurrentHashMap
 
-object RunSplits: Feature("A Splits HUD for Dungeons") {
+object RunSplits: Feature("A Splits HUD for Dungeons.") {
     private val runEndRegex = Regex("^\\s*☠ Defeated (.+) in 0?([\\dhms ]+?)\\s*(\\(NEW RECORD!\\))?$")
     private val floorSplits by lazy {
         DataDownloader.loadJson<Map<String, List<Map<String, String?>>>>("runSplits.json").mapValues {

@@ -2,10 +2,10 @@ package com.github.noamm9.features.impl.dungeon
 
 import com.github.noamm9.event.impl.PlayerInteractEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.Utils.equalsOneOf
 import com.github.noamm9.utils.dungeons.map.core.RoomType
 import com.github.noamm9.utils.dungeons.map.utils.ScanUtils
@@ -17,8 +17,8 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.world.level.block.Blocks
 
 object BreakerHelper: Feature("Zero Ping Dungeon Breaker") {
-    private val preventBreakingSecrets by ToggleSetting("Prevent Secret Mine").withDescription("Prevents you from breaking secret blocks like chests lever")
-    private val zeroPing by ToggleSetting("Zero Ping").withDescription("Removes the blocks u mine instantly instead of waiting for the server to remove them")
+    private val preventBreakingSecrets by ToggleSetting("Prevent Secret Mine").withDescription("Prevents you from breaking secret blocks like chests, levers.")
+    private val zeroPing by ToggleSetting("Zero Ping").withDescription("Removes the blocks you mine instantly instead of waiting for the server to remove them.")
 
     private val blacklist = setOf(
         Blocks.BARRIER, Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.TNT, Blocks.CHEST, Blocks.PLAYER_HEAD,

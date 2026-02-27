@@ -3,7 +3,7 @@ package com.github.noamm9.mixin;
 import com.github.noamm9.event.EventBus;
 import com.github.noamm9.event.impl.ScreenEvent;
 import com.github.noamm9.features.impl.misc.Camera;
-import com.github.noamm9.ui.nodification.NotificationManager;
+import com.github.noamm9.ui.notification.NotificationManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;

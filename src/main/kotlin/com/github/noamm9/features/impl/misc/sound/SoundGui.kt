@@ -2,7 +2,7 @@ package com.github.noamm9.features.impl.misc.sound
 
 import com.github.noamm9.NoammAddons
 import com.github.noamm9.ui.clickgui.ClickGuiScreen
-import com.github.noamm9.ui.clickgui.componnents.Style
+import com.github.noamm9.ui.clickgui.components.Style
 import com.github.noamm9.ui.utils.Animation
 import com.github.noamm9.ui.utils.Resolution
 import com.github.noamm9.ui.utils.TextInputHandler

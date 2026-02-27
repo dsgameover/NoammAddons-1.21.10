@@ -5,10 +5,10 @@ import com.github.noamm9.event.impl.RenderOverlayEvent
 import com.github.noamm9.event.impl.TickEvent
 import com.github.noamm9.event.impl.WorldChangeEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.DropdownSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.DropdownSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.NumbersUtils.toFixed
 import com.github.noamm9.utils.items.ItemUtils.skyblockId
@@ -17,7 +17,7 @@ import com.github.noamm9.utils.render.Render2D
 import com.github.noamm9.utils.render.Render2D.width
 import net.minecraft.world.entity.EquipmentSlot
 
-object MaskTimers: Feature("Mask Cooldwon Timers, Invulnerability Timers and more") {
+object MaskTimers: Feature("Mask Cooldown Timers, Invulnerability Timers, and more") {
     private val onlyInDungeon by ToggleSetting("Dungeons Only")
     private val maskTimerStyle by DropdownSetting("Style", 0, listOf("NoammAddons", "Zyryon"))
 

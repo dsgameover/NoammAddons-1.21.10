@@ -3,13 +3,13 @@ package com.github.noamm9.features.impl.general.teleport
 import com.github.noamm9.event.impl.MainThreadPacketReceivedEvent
 import com.github.noamm9.event.impl.PacketEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.ui.clickgui.componnents.getValue
-import com.github.noamm9.ui.clickgui.componnents.impl.ButtonSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SliderSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.SoundSetting
-import com.github.noamm9.ui.clickgui.componnents.impl.ToggleSetting
-import com.github.noamm9.ui.clickgui.componnents.provideDelegate
-import com.github.noamm9.ui.clickgui.componnents.withDescription
+import com.github.noamm9.ui.clickgui.components.getValue
+import com.github.noamm9.ui.clickgui.components.impl.ButtonSetting
+import com.github.noamm9.ui.clickgui.components.impl.SliderSetting
+import com.github.noamm9.ui.clickgui.components.impl.SoundSetting
+import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
+import com.github.noamm9.ui.clickgui.components.provideDelegate
+import com.github.noamm9.ui.clickgui.components.withDescription
 import com.github.noamm9.utils.MathUtils.toVec
 import com.github.noamm9.utils.PlayerUtils
 import com.github.noamm9.utils.Utils.equalsOneOf
@@ -23,7 +23,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.level.block.Blocks
 
 object EtherwarpSound: Feature() {
-    private val zeroPingSound by ToggleSetting("Zero-Ping Sound").withDescription("plays the Etherwarp Sound Client-side instead of waiting for the server to send the sound packet")
+    private val zeroPingSound by ToggleSetting("Zero-Ping Sound").withDescription("Plays the Etherwarp sound client-side instead of waiting for the server to send the sound packet")
     private val sound by SoundSetting("Sound", SoundEvents.EXPERIENCE_ORB_PICKUP).withDescription("The internal Minecraft sound key to play.")
     private val volume by SliderSetting("Volume", 0.5f, 0f, 1f, 0.1f).withDescription("The loudness of the sound.")
     private val pitch by SliderSetting("Pitch", 1f, 0f, 2f, 0.1f).withDescription("The pitch/frequency of the sound.")
