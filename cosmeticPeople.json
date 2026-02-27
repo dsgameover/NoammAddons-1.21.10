@@ -124,5 +124,9 @@
   },
   "ca793999-348f-41cd-9370-1afd861716c1": {
     "name": "{\"text\":\"\",\"extra\":[{\"text\":\"h\",\"color\":\"#54DAF4\"},{\"text\":\"a\",\"color\":\"#51B3E7\"},{\"text\":\"e\",\"color\":\"#5090D9\"},{\"text\":\"l\",\"color\":\"#5173C8\"},{\"text\":\"6\",\"color\":\"#545EB6\"}]}"
+  },
+  "36a232f5-901f-48d1-b630-0e025a9a8ca3": {
+    "name": "{\"text\":\"\",\"extra\":[{\"text\":\"a\",\"color\":\"#F6ADC6\",\"bold\":true},{\"text\":\"t\",\"color\":\"#F89ABA\",\"bold\":true},{\"text\":\"0\",\"color\":\"#F987AE\",\"bold\":true},{\"text\":\"w\",\"color\":\"#FB73A1\",\"bold\":true},{\"text\":\"0\",\"color\":\"#FC6095\",\"bold\":true}]}"
   }
 }
+
