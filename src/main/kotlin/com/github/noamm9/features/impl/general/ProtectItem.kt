@@ -29,10 +29,7 @@ import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 
 object ProtectItem: Feature("Prevents dropping or selling important items via /protectitem or the keybind.") {
-    private val data = PogObject("item_protection", mutableMapOf<String, List<String>>(
-        "uuids" to listOf(),
-        "ids" to listOf()
-    ))
+    private val data = PogObject("item_protection", mutableMapOf<String, List<String>>("uuids" to emptyList(), "ids" to emptyList()))
 
     private val protectBind by KeybindSetting("Protect Key", GLFW.GLFW_KEY_L).section("Keybind").withDescription("Press while hovering an item in an inventory to protect/unprotect it via UUID.")
     private val showProtected by ToggleSetting("Show Protected Items").withDescription("Shows protected items in the menu with a small icon indicator.")
@@ -73,12 +70,11 @@ object ProtectItem: Feature("Prevents dropping or selling important items via /p
         }
 
         register<KeyboardEvent.KeyPressed> {
-            if (! enabled || mc.screen != null) return@register
             if (LocationUtils.inDungeon) return@register
-
-            val dropKey = mc.options.keyDrop.matches(event.keyEvent)
-            if (!dropKey || event.action != GLFW.GLFW_PRESS) return@register
+            if (mc.screen != null) return@register
+            if (! mc.options.keyDrop.matches(event.keyEvent)) return@register
             val heldItem = mc.player?.inventory?.selectedItem ?: return@register
+
             if (getProtectType(heldItem) != ProtectType.None) {
                 NotificationManager.push("Action Blocked", "This item is protected!", 1500L)
                 event.isCanceled = true
@@ -109,9 +105,9 @@ object ProtectItem: Feature("Prevents dropping or selling important items via /p
         }
 
         register<ContainerEvent.Render.Slot.Post> {
-            if (!showProtected.value) return@register
+            if (! showProtected.value) return@register
             val stack = event.slot.item.takeUnless { it.isEmpty } ?: return@register
-            if (getProtectType(stack) != ProtectType.None){
+            if (getProtectType(stack) != ProtectType.None) {
                 val x = event.slot.x + 1
                 val y = event.slot.y + 1
                 Render2D.drawString(event.context, "§aP", x, y, scale = 0.75, shadow = true)
@@ -156,10 +152,7 @@ object ProtectItem: Feature("Prevents dropping or selling important items via /p
         val data = data.getData()
         val set = data[key]?.toMutableSet() ?: return
 
-        if (set.contains(id)) {
-            set.remove(id)
-            NotificationManager.push("&cProtection Removed", "No longer protecting $label.")
-        }
+        if (set.remove(id)) NotificationManager.push("&cProtection Removed", "No longer protecting $label.")
         else {
             set.add(id)
             NotificationManager.push("&aProtection Added", "Now protecting $label.")
