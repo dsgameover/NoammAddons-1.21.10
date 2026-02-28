@@ -4,7 +4,6 @@ import com.github.noamm9.config.PogObject
 import com.github.noamm9.event.impl.ContainerEvent
 import com.github.noamm9.event.impl.KeyboardEvent
 import com.github.noamm9.features.Feature
-import com.github.noamm9.mixin.IKeyMapping
 import com.github.noamm9.ui.clickgui.components.getValue
 import com.github.noamm9.ui.clickgui.components.impl.KeybindSetting
 import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
