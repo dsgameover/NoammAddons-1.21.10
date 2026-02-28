@@ -10,19 +10,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import java.util.Objects;
 
 @Mixin(ItemModelResolver.class)
-public class MixinLivingEntityItem {
-    @ModifyVariable(
-            method = "updateForLiving",
-            at = @At("HEAD"),
-            argsOnly = true,
-            ordinal = 0
-    )
+public class MixinItemModelResolver {
+    @ModifyVariable(method = "updateForLiving", at = @At("HEAD"), argsOnly = true)
     private ItemStack revertAxe(ItemStack original) {
-        if (original == null || original.isEmpty()) {
-            return original;
-        }
-
-        ItemStack replacement = RevertAxes.INSTANCE.shouldReplace(original);
+        if (original == null || original.isEmpty()) return original;
+        ItemStack replacement = RevertAxes.shouldReplace(original);
         return Objects.requireNonNullElse(replacement, original);
     }
 }
