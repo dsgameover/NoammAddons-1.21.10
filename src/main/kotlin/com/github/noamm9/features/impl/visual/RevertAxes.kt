@@ -9,6 +9,7 @@ object RevertAxes: Feature("Turns certain swords back into an axe") {
     private val replaceableItems = hashMapOf(
         Pair("RAGNAROCK_AXE", Items.GOLDEN_AXE),
         Pair("DAEDALUS_AXE", Items.GOLDEN_AXE),
+        Pair("STARRED_DAEDALUS_AXE", Items.GOLDEN_AXE),
         Pair("AXE_OF_THE_SHREDDED", Items.DIAMOND_AXE)
     )
 
