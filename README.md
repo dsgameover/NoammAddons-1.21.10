@@ -5,8 +5,6 @@
 
 > 1.21.10 port of the greatest skyblock mod ever!
 
-<img width="2559" height="1439" alt="image" src="https://github.com/user-attachments/assets/4185f869-e178-408d-8f28-987c9d8e1bf4" />
-
 ----
 
 ## How to install?

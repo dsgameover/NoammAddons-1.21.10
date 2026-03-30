@@ -18,10 +18,7 @@ base {
 
 repositories {
     maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
-    maven {
-        name = 'ParchmentMC'
-        url = 'https://maven.parchmentmc.org'
-    }
+    maven { url = 'https://maven.parchmentmc.org' }
 }
 
 dependencies {
@@ -76,47 +73,23 @@ jar {
 
 sourceSets {
     main {
-        java {
-            setSrcDirs(["src/main/java"])
-        }
-        kotlin {
-            setSrcDirs(["src/main/kotlin"])
-        }
-        resources {
-            setSrcDirs(["src/main/resources"])
-        }
+        java { setSrcDirs(["src/main/java"]) }
+        kotlin { setSrcDirs(["src/main/kotlin"]) }
+        resources { setSrcDirs(["src/main/resources"]) }
     }
     cheat {
-        java {
-            setSrcDirs(["${buildDir}/preprocessed/cheat/java"])
-        }
-        kotlin {
-            setSrcDirs(["${buildDir}/preprocessed/cheat/kotlin"])
-        }
-        resources {
-            setSrcDirs(["src/main/resources"])
-        }
+        java { setSrcDirs(["${buildDir}/preprocessed/cheat/java"]) }
+        kotlin { setSrcDirs(["${buildDir}/preprocessed/cheat/kotlin"]) }
+        resources { setSrcDirs(["src/main/resources"]) }
         compileClasspath += sourceSets.main.compileClasspath
         runtimeClasspath += sourceSets.main.runtimeClasspath
     }
-}
-
-tasks.named("compileKotlin").configure {
-    dependsOn("preprocessLegit")
-    inputs.dir("src/main/kotlin")
-    inputs.dir("${buildDir}/preprocessed/legit/kotlin")
-    doFirst {
-        source = fileTree("${buildDir}/preprocessed/legit/kotlin") { include "**/*.kt" }
-    }
-    kotlinOptions.freeCompilerArgs += ["-Xjava-source-roots=${buildDir}/preprocessed/legit/java"]
-}
-
-tasks.named("compileJava").configure {
-    dependsOn("preprocessLegit", "compileKotlin")
-    inputs.dir("src/main/java")
-    inputs.dir("${buildDir}/preprocessed/legit/java")
-    doFirst {
-        source = fileTree("${buildDir}/preprocessed/legit/java") { include "**/*.java" }
+    legit {
+        java { setSrcDirs(["${buildDir}/preprocessed/legit/java"]) }
+        kotlin { setSrcDirs(["${buildDir}/preprocessed/legit/kotlin"]) }
+        resources { setSrcDirs(["src/main/resources"]) }
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
     }
 }
 
@@ -128,6 +101,10 @@ tasks.named("compileCheatKotlin").configure {
     kotlinOptions {
         jvmTarget = 21
     }
+}
+
+tasks.named("compileKotlin").configure {
+    kotlinOptions.freeCompilerArgs += ["-Xjava-source-roots=${project.projectDir}/src/main/java"]
 }
 
 tasks.named("compileCheatJava").configure {
@@ -142,10 +119,40 @@ tasks.named("cheatClasses").configure {
     dependsOn("compileCheatKotlin", "compileCheatJava")
 }
 
+tasks.named("compileLegitKotlin").configure {
+    dependsOn("preprocessLegit")
+    inputs.dir("src/main/kotlin")
+    inputs.dir("${buildDir}/preprocessed/legit/kotlin")
+    kotlinOptions.freeCompilerArgs += ["-Xjava-source-roots=${buildDir}/preprocessed/legit/java"]
+}
+
+tasks.named("compileLegitJava").configure {
+    dependsOn("preprocessLegit", "compileLegitKotlin")
+    inputs.dir("src/main/java")
+    inputs.dir("${buildDir}/preprocessed/legit/java")
+    options.release = 21
+    classpath += files(tasks.named("compileLegitKotlin").flatMap { it.destinationDirectory })
+}
+
+tasks.named("legitClasses").configure {
+    dependsOn("compileLegitKotlin", "compileLegitJava")
+}
+
 tasks.register("jarCheat", Jar) {
     dependsOn("cheatClasses", "processCheatResources")
     from(sourceSets.cheat.output)
     archiveClassifier = "cheat"
+    destinationDirectory = file("${project.layout.buildDirectory.get()}/tmp/intermediateJars")
+
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+tasks.register("jarLegit", Jar) {
+    dependsOn("legitClasses", "processLegitResources")
+    from(sourceSets.legit.output)
+    archiveClassifier = "legit"
     destinationDirectory = file("${project.layout.buildDirectory.get()}/tmp/intermediateJars")
 
     from("LICENSE") {
@@ -161,43 +168,61 @@ tasks.register("remapJarCheat", net.fabricmc.loom.task.RemapJarTask) {
     classpath.from(sourceSets.cheat.runtimeClasspath)
 }
 
+tasks.named('remapJar') {
+    dependsOn("jarLegit")
+    inputFile = tasks.named("jarLegit").flatMap { it.archiveFile }
+    archiveFileName = "$mod_name - ${version}-legit.jar"
+    destinationDirectory = file("${project.layout.buildDirectory.get()}/libs")
+    classpath.from(sourceSets.legit.runtimeClasspath)
+}
+
 test {
     failOnNoDiscoveredTests = false
 }
-
-publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId = archives_base_name
-            from components.java
-        }
-    }
-
-    repositories {
-    }
-}
-
-tasks.named('remapJar') {
-    archiveFileName = "$mod_name - ${version}-legit.jar"
-}
-
 kotlin {
     jvmToolchain(21)
 }
 
-tasks.register("buildAll") {
-    dependsOn("remapJar", "remapJarCheat")
+publishing {
+    publications {
+        create("mavenLegit", MavenPublication) {
+            artifactId = "legit"
+            artifact(tasks.named("remapJar"))
+        }
+        create("mavenCheat", MavenPublication) {
+            artifactId = "cheat"
+            artifact(tasks.named("remapJarCheat"))
+        }
+    }
 }
 
 loom {
     runs {
+        client { ideConfigGenerated = false }
+        server { ideConfigGenerated = false }
         cheatClient {
             inherit client
             name "Cheat Client"
             runDir "run/"
+            source sourceSets.main
+        }
+        cheatClientPreprocessed {
+            inherit client
+            name "Cheat Client (Preprocessed)"
+            runDir "run/"
             source sourceSets.cheat
         }
+        legitClientPreprocessed {
+            inherit client
+            name "Legit Client (Preprocessed)"
+            runDir "run/"
+            source sourceSets.legit
+        }
     }
+}
+
+tasks.named('build') {
+    dependsOn("remapJarCheat", "remapJar")
 }
 
 apply from: file('preprocess.gradle')

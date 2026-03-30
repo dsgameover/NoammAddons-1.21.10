@@ -2,17 +2,18 @@ package com.github.noamm9.features.impl.dev
 
 import com.github.noamm9.NoammAddons
 import com.github.noamm9.features.Feature
+import com.github.noamm9.features.impl.dev.text.TextReplacer
 import com.github.noamm9.ui.clickgui.components.getValue
 import com.github.noamm9.ui.clickgui.components.impl.ButtonSetting
 import com.github.noamm9.ui.clickgui.components.impl.ToggleSetting
 import com.github.noamm9.ui.clickgui.components.provideDelegate
 import com.github.noamm9.ui.notification.NotificationManager
+import com.github.noamm9.utils.ChatUtils
 import com.github.noamm9.utils.NumbersUtils
 import com.github.noamm9.utils.network.ProfileUtils
 import com.github.noamm9.utils.network.WebUtils
 import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.vertex.PoseStack
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey
@@ -27,7 +28,7 @@ object Cosmetics: Feature(toggled = true) {
     val customNames by ToggleSetting("Show Custom Names", true)
     val customSizes by ToggleSetting("Show Custom Sizes", true)
     val reload by ButtonSetting("Reload Cosmetics") {
-        if (System.currentTimeMillis() - lastReload >= 300_000) init()
+        if (System.currentTimeMillis() - lastReload >= 15_000) init()
         else NotificationManager.push("Cosmetics", "Please wait another ${NumbersUtils.formatTime(150_000 - (System.currentTimeMillis() - lastReload))} before reloading again.")
     }
 
@@ -35,17 +36,22 @@ object Cosmetics: Feature(toggled = true) {
     lateinit var cosmeticPeople: Map<UUID, CosmeticData>
 
     override fun init() {
-        scope.launch(Dispatchers.IO) {
+        scope.launch(WebUtils.networkDispatcher) {
             lastReload = System.currentTimeMillis()
+            NoammAddons.logger.info("fetching cosmeticPeople")
             WebUtils.getAs<Map<String, CosmeticData>>("https://old-api.noamm.org/cosmeticPeople.json").onSuccess { data ->
                 cosmeticPeople = data.mapKeys { UUID.fromString(it.key) }
+                val customNames = HashMap<String, String>()
 
                 cosmeticPeople.filter { it.value.hasCustomName }.forEach { (uuid, cosmetic) ->
                     val profile = ProfileUtils.getNameByUUID(uuid.toString()).getOrThrow()
-                    TextReplacer.replaceMap[profile.name] = cosmetic.name
+                    customNames[profile.name] = cosmetic.name
                 }
+
+                TextReplacer.setCustomReplacements(customNames)
             }.onFailure { cause ->
                 NoammAddons.logger.error("Failed to load cosmetic people", cause)
+                ChatUtils.modMessage("&cFailed to load cosmetic people: ${cause.message}")
             }
         }
     }
